@@ -55,6 +55,8 @@ export default function Navbar() {
               >
                 Home
               </Link>
+            
+              <SignedIn>
               <Link 
                 href="/projects" 
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
@@ -65,27 +67,6 @@ export default function Navbar() {
               >
                 Projects
               </Link>
-              <SignedIn>
-                <Link 
-                  href="/dashboard" 
-                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                    isActive('/dashboard') 
-                      ? 'border-blue-500 text-gray-900' 
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                  }`}
-                >
-                  Dashboard
-                </Link>
-                <Link 
-                  href="/messages" 
-                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                    isActive('/messages') 
-                      ? 'border-blue-500 text-gray-900' 
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                  }`}
-                >
-                  Messages
-                </Link>
               </SignedIn>
             </div>
           </div>
