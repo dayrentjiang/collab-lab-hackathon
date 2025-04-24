@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { getRecommendedProjects } from '../types/mockData';
+import { getRecommendedProjects } from '@/types/mockData';
 import ProjectCard from './components/ProjectCard';
 import SkillCategoryTabs from './components/SkillCategoryTabs';
 import { PlusIcon, SearchIcon, UserIcon } from 'lucide-react';
-import { ProjectWithRelations } from '../types/types';
+import { ProjectWithRelations } from '@/types/types';
 
 export default async function Home({
   searchParams
