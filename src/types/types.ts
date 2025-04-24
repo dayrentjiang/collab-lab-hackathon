@@ -3,6 +3,7 @@
 // Base types that correspond directly to database tables
 export type User = {
   user_id: number;
+  user_clerk_id: string;
   user_email: string;
   user_password?: string; // Optional, usually not returned from database
   user_name: string;
@@ -10,7 +11,7 @@ export type User = {
   user_role: "student" | "admin" | "mentor";
   user_linkedin_link?: string;
   user_university?: string;
-  has_completed_personalized : boolean;
+  has_completed_personalized: boolean;
   created_at: string;
   updated_at: string;
 };
