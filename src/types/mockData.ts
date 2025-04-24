@@ -177,6 +177,7 @@ export const MOCK_USERS: User[] = [
 
 // User Skills (junction table)
 export const MOCK_USER_SKILLS: UserSkill[] = [
+<<<<<<< HEAD
   { user_id: 1, skill_id: 1 }, // Alex - React
   { user_id: 1, skill_id: 2 }, // Alex - TypeScript
   { user_id: 1, skill_id: 3 }, // Alex - Next.js
@@ -198,6 +199,29 @@ export const MOCK_USER_SKILLS: UserSkill[] = [
   { user_id: 5, skill_id: 3 }, // Jamie - Next.js
   { user_id: 5, skill_id: 5 }, // Jamie - Node.js
   { user_id: 5, skill_id: 7 } // Jamie - PostgreSQL
+=======
+  { user_id: "1", skill_id: 1 }, // Alex - React
+  { user_id: "1", skill_id: 2 }, // Alex - TypeScript
+  { user_id: "1", skill_id: 3 }, // Alex - Next.js
+  { user_id: "1", skill_id: 14 }, // Alex - Git
+
+  { user_id: "2", skill_id: 5 }, // Taylor - Node.js
+  { user_id: "2", skill_id: 6 }, // Taylor - Express
+  { user_id: "2", skill_id: 8 }, // Taylor - MongoDB
+  { user_id: "2", skill_id: 14 }, // Taylor - Git
+
+  { user_id: "3", skill_id: 10 }, // Jordan - Figma
+  { user_id: "3", skill_id: 11 }, // Jordan - UI/UX Design
+  { user_id: "3", skill_id: 12 }, // Jordan - Adobe XD
+
+  { user_id: "4", skill_id: 13 }, // Dr. Chen - Project Management
+  { user_id: "4", skill_id: 15 }, // Dr. Chen - Agile/Scrum
+
+  { user_id: "5", skill_id: 1 }, // Jamie - React
+  { user_id: "5", skill_id: 3 }, // Jamie - Next.js
+  { user_id: "5", skill_id: 5 }, // Jamie - Node.js
+  { user_id: "5", skill_id: 7 } // Jamie - PostgreSQL
+>>>>>>> origin/develop
 ];
 
 // Mock Projects
@@ -308,64 +332,109 @@ export const MOCK_PROJECT_SKILLS: ProjectSkill[] = [
 // User Projects (junction table with role)
 export const MOCK_USER_PROJECTS: UserProject[] = [
   {
+<<<<<<< HEAD
     user_project_id: 1,
     user_id: 1,
+=======
+    user_project_id: "1",
+    user_id: "1",
+>>>>>>> origin/develop
     project_id: 1,
     user_role: "creator",
     joined_at: "2023-04-10T11:30:00Z"
   },
   {
+<<<<<<< HEAD
     user_project_id: 2,
     user_id: 2,
+=======
+    user_project_id: "2",
+    user_id: "2",
+>>>>>>> origin/develop
     project_id: 2,
     user_role: "creator",
     joined_at: "2023-03-15T09:45:00Z"
   },
   {
+<<<<<<< HEAD
     user_project_id: 3,
     user_id: 1,
+=======
+    user_project_id: "3",
+    user_id: "1",
+>>>>>>> origin/develop
     project_id: 2,
     user_role: "member",
     joined_at: "2023-03-20T14:30:00Z"
   },
   {
+<<<<<<< HEAD
     user_project_id: 4,
     user_id: 4,
+=======
+    user_project_id: "4",
+    user_id: "4",
+>>>>>>> origin/develop
     project_id: 3,
     user_role: "creator",
     joined_at: "2023-04-18T16:20:00Z"
   },
   {
+<<<<<<< HEAD
     user_project_id: 5,
     user_id: 3,
+=======
+    user_project_id: "5",
+    user_id: "3",
+>>>>>>> origin/develop
     project_id: 4,
     user_role: "creator",
     joined_at: "2023-04-22T10:15:00Z"
   },
   {
+<<<<<<< HEAD
     user_project_id: 6,
     user_id: 5,
+=======
+    user_project_id: "6",
+    user_id: "5",
+>>>>>>> origin/develop
     project_id: 5,
     user_role: "creator",
     joined_at: "2023-04-25T08:30:00Z"
   },
   {
+<<<<<<< HEAD
     user_project_id: 7,
     user_id: 2,
+=======
+    user_project_id: "7",
+    user_id: "2",
+>>>>>>> origin/develop
     project_id: 6,
     user_role: "creator",
     joined_at: "2023-02-05T08:30:00Z"
   },
   {
+<<<<<<< HEAD
     user_project_id: 8,
     user_id: 1,
+=======
+    user_project_id: "8",
+    user_id: "1",
+>>>>>>> origin/develop
     project_id: 6,
     user_role: "member",
     joined_at: "2023-02-10T09:15:00Z"
   },
   {
+<<<<<<< HEAD
     user_project_id: 9,
     user_id: 3,
+=======
+    user_project_id: "9",
+    user_id: "3",
+>>>>>>> origin/develop
     project_id: 6,
     user_role: "member",
     joined_at: "2023-02-12T11:45:00Z"
@@ -377,7 +446,11 @@ export const MOCK_APPLICATIONS: Application[] = [
   {
     application_id: 1,
     project_id: 1,
+<<<<<<< HEAD
     user_id: 3,
+=======
+    user_id: "3",
+>>>>>>> origin/develop
     application_msg:
       "I'm very interested in this project as I have extensive experience in UI/UX design. I've worked on similar portal redesigns and would love to contribute my skills to improve the student experience.",
     application_status: "pending",
@@ -386,7 +459,11 @@ export const MOCK_APPLICATIONS: Application[] = [
   {
     application_id: 2,
     project_id: 1,
+<<<<<<< HEAD
     user_id: 5,
+=======
+    user_id: "5",
+>>>>>>> origin/develop
     application_msg:
       "I'd like to join this project to contribute my frontend development skills. I've worked with React and Next.js extensively and am passionate about creating accessible interfaces.",
     application_status: "accepted",
@@ -395,7 +472,11 @@ export const MOCK_APPLICATIONS: Application[] = [
   {
     application_id: 3,
     project_id: 3,
+<<<<<<< HEAD
     user_id: 2,
+=======
+    user_id: "2",
+>>>>>>> origin/develop
     application_msg:
       "I have experience building database systems and would love to contribute to this research database project. My backend skills would be a great fit for this team.",
     application_status: "pending",
@@ -404,7 +485,11 @@ export const MOCK_APPLICATIONS: Application[] = [
   {
     application_id: 4,
     project_id: 4,
+<<<<<<< HEAD
     user_id: 1,
+=======
+    user_id: "1",
+>>>>>>> origin/develop
     application_msg:
       "As someone who struggles with budgeting, I'm excited about this project! I can contribute my React and Next.js skills to build a great frontend for this tool.",
     application_status: "rejected",
@@ -413,7 +498,11 @@ export const MOCK_APPLICATIONS: Application[] = [
   {
     application_id: 5,
     project_id: 5,
+<<<<<<< HEAD
     user_id: 3,
+=======
+    user_id: "3",
+>>>>>>> origin/develop
     application_msg:
       "I'd love to help design the user interface for this AR app. I have some experience with AR design principles and can ensure the app is intuitive and visually appealing.",
     application_status: "pending",
@@ -425,8 +514,13 @@ export const MOCK_APPLICATIONS: Application[] = [
 export const MOCK_MESSAGES: Message[] = [
   {
     msg_id: 1,
+<<<<<<< HEAD
     msg_sender_id: 1,
     msg_receiver_id: 3,
+=======
+    msg_sender_id: "1",
+    msg_receiver_id: "3",
+>>>>>>> origin/develop
     msg_content:
       "Hi Jordan, I saw your application for the Student Portal Redesign. Would you be available for a quick chat this week to discuss your design ideas?",
     sent_at: "2023-04-13T15:30:00Z",
@@ -434,8 +528,13 @@ export const MOCK_MESSAGES: Message[] = [
   },
   {
     msg_id: 2,
+<<<<<<< HEAD
     msg_sender_id: 3,
     msg_receiver_id: 1,
+=======
+    msg_sender_id: "3",
+    msg_receiver_id: "1",
+>>>>>>> origin/develop
     msg_content:
       "Hi Alex, I'd be happy to chat! How about Thursday at 3pm? I can share some of my initial thoughts for the redesign.",
     sent_at: "2023-04-13T16:45:00Z",
@@ -443,8 +542,13 @@ export const MOCK_MESSAGES: Message[] = [
   },
   {
     msg_id: 3,
+<<<<<<< HEAD
     msg_sender_id: 4,
     msg_receiver_id: 4, // Self (project message)
+=======
+    msg_sender_id: "4",
+    msg_receiver_id: "4", // Self (project message)
+>>>>>>> origin/develop
     project_id: 3,
     msg_content:
       "Welcome to the Academic Research Database project! I've created a shared document with the project requirements and initial database schema. Let's schedule our first team meeting next week.",
@@ -453,8 +557,13 @@ export const MOCK_MESSAGES: Message[] = [
   },
   {
     msg_id: 4,
+<<<<<<< HEAD
     msg_sender_id: 2,
     msg_receiver_id: 1,
+=======
+    msg_sender_id: "2",
+    msg_receiver_id: "1",
+>>>>>>> origin/develop
     msg_content:
       "Hey Alex, how's your part of the Campus Event Finder coming along? Let me know if you need any help with the API integration.",
     sent_at: "2023-04-22T14:20:00Z",
@@ -462,8 +571,13 @@ export const MOCK_MESSAGES: Message[] = [
   },
   {
     msg_id: 5,
+<<<<<<< HEAD
     msg_sender_id: 5,
     msg_receiver_id: 5, // Self (project message)
+=======
+    msg_sender_id: "5",
+    msg_receiver_id: "5", // Self (project message)
+>>>>>>> origin/develop
     project_id: 5,
     msg_content:
       "I've pushed the initial project setup to our GitHub repo. Everyone please clone it and make sure you can run it locally. Let me know if you encounter any issues.",
@@ -484,7 +598,11 @@ export async function getUserWithRelations(
 
   // Get user skills
   const userSkillIds = MOCK_USER_SKILLS.filter(
+<<<<<<< HEAD
     (us) => us.user_id === userId
+=======
+    (us) => us.user_id === userId.toString()
+>>>>>>> origin/develop
   ).map((us) => us.skill_id);
 
   const skills = MOCK_SKILLS.filter((skill) =>
@@ -492,7 +610,13 @@ export async function getUserWithRelations(
   );
 
   // Get user projects
+<<<<<<< HEAD
   const userProjects = MOCK_USER_PROJECTS.filter((up) => up.user_id === userId);
+=======
+  const userProjects = MOCK_USER_PROJECTS.filter(
+    (up) => up.user_id === userId.toString()
+  );
+>>>>>>> origin/develop
 
   const projectIds = userProjects.map((up) => up.project_id);
   const projects = MOCK_PROJECTS.filter((project) =>
@@ -536,7 +660,13 @@ export async function getProjectWithRelations(
     (up) => up.project_id === projectId
   );
   const memberIds = userProjects.map((up) => up.user_id);
+<<<<<<< HEAD
   const members = MOCK_USERS.filter((user) => memberIds.includes(user.user_id));
+=======
+  const members = MOCK_USERS.filter((user) =>
+    memberIds.includes(user.user_id.toString())
+  );
+>>>>>>> origin/develop
 
   // Get applications
   const applications = MOCK_APPLICATIONS.filter(
@@ -565,7 +695,13 @@ export async function getApplicationWithRelations(
   );
   if (!application) return null;
 
+<<<<<<< HEAD
   const user = MOCK_USERS.find((u) => u.user_id === application.user_id);
+=======
+  const user = MOCK_USERS.find(
+    (u) => u.user_id.toString() === application.user_id
+  );
+>>>>>>> origin/develop
   const project = MOCK_PROJECTS.find(
     (p) => p.project_id === application.project_id
   );
@@ -587,9 +723,17 @@ export async function getMessageWithRelations(
   const message = MOCK_MESSAGES.find((m) => m.msg_id === messageId);
   if (!message) return null;
 
+<<<<<<< HEAD
   const sender = MOCK_USERS.find((u) => u.user_id === message.msg_sender_id);
   const receiver = message.msg_receiver_id
     ? MOCK_USERS.find((u) => u.user_id === message.msg_receiver_id)
+=======
+  const sender = MOCK_USERS.find(
+    (u) => u.user_id.toString() === message.msg_sender_id
+  );
+  const receiver = message.msg_receiver_id
+    ? MOCK_USERS.find((u) => u.user_id.toString() === message.msg_receiver_id)
+>>>>>>> origin/develop
     : undefined;
 
   const project = message.project_id
@@ -715,7 +859,11 @@ export async function getUserApplicationsWithRelations(userId: number) {
   await new Promise((resolve) => setTimeout(resolve, 300));
 
   const applications = MOCK_APPLICATIONS.filter(
+<<<<<<< HEAD
     (app) => app.user_id === userId
+=======
+    (app) => app.user_id === userId.toString()
+>>>>>>> origin/develop
   );
 
   return Promise.all(
@@ -731,7 +879,13 @@ export async function getUserMessagesWithRelations(userId: number) {
   await new Promise((resolve) => setTimeout(resolve, 250));
 
   const messages = MOCK_MESSAGES.filter(
+<<<<<<< HEAD
     (msg) => msg.msg_sender_id === userId || msg.msg_receiver_id === userId
+=======
+    (msg) =>
+      msg.msg_sender_id === userId.toString() ||
+      msg.msg_receiver_id === userId.toString()
+>>>>>>> origin/develop
   );
 
   return Promise.all(
