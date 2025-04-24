@@ -103,6 +103,7 @@ import {
       user_role: 'student',
       user_linkedin_link: 'https://linkedin.com/in/alexr',
       user_university: 'Stanford University',
+      has_completed_personalized: false,
       created_at: '2023-01-15T08:00:00Z',
       updated_at: '2023-03-20T14:30:00Z'
     },
@@ -113,6 +114,7 @@ import {
       user_bio: 'Backend developer with experience in building RESTful APIs and database management.',
       user_role: 'student',
       user_university: 'MIT',
+      has_completed_personalized: false,
       created_at: '2023-02-10T10:30:00Z',
       updated_at: '2023-02-10T10:30:00Z'
     },
@@ -124,6 +126,7 @@ import {
       user_role: 'student',
       user_linkedin_link: 'https://linkedin.com/in/jordans',
       user_university: 'UCLA',
+      has_completed_personalized: false,
       created_at: '2023-01-22T15:45:00Z',
       updated_at: '2023-03-15T11:20:00Z'
     },
@@ -135,6 +138,7 @@ import {
       user_role: 'mentor',
       user_linkedin_link: 'https://linkedin.com/in/dr-chen',
       user_university: 'Stanford University',
+      has_completed_personalized: false,
       created_at: '2022-11-05T09:15:00Z',
       updated_at: '2023-04-01T16:30:00Z'
     },
@@ -145,6 +149,7 @@ import {
       user_bio: 'Full-stack developer interested in educational technology and accessibility.',
       user_role: 'student',
       user_university: 'UC Berkeley',
+      has_completed_personalized: false,
       created_at: '2023-01-30T13:20:00Z',
       updated_at: '2023-03-25T09:45:00Z'
     },
@@ -153,6 +158,7 @@ import {
       user_email: 'admin@collablab.edu',
       user_name: 'System Administrator',
       user_role: 'admin',
+      has_completed_personalized: false,
       created_at: '2022-10-01T00:00:00Z',
       updated_at: '2022-10-01T00:00:00Z'
     }
@@ -642,7 +648,7 @@ export async function getRecommendedProjects(category?: string): Promise<Project
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
   }
-  
+
 // Get user applications with project data
 export async function getUserApplicationsWithRelations(userId: number) {
   // Simulate API delay

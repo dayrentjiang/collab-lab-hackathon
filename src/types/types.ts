@@ -10,6 +10,7 @@ export type User = {
   user_role: "student" | "admin" | "mentor";
   user_linkedin_link?: string;
   user_university?: string;
+  has_completed_personalized : boolean;
   created_at: string;
   updated_at: string;
 };
