@@ -2,7 +2,7 @@
 
 // Base types that correspond directly to database tables
 export type User = {
-  user_id: string;
+  user_id: number;
   user_email: string;
   user_password?: string; // Optional, usually not returned from database
   user_name: string;
@@ -15,16 +15,16 @@ export type User = {
 };
 
 export type Skill = {
-  skill_id: string;
+  skill_id: number;
   skill_name: string;
   skill_category: string;
 };
 
 export type Project = {
-  project_id: string;
+  project_id: number;
   project_title: string;
   project_description: string;
-  project_creator_id: string; // Foreign key to User.user_id
+  project_creator_id: number; // Foreign key to User.user_id
   project_status: "recruiting" | "in_progress" | "completed";
   project_vacancy: number;
   project_timeline?: string;
@@ -33,37 +33,37 @@ export type Project = {
 };
 
 export type UserSkill = {
-  user_id: string; // Foreign key to User.user_id
-  skill_id: string; // Foreign key to Skill.skill_id
+  user_id: number; // Foreign key to User.user_id
+  skill_id: number; // Foreign key to Skill.skill_id
 };
 
 export type ProjectSkill = {
-  project_id: string; // Foreign key to Project.project_id
-  skill_id: string; // Foreign key to Skill.skill_id
+  project_id: number; // Foreign key to Project.project_id
+  skill_id: number; // Foreign key to Skill.skill_id
 };
 
 export type UserProject = {
-  user_project_id: string;
-  user_id: string; // Foreign key to User.user_id
-  project_id: string; // Foreign key to Project.project_id
+  user_project_id: number;
+  user_id: number; // Foreign key to User.user_id
+  project_id: number; // Foreign key to Project.project_id
   user_role: "creator" | "member"; // Role in the project
   joined_at: string;
 };
 
 export type Application = {
-  application_id: string;
-  project_id: string; // Foreign key to Project.project_id
-  user_id: string; // Foreign key to User.user_id
+  application_id: number;
+  project_id: number; // Foreign key to Project.project_id
+  user_id: number; // Foreign key to User.user_id
   application_msg: string;
   application_status: "pending" | "accepted" | "rejected";
   applied_at: string;
 };
 
 export type Message = {
-  msg_id: string;
-  msg_sender_id: string; // Foreign key to User.user_id
-  msg_receiver_id: string; // Foreign key to User.user_id
-  project_id?: string; // Foreign key to Project.project_id (optional for direct messages)
+  msg_id: number;
+  msg_sender_id: number; // Foreign key to User.user_id
+  msg_receiver_id: number; // Foreign key to User.user_id
+  project_id?: number; // Foreign key to Project.project_id (optional for direct messages)
   msg_content: string;
   sent_at: string;
   is_read: boolean;
