@@ -1,0 +1,114 @@
+import Link from 'next/link';
+import { User, Project, Skill, Application, Message } from '@/types/types';
+import { CalendarIcon, ClockIcon, UsersIcon } from 'lucide-react';
+
+type ProjectCardProps = {
+  project: Project;
+};
+
+export default function ProjectCard({ project }: ProjectCardProps) {
+  const {
+    project_id,
+    project_title,
+    project_description,
+    required_skills,
+    project_status,
+    project_vacancy,
+    project_members,
+    project_timeline,
+    created_at
+  } = project;
+
+  // Get the creator from the members list
+  const creator = project_members.find(member => member.user_id === project.project_creator_id);
+  
+  // Status badge color
+  const statusColors = {
+    'recruiting': 'bg-blue-100 text-blue-800',
+    'in_progress': 'bg-green-100 text-green-800',
+    'completed': 'bg-gray-100 text-gray-800'
+  };
+
+  // Format the creation date
+  const formattedDate = new Date(created_at).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition duration-300">
+      <div className="p-5">
+        <div className="flex justify-between items-start mb-3">
+          <h3 className="text-lg font-semibold text-gray-800 line-clamp-1">{project_title}</h3>
+          <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[project_status]}`}>
+            {project_status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+          </span>
+        </div>
+        
+        <p className="text-gray-600 text-sm mb-4 line-clamp-2">{project_description}</p>
+        
+        {/* Skills */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {required_skills.slice(0, 3).map(skill => (
+            <span 
+              key={skill.skill_id}
+              className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                skill.skill_category === 'frontend' ? 'bg-purple-100 text-purple-800' :
+                skill.skill_category === 'backend' ? 'bg-green-100 text-green-800' :
+                skill.skill_category === 'design' ? 'bg-pink-100 text-pink-800' :
+                'bg-gray-100 text-gray-800'
+              }`}
+            >
+              {skill.skill_name}
+            </span>
+          ))}
+          {required_skills.length > 3 && (
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+              +{required_skills.length - 3} more
+            </span>
+          )}
+        </div>
+        
+        {/* Project Info */}
+        <div className="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-xs text-gray-500">
+          {creator && (
+            <div className="flex items-center">
+              <div className="h-5 w-5 rounded-full bg-blue-500 flex items-center justify-center text-white text-[10px] mr-1.5">
+                {creator.user_name.substring(0, 2).toUpperCase()}
+              </div>
+              <span>{creator.user_name}</span>
+            </div>
+          )}
+          
+          <div className="flex items-center">
+            <UsersIcon className="h-3.5 w-3.5 mr-1" />
+            <span>{project_members.length}/{project_members.length + project_vacancy} members</span>
+          </div>
+          
+          {project_timeline && (
+            <div className="flex items-center">
+              <ClockIcon className="h-3.5 w-3.5 mr-1" />
+              <span>{project_timeline}</span>
+            </div>
+          )}
+          
+          <div className="flex items-center">
+            <CalendarIcon className="h-3.5 w-3.5 mr-1" />
+            <span>Posted {formattedDate}</span>
+          </div>
+        </div>
+        
+        {/* Action Button */}
+        <Link 
+          href={`/projects/${project_id}`}
+          className="block w-full py-2 bg-blue-500 text-white text-center rounded-full text-sm font-medium hover:bg-blue-600 transition"
+        >
+          {project_status === 'recruiting' 
+            ? 'View & Apply' 
+            : 'View Project'}
+        </Link>
+      </div>
+    </div>
+  );
+}
