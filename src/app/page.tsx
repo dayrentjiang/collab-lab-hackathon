@@ -1,42 +1,10 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { MOCK_PROJECTS } from '@/types/mockData';
-import { Project } from '@/types/types';
-
+import { getRecommendedProjects } from '../types/mockData';
 import ProjectCard from './components/ProjectCard';
 import SkillCategoryTabs from './components/SkillCategoryTabs';
-import { PlusIcon, SearchIcon } from 'lucide-react';
-
-// Add the getRecommendedProjects function here
-async function getRecommendedProjects(category?: string): Promise<Project[]> {
-  // Add a slight delay to simulate fetching data
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  let filteredProjects = [...MOCK_PROJECTS];
-  
-  // Apply category filter if provided
-  if (category) {
-    filteredProjects = filteredProjects.filter(project => 
-      project.required_skills.some(skill => skill.skill_category === category)
-    );
-  }
-  
-  // Sort by most recent first and show recruiting projects first
-  return filteredProjects
-    .sort((a, b) => {
-      // Status priority: recruiting > in_progress > completed
-      if (a.project_status !== b.project_status) {
-        if (a.project_status === 'recruiting') return -1;
-        if (b.project_status === 'recruiting') return 1;
-        if (a.project_status === 'in_progress') return -1;
-        if (b.project_status === 'in_progress') return 1;
-      }
-      
-      // Then sort by date (newest first)
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    })
-    .slice(0, 6); // Return top 6 recommended projects
-}
+import { PlusIcon, SearchIcon, UserIcon } from 'lucide-react';
+import { ProjectWithRelations } from '../types/types';
 
 export default async function Home({
   searchParams
@@ -49,7 +17,6 @@ export default async function Home({
   const projects = await getRecommendedProjects(category);
   
   return (
-    // Rest of your component remains unchanged
     <main className="container mx-auto px-4 py-8">
       {/* Hero Section */}
       <section className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
@@ -91,10 +58,10 @@ export default async function Home({
             : 'Recommended Projects'}
         </h2>
         
-        <Suspense fallback={<p className="text-center py-8 text-gray-500">Loading projects...</p>}>
+        <Suspense fallback={<ProjectsLoadingSkeleton />}>
           {projects.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.map(project => (
+              {projects.map((project: ProjectWithRelations) => (
                 <ProjectCard key={project.project_id} project={project} />
               ))}
             </div>
@@ -122,25 +89,95 @@ export default async function Home({
       <section className="mb-12">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6">Recent Activity</h2>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 divide-y divide-gray-200">
-          {/* This would typically come from a database */}
-          {[1, 2, 3].map((item) => (
-            <div key={item} className="p-4 flex items-start">
-              <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm mr-4">
-                US
-              </div>
-              <div>
-                <p className="text-gray-800">
-                  <span className="font-medium">User {item}</span>
-                  {' '}{item === 1 ? 'created a new project' : item === 2 ? 'joined a project' : 'completed a project'}
-                </p>
-                <p className="text-sm text-gray-500">2 hours ago</p>
-              </div>
-            </div>
-          ))}
+          <ActivityItem 
+            initials="AR"
+            name="Alex Rodriguez"
+            action="created a new project"
+            projectTitle="Student Portal Redesign"
+            time="2 days ago"
+          />
+          <ActivityItem 
+            initials="TK"
+            name="Taylor Kim"
+            action="joined"
+            projectTitle="Campus Event Finder App"
+            time="3 days ago"
+          />
+          <ActivityItem 
+            initials="JS"
+            name="Jordan Smith"
+            action="applied to"
+            projectTitle="Student Portal Redesign"
+            time="4 days ago"
+          />
+          <ActivityItem 
+            initials="MC"
+            name="Dr. Morgan Chen"
+            action="completed"
+            projectTitle="Research Database Initial Planning"
+            time="1 week ago"
+          />
         </div>
       </section>
     </main>
   );
 }
-   
- 
+
+// Loading skeleton for projects
+function ProjectsLoadingSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {[1, 2, 3, 4, 5, 6].map((i) => (
+        <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 animate-pulse">
+          <div className="flex justify-between mb-4">
+            <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+          </div>
+          <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
+          <div className="flex gap-2 mb-6">
+            <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+            <div className="h-6 bg-gray-200 rounded-full w-20"></div>
+            <div className="h-6 bg-gray-200 rounded-full w-14"></div>
+          </div>
+          <div className="flex justify-between mb-6">
+            <div className="h-5 bg-gray-200 rounded w-24"></div>
+            <div className="h-5 bg-gray-200 rounded w-24"></div>
+          </div>
+          <div className="h-9 bg-gray-200 rounded-full w-full"></div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Activity Item component
+function ActivityItem({ 
+  initials, 
+  name, 
+  action, 
+  projectTitle, 
+  time 
+}: { 
+  initials: string; 
+  name: string; 
+  action: string; 
+  projectTitle: string; 
+  time: string; 
+}) {
+  return (
+    <div className="p-4 flex items-start">
+      <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-medium mr-4">
+        {initials}
+      </div>
+      <div>
+        <p className="text-gray-800">
+          <span className="font-medium">{name}</span>
+          {' '}{action}{' '}
+          <Link href="#" className="text-blue-600 hover:underline">{projectTitle}</Link>
+        </p>
+        <p className="text-sm text-gray-500">{time}</p>
+      </div>
+    </div>
+  );
+}
