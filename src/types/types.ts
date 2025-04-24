@@ -1,53 +1,96 @@
 // types.ts
+
+// Base types that correspond directly to database tables
 export type User = {
-  user_id: string;
-  user_email: string;
-  user_password?: string; // Optional field
-  user_name: string;
-  user_bio?: string;
-  user_role: "students" | "admins" | "mentors"; // Enum for user roles
-  user_linkedin_link?: string;
-  user_university?: string;
-  user_skills: Skill[]; // Array of Skill objects
-  created_at: string;
-  updated_at: string;
+  userId: string;
+  email: string;
+  password?: string; // Optional, usually not returned from database
+  name: string;
+  bio?: string;
+  role: "students" | "admins" | "mentors";
+  linkedinLink?: string;
+  university?: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type Skill = {
-  skill_id: string;
-  skill_name: string; // e.g., React, Next.js, etc.
-  skill_category: "frontend" | "backend" | "design" | "other"; // Categories
+  skillId: string;
+  name: string;
+  category: string;
 };
 
 export type Project = {
-  project_id: string;
-  project_title: string;
-  project_description: string;
-  project_creator_id: string; // Foreign key to user_id
-  required_skills: Skill[]; // Array of required skills
-  project_status: "recruiting" | "in_progress" | "completed"; // Project status
-  project_vacancy: number; // How many members needed
-  project_members: User[]; // Array of team members
-  project_timeline?: string; // Optional timeline
-  created_at: string;
-  updated_at: string;
+  projectId: string;
+  title: string;
+  description: string;
+  creatorId: string; // Foreign key to User.userId
+  status: "recruiting" | "in_progress" | "completed";
+  vacancy: number;
+  timeline?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type UserSkill = {
+  userSkillId: string;
+  userId: string; // Foreign key to User.userId
+  skillId: string; // Foreign key to Skill.skillId
+};
+
+export type ProjectSkill = {
+  projectSkillId: string;
+  projectId: string; // Foreign key to Project.projectId
+  skillId: string; // Foreign key to Skill.skillId
+};
+
+export type UserProject = {
+  userProjectId: string;
+  userId: string; // Foreign key to User.userId
+  projectId: string; // Foreign key to Project.projectId
+  role: "creator" | "member";
+  joinedAt: string;
 };
 
 export type Application = {
-  application_id: string;
-  project_id: string; // Foreign key to project_id
-  user_id: string; // Foreign key to user_id
-  application_msg: string; // Motivation, self-introduction
-  application_status: "pending" | "accepted" | "rejected"; // Application status
-  applied_at: string; // Application timestamp
+  applicationId: string;
+  projectId: string; // Foreign key to Project.projectId
+  userId: string; // Foreign key to User.userId
+  message: string;
+  status: "pending" | "accepted" | "rejected";
+  appliedAt: string;
 };
 
 export type Message = {
-  msg_id: string;
-  msg_sender_id: string; // Foreign key to user_id
-  msg_receiver_id?: string; // Foreign key to user_id (optional for project messages)
-  project_id?: string; // Foreign key to project_id (optional for direct messages)
-  msg_content: string;
-  sent_at: string;
-  is_read: boolean;
+  messageId: string;
+  senderId: string; // Foreign key to User.userId
+  receiverId?: string; // Foreign key to User.userId (for direct messages)
+  projectId?: string; // Foreign key to Project.projectId (for project messages)
+  content: string;
+  sentAt: string;
+  isRead: boolean;
+};
+
+// Extended types that include related data (for API responses)
+export type UserWithRelations = User & {
+  skills?: Skill[];
+  projects?: Project[];
+};
+
+export type ProjectWithRelations = Project & {
+  creator?: User;
+  requiredSkills?: Skill[];
+  members?: User[];
+  applications?: Application[];
+};
+
+export type ApplicationWithRelations = Application & {
+  user?: User;
+  project?: Project;
+};
+
+export type MessageWithRelations = Message & {
+  sender?: User;
+  receiver?: User;
+  project?: Project;
 };
