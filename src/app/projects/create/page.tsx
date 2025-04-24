@@ -1,7 +1,7 @@
-import AddProjectForm from '../../components/AddProjectForm';
-'use client';
+"use client";
+import AddProjectForm from "../../components/AddProjectForm";
 
-import { useUser } from '@clerk/nextjs';
+import { useUser } from "@clerk/nextjs";
 
 export default function AddProjectPage() {
   const { user, isLoaded } = useUser();
