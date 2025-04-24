@@ -1,12 +1,18 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { supabase } from '@/lib/supabase';
 import { hash } from 'bcrypt';
 
 // GET /api/users - Get all users
 export async function GET() {
   try {
-    const users = await db.query('SELECT user_id, user_email, user_name, user_bio, user_role, user_linkedin_link, user_university, created_at, updated_at FROM users');
-    return NextResponse.json(users.rows);
+    const { data: users, error } = await supabase
+      .from('users').select('*');
+
+    if (error) {
+      throw error;
+    }
+
+    return NextResponse.json(users);
   } catch (error) {
     console.error('Error fetching users:', error);
     return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
@@ -20,8 +26,13 @@ export async function POST(req: Request) {
     const { user_email, user_password, user_name, user_bio, user_linkedin_link, user_university } = body;
 
     // Check if user already exists
-    const existingUser = await db.query('SELECT user_id FROM users WHERE user_email = $1', [user_email]);
-    if (existingUser.rows.length > 0) {
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('user_id')
+      .eq('user_email', user_email)
+      .single();
+
+    if (existingUser) {
       return NextResponse.json({ error: 'User already exists' }, { status: 400 });
     }
 
@@ -29,14 +40,25 @@ export async function POST(req: Request) {
     const hashedPassword = await hash(user_password, 10);
 
     // Insert new user
-    const result = await db.query(
-      `INSERT INTO users (user_email, user_password, user_name, user_bio, user_linkedin_link, user_university, user_role, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, 'user', NOW(), NOW())
-       RETURNING user_id, user_email, user_name, user_bio, user_role, user_linkedin_link, user_university, created_at, updated_at`,
-      [user_email, hashedPassword, user_name, user_bio, user_linkedin_link, user_university]
-    );
+    const { data: result, error } = await supabase
+      .from('users')
+      .insert({
+        user_email,
+        user_password: hashedPassword,
+        user_name,
+        user_bio,
+        user_linkedin_link,
+        user_university,
+        user_role: 'user'
+      })
+      .select()
+      .single();
 
-    return NextResponse.json(result.rows[0], { status: 201 });
+    if (error) {
+      throw error;
+    }
+
+    return NextResponse.json(result, { status: 201 });
   } catch (error) {
     console.error('Error creating user:', error);
     return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });

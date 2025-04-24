@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { supabase } from '@/lib/supabase';
 import { hash } from 'bcrypt';
 
 // GET /api/users/[userId] - Get a specific user
@@ -9,16 +9,17 @@ export async function GET(
 ) {
   try {
     const { userId } = params;
-    const user = await db.query(
-      'SELECT user_id, user_email, user_name, user_bio, user_role, user_linkedin_link, user_university, created_at, updated_at FROM users WHERE user_id = $1',
-      [userId]
-    );
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('user_id, user_email, user_name, user_bio, user_role, user_linkedin_link, user_university, created_at, updated_at')
+      .eq('user_id', userId)
+      .single();
 
-    if (user.rows.length === 0) {
+    if (error || !user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    return NextResponse.json(user.rows[0]);
+    return NextResponse.json(user);
   } catch (error) {
     console.error('Error fetching user:', error);
     return NextResponse.json({ error: 'Failed to fetch user' }, { status: 500 });
@@ -79,20 +80,26 @@ export async function PATCH(
     }
 
     values.push(userId);
-    const query = `
-      UPDATE users 
-      SET ${updates.join(', ')}
-      WHERE user_id = $${paramCount}
-      RETURNING user_id, user_email, user_name, user_bio, user_role, user_linkedin_link, user_university, created_at, updated_at
-    `;
+    const { data: result, error } = await supabase
+      .from('users')
+      .update({
+        ...(user_email && { user_email }),
+        ...(user_password && { user_password: await hash(user_password, 10) }),
+        ...(user_name && { user_name }),
+        ...(user_bio && { user_bio }),
+        ...(user_linkedin_link && { user_linkedin_link }),
+        ...(user_university && { user_university }),
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', userId)
+      .select()
+      .single();
 
-    const result = await db.query(query, values);
-
-    if (result.rows.length === 0) {
+    if (error || !result) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    return NextResponse.json(result.rows[0]);
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Error updating user:', error);
     return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
@@ -106,9 +113,12 @@ export async function DELETE(
 ) {
   try {
     const { userId } = params;
-    const result = await db.query('DELETE FROM users WHERE user_id = $1 RETURNING user_id', [userId]);
+    const { error } = await supabase
+      .from('users')
+      .delete()
+      .eq('user_id', userId);
 
-    if (result.rows.length === 0) {
+    if (error) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
