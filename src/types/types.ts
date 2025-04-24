@@ -35,7 +35,7 @@ export type Project = {
 };
 
 export type UserSkill = {
-  user_id: number; // Foreign key to User.user_id
+  user_id: string; // Foreign key to User.user_id
   skill_id: number; // Foreign key to Skill.skill_id
 };
 
@@ -45,8 +45,8 @@ export type ProjectSkill = {
 };
 
 export type UserProject = {
-  user_project_id: number;
-  user_id: number; // Foreign key to User.user_id
+  user_project_id: string;
+  user_id: string; // Foreign key to User.user_id
   project_id: number; // Foreign key to Project.project_id
   user_role: "creator" | "member"; // Role in the project
   joined_at: string;
@@ -55,7 +55,7 @@ export type UserProject = {
 export type Application = {
   application_id: number;
   project_id: number; // Foreign key to Project.project_id
-  user_id: number; // Foreign key to User.user_id
+  user_id: string; // Foreign key to User.user_id
   application_msg: string;
   application_status: "pending" | "accepted" | "rejected";
   applied_at: string;
@@ -63,8 +63,8 @@ export type Application = {
 
 export type Message = {
   msg_id: number;
-  msg_sender_id: number; // Foreign key to User.user_id
-  msg_receiver_id: number; // Foreign key to User.user_id
+  msg_sender_id: string; // Foreign key to User.user_id
+  msg_receiver_id: string; // Foreign key to User.user_id
   project_id?: number; // Foreign key to Project.project_id (optional for direct messages)
   msg_content: string;
   sent_at: string;
