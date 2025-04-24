@@ -2,73 +2,73 @@
 
 // Base types that correspond directly to database tables
 export type User = {
-  userId: string;
+  user_id: string;
   email: string;
   password?: string; // Optional, usually not returned from database
   name: string;
   bio?: string;
   role: "students" | "admins" | "mentors";
-  linkedinLink?: string;
+  linkedin_link?: string;
   university?: string;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 };
 
 export type Skill = {
-  skillId: string;
+  skill_id: string;
   name: string;
   category: string;
 };
 
 export type Project = {
-  projectId: string;
+  project_id: string;
   title: string;
   description: string;
-  creatorId: string; // Foreign key to User.userId
+  creator_id: string; // Foreign key to User.user_id
   status: "recruiting" | "in_progress" | "completed";
   vacancy: number;
   timeline?: string;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 };
 
 export type UserSkill = {
-  userSkillId: string;
-  userId: string; // Foreign key to User.userId
-  skillId: string; // Foreign key to Skill.skillId
+  user_skill_id: string;
+  user_id: string; // Foreign key to User.user_id
+  skill_id: string; // Foreign key to Skill.skill_id
 };
 
 export type ProjectSkill = {
-  projectSkillId: string;
-  projectId: string; // Foreign key to Project.projectId
-  skillId: string; // Foreign key to Skill.skillId
+  project_skill_id: string;
+  project_id: string; // Foreign key to Project.project_id
+  skill_id: string; // Foreign key to Skill.skill_id
 };
 
 export type UserProject = {
-  userProjectId: string;
-  userId: string; // Foreign key to User.userId
-  projectId: string; // Foreign key to Project.projectId
+  user_project_id: string;
+  user_id: string; // Foreign key to User.user_id
+  project_id: string; // Foreign key to Project.project_id
   role: "creator" | "member";
-  joinedAt: string;
+  joined_at: string;
 };
 
 export type Application = {
-  applicationId: string;
-  projectId: string; // Foreign key to Project.projectId
-  userId: string; // Foreign key to User.userId
+  application_id: string;
+  project_id: string; // Foreign key to Project.project_id
+  user_id: string; // Foreign key to User.user_id
   message: string;
   status: "pending" | "accepted" | "rejected";
-  appliedAt: string;
+  applied_at: string;
 };
 
 export type Message = {
-  messageId: string;
-  senderId: string; // Foreign key to User.userId
-  receiverId?: string; // Foreign key to User.userId (for direct messages)
-  projectId?: string; // Foreign key to Project.projectId (for project messages)
+  message_id: string;
+  sender_id: string; // Foreign key to User.user_id
+  receiver_id?: string; // Foreign key to User.user_id (for direct messages)
+  project_id?: string; // Foreign key to Project.project_id (for project messages)
   content: string;
-  sentAt: string;
-  isRead: boolean;
+  sent_at: string;
+  is_read: boolean;
 };
 
 // Extended types that include related data (for API responses)
@@ -79,7 +79,7 @@ export type UserWithRelations = User & {
 
 export type ProjectWithRelations = Project & {
   creator?: User;
-  requiredSkills?: Skill[];
+  required_skills?: Skill[];
   members?: User[];
   applications?: Application[];
 };
