@@ -1,12 +1,12 @@
-import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
-import { hash } from 'bcrypt';
+import { NextResponse } from "next/server";
+import { supabase } from "@/lib/supabase";
+import { hash } from "bcrypt";
 
 // GET /api/users - Get all users
 export async function GET() {
+  console.log("Fetching all users...");
   try {
-    const { data: users, error } = await supabase
-      .from('users').select('*');
+    const { data: users, error } = await supabase.from("users").select("*");
 
     if (error) {
       throw error;
@@ -14,8 +14,11 @@ export async function GET() {
 
     return NextResponse.json(users);
   } catch (error) {
-    console.error('Error fetching users:', error);
-    return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
+    console.error("Error fetching users:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch users" },
+      { status: 500 }
+    );
   }
 }
 
@@ -23,17 +26,27 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { user_email, user_password, user_name, user_bio, user_linkedin_link, user_university } = body;
+    const {
+      user_email,
+      user_password,
+      user_name,
+      user_bio,
+      user_linkedin_link,
+      user_university
+    } = body;
 
     // Check if user already exists
     const { data: existingUser } = await supabase
-      .from('users')
-      .select('user_id')
-      .eq('user_email', user_email)
+      .from("users")
+      .select("user_id")
+      .eq("user_email", user_email)
       .single();
 
     if (existingUser) {
-      return NextResponse.json({ error: 'User already exists' }, { status: 400 });
+      return NextResponse.json(
+        { error: "User already exists" },
+        { status: 400 }
+      );
     }
 
     // Hash password
@@ -41,7 +54,7 @@ export async function POST(req: Request) {
 
     // Insert new user
     const { data: result, error } = await supabase
-      .from('users')
+      .from("users")
       .insert({
         user_email,
         user_password: hashedPassword,
@@ -49,7 +62,7 @@ export async function POST(req: Request) {
         user_bio,
         user_linkedin_link,
         user_university,
-        user_role: 'user'
+        user_role: "user"
       })
       .select()
       .single();
@@ -60,7 +73,10 @@ export async function POST(req: Request) {
 
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
-    console.error('Error creating user:', error);
-    return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
+    console.error("Error creating user:", error);
+    return NextResponse.json(
+      { error: "Failed to create user" },
+      { status: 500 }
+    );
   }
-} 
+}
