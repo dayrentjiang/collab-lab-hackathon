@@ -69,9 +69,10 @@ export const leaveProject = async (userId: string, projectId: string) => {
 //get user project where they are member in that project (check by role)
 export const getUserProjectsAsMember = async (userId: string) => {
   try {
+    console.log("Fetching user projects as member:", userId);
     const { data: userProjects } = await supabase
       .from("user_projects")
-      .select("*, project:projects(*)")
+      .select("*")
       .eq("user_id", userId)
       .eq("user_role", "member");
 
@@ -99,6 +100,7 @@ export const getUserProjectsAsMember = async (userId: string) => {
         return { ...project, projectSkills };
       })
     );
+    console.log("Fetched projects with skills:", projectsWithSkills);
     return projectsWithSkills;
   } catch (error) {
     console.error("[GET_USER_PROJECTS_AS_MEMBER]", error);

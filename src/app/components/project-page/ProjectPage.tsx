@@ -9,9 +9,25 @@ import { UserProject, Project } from "../../../types/types";
 import UserProjectCard from "./UserProjectCard";
 import JoinedProjectCard from "./JoinedProjectCard"; // Import the component for joined projects
 import { User, Users } from "lucide-react";
-import { ProjectCard } from "../../../types/types";
 
-type CombinedProject = UserProject & { project: Project };
+// Make sure we have a comprehensive type that matches the data structure returned by our APIs
+type CombinedProject = {
+  user_project_id?: string;
+  user_id?: string;
+  project_id: number;
+  user_role?: string;
+  joined_at?: string;
+  project?: Project; // For joined projects
+  project_title?: string; // For created projects (direct properties)
+  project_description?: string;
+  project_status?: string;
+  project_vacancy?: number;
+  project_timeline?: string;
+  created_at?: string;
+  updated_at?: string;
+  project_creator_id?: string;
+  projectSkills?: any[];
+};
 
 interface ProjectPageProps {
   userId: string;
@@ -19,38 +35,65 @@ interface ProjectPageProps {
 
 const ProjectPage: React.FC<ProjectPageProps> = ({ userId }) => {
   const [activeTab, setActiveTab] = useState<"created" | "joined">("created");
-  const [projects, setProjects] = useState<CombinedProject[]>([]);
+  const [createdProjects, setCreatedProjects] = useState<CombinedProject[]>([]);
+  const [joinedProjects, setJoinedProjects] = useState<CombinedProject[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Separate useEffect for each tab's data to avoid conflicts
   useEffect(() => {
-    const fetchProjects = async () => {
-      setLoading(true);
+    const fetchCreatedProjects = async () => {
+      if (activeTab === "created") setLoading(true);
       try {
-        let data;
-        if (activeTab === "created") {
-          data = await getUserProjectsAsCreator(userId);
-        } else {
-          data = await getUserProjectsAsMember(userId);
-          console.log("Joined projects data:", data);
-        }
-        console.log(`Fetched ${activeTab} projects:`, data);
-        setProjects(data || []);
+        const data = await getUserProjectsAsCreator(userId);
+        console.log("Fetched created projects:", data);
+        setCreatedProjects(data || []);
       } catch (err) {
-        console.error(`Error fetching ${activeTab} projects:`, err);
+        console.error("Error fetching created projects:", err);
+        setCreatedProjects([]);
       } finally {
-        setLoading(false);
+        if (activeTab === "created") setLoading(false);
       }
     };
 
-    fetchProjects();
-  }, [userId, activeTab]);
+    const fetchJoinedProjects = async () => {
+      if (activeTab === "joined") setLoading(true);
+      try {
+        const data = await getUserProjectsAsMember(userId);
+        console.log("Fetched joined projects:", data);
+        setJoinedProjects(data || []);
+      } catch (err) {
+        console.error("Error fetching joined projects:", err);
+        setJoinedProjects([]);
+      } finally {
+        if (activeTab === "joined") setLoading(false);
+      }
+    };
+
+    // On component mount, fetch both types of projects
+    // This way we have the data ready when the user switches tabs
+    fetchCreatedProjects();
+    fetchJoinedProjects();
+  }, [userId]); // Only depends on userId, not activeTab
+
+  // Function to handle tab change
+  const handleTabChange = (tab: "created" | "joined") => {
+    setActiveTab(tab);
+    // We're not fetching on tab change anymore, so we just need to set loading briefly
+    // while we switch to already-loaded data
+    setLoading(true);
+    setTimeout(() => setLoading(false), 100); // Brief loading state for UI feedback
+  };
+
+  // Get the currently active projects based on the selected tab
+  const activeProjects =
+    activeTab === "created" ? createdProjects : joinedProjects;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
-      {/* Simple Navigation Bar */}
+      {/* Navigation Tabs */}
       <div className="flex justify-center mb-8 border-b border-gray-200">
         <button
-          onClick={() => setActiveTab("created")}
+          onClick={() => handleTabChange("created")}
           className={`flex items-center px-6 py-3 font-medium text-sm ${
             activeTab === "created"
               ? "border-b-2 border-blue-500 text-blue-600"
@@ -61,7 +104,7 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ userId }) => {
           My Created Projects
         </button>
         <button
-          onClick={() => setActiveTab("joined")}
+          onClick={() => handleTabChange("joined")}
           className={`flex items-center px-6 py-3 font-medium text-sm ${
             activeTab === "joined"
               ? "border-b-2 border-blue-500 text-blue-600"
@@ -78,22 +121,36 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ userId }) => {
       </h1>
 
       {loading ? (
-        <p className="text-gray-500 text-center">Loading...</p>
-      ) : projects.length === 0 ? (
-        <p className="text-gray-500 text-center">
-          {activeTab === "created"
-            ? "You haven't created any projects yet."
-            : "You haven't joined any projects yet."}
-        </p>
+        <div className="flex justify-center items-center py-20">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      ) : activeProjects.length === 0 ? (
+        <div className="text-center py-10">
+          <p className="text-gray-500 text-lg">
+            {activeTab === "created"
+              ? "You haven't created any projects yet."
+              : "You haven't joined any projects yet."}
+          </p>
+          {activeTab === "created" && (
+            <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition">
+              Create Your First Project
+            </button>
+          )}
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {activeTab === "created"
-            ? projects.map((project) => (
-                <UserProjectCard key={project.project_id} project={project} />
+            ? activeProjects.map((project) => (
+                <UserProjectCard
+                  key={`created-${project.project_id}`}
+                  project={project}
+                />
               ))
-            : projects.map((project) => (
-                <JoinedProjectCard key={project.project_id} project={project} />
-                // <UserProjectCard key={project.project_id} project={project} /> // Placeholder for joined projects
+            : activeProjects.map((project) => (
+                <JoinedProjectCard
+                  key={`joined-${project.project_id}`}
+                  project={project}
+                />
               ))}
         </div>
       )}
