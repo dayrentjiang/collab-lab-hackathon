@@ -11,7 +11,7 @@ export async function GET(
     const { userId } = params;
     const { data: user, error } = await supabase
       .from('users')
-      .select('user_id, user_email, user_name, user_bio, user_role, user_linkedin_link, user_university, created_at, updated_at')
+      .select('user_id, user_email, user_name, user_bio, user_role, user_linkedin_link, user_university, user_clerk_id, created_at, updated_at')
       .eq('user_id', userId)
       .single();
 
@@ -34,7 +34,7 @@ export async function PATCH(
   try {
     const { userId } = params;
     const body = await req.json();
-    const { user_email, user_password, user_name, user_bio, user_linkedin_link, user_university } = body;
+    const { user_email, user_password, user_name, user_bio, user_linkedin_link, user_university, user_clerk_id, user_role } = body;
 
     // Build update query dynamically based on provided fields
     const updates: string[] = [];
@@ -72,6 +72,16 @@ export async function PATCH(
       values.push(user_university);
       paramCount++;
     }
+    if (user_clerk_id) {
+      updates.push(`user_clerk_id = $${paramCount}`);
+      values.push(user_clerk_id);
+      paramCount++;
+    }
+    if (user_role) {
+      updates.push(`user_role = $${paramCount}`);
+      values.push(user_role);
+      paramCount++;
+    }
 
     updates.push(`updated_at = NOW()`);
 
@@ -89,6 +99,8 @@ export async function PATCH(
         ...(user_bio && { user_bio }),
         ...(user_linkedin_link && { user_linkedin_link }),
         ...(user_university && { user_university }),
+        ...(user_clerk_id && { user_clerk_id }),
+        ...(user_role && { user_role }),
         updated_at: new Date().toISOString()
       })
       .eq('user_id', userId)
