@@ -222,12 +222,38 @@ export const getProjectByProjectId = async (projectId: number) => {
 //remove project by id
 export const removeProjectById = async (projectId: number) => {
   try {
-    const { error } = await supabase
+    // First, delete all related applications
+    const { error: applicationsError } = await supabase
+      .from("applications")
+      .delete()
+      .eq("project_id", projectId);
+
+    if (applicationsError) {
+      console.error("Error deleting related applications:", applicationsError);
+      throw applicationsError;
+    }
+
+    // Then delete all related project skills
+    const { error: skillsError } = await supabase
+      .from("project_skills")
+      .delete()
+      .eq("project_id", projectId);
+
+    if (skillsError) {
+      console.error("Error deleting related project skills:", skillsError);
+      throw skillsError;
+    }
+
+    // Finally, delete the project
+    const { error: projectError } = await supabase
       .from("projects")
       .delete()
       .eq("project_id", projectId);
 
-    if (error) throw error;
+    if (projectError) {
+      console.error("Error deleting project:", projectError);
+      throw projectError;
+    }
 
     return true;
   } catch (error) {

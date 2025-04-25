@@ -29,7 +29,7 @@ export default function ApplicationSuccessPage({ params }: { params: { id: strin
           </Link>
           
           <Link
-            href="/dashboard/applications"
+            href="/applications"
             className="px-6 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition-colors"
           >
             View My Applications

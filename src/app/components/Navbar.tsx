@@ -68,6 +68,16 @@ export default function Navbar() {
                 Projects
               </Link>
               <Link 
+                href="/applications" 
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                  isActive('/applications') 
+                    ? 'border-blue-500 text-gray-900' 
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                }`}
+              >
+                Applications
+              </Link>
+              <Link 
                 href="/profile" 
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                   isActive('/profile') 
@@ -179,6 +189,17 @@ export default function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Dashboard
+              </Link>
+              <Link
+                href="/applications"
+                className={`block pl-3 pr-4 py-2 text-base font-medium ${
+                  isActive('/applications')
+                    ? 'bg-blue-50 border-l-4 border-blue-500 text-blue-700'
+                    : 'border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Applications
               </Link>
               <Link
                 href="/messages"
