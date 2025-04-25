@@ -634,58 +634,60 @@ export default function UserProjectCard({ project }: { project: ProjectCard }) {
               </div>
             )}
 
-            {applications.length > 0 ? (
+            {applications.filter((app) => app.application_status === "pending")
+              .length > 0 ? (
               <div className="space-y-3">
-                {applications.map((app) => (
-                  <div
-                    key={app.application_id}
-                    className="p-3 rounded-md border border-gray-200 hover:border-blue-300 transition-colors"
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex items-center">
-                        <div className="h-8 w-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-sm mr-2">
-                          {getUserInitials(app.user?.user_name)}
-                        </div>
-                        <div>
-                          <div className="font-medium text-sm">
-                            {app.user?.user_name}
+                {applications
+                  .filter((app) => app.application_status === "pending")
+                  .map((app) => (
+                    <div
+                      key={app.application_id}
+                      className="p-3 rounded-md border border-gray-200 hover:border-blue-300 transition-colors"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="flex items-center">
+                          <div className="h-8 w-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-sm mr-2">
+                            {getUserInitials(app.user?.user_name)}
                           </div>
-                          <div className="text-xs text-gray-500">
-                            {app.user?.user_email}
+                          <div>
+                            <div className="font-medium text-sm">
+                              {app.user?.user_name}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {app.user?.user_email}
+                            </div>
                           </div>
                         </div>
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            applicationStatusColors[app.application_status] ||
+                            "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {app.application_status.charAt(0).toUpperCase() +
+                            app.application_status.slice(1)}
+                        </span>
                       </div>
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          applicationStatusColors[app.application_status] ||
-                          "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {app.application_status.charAt(0).toUpperCase() +
-                          app.application_status.slice(1)}
-                      </span>
-                    </div>
 
-                    {app.application_msg && (
-                      <div className="mb-2">
-                        <div className="flex items-center text-xs text-gray-500 mb-1">
-                          <MessageCircle className="h-3 w-3 mr-1" />
-                          <span>Application Message:</span>
+                      {app.application_msg && (
+                        <div className="mb-2">
+                          <div className="flex items-center text-xs text-gray-500 mb-1">
+                            <MessageCircle className="h-3 w-3 mr-1" />
+                            <span>Application Message:</span>
+                          </div>
+                          <p className="text-sm text-gray-700 bg-gray-50 p-2 rounded-md">
+                            {app.application_msg.length > 100
+                              ? `${app.application_msg.substring(0, 100)}...`
+                              : app.application_msg}
+                          </p>
                         </div>
-                        <p className="text-sm text-gray-700 bg-gray-50 p-2 rounded-md">
-                          {app.application_msg.length > 100
-                            ? `${app.application_msg.substring(0, 100)}...`
-                            : app.application_msg}
-                        </p>
-                      </div>
-                    )}
+                      )}
 
-                    <div className="flex justify-between items-center mt-2">
-                      <div className="text-xs text-gray-500">
-                        Applied: {formatApplicationDate(app.applied_at)}
-                      </div>
+                      <div className="flex justify-between items-center mt-2">
+                        <div className="text-xs text-gray-500">
+                          Applied: {formatApplicationDate(app.applied_at)}
+                        </div>
 
-                      {app.application_status === "pending" && (
                         <div className="flex space-x-2">
                           <button
                             className="flex items-center text-xs text-green-600 hover:text-green-800 disabled:opacity-50"
@@ -708,14 +710,13 @@ export default function UserProjectCard({ project }: { project: ProjectCard }) {
                             Reject
                           </button>
                         </div>
-                      )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             ) : (
               <div className="text-sm text-gray-500 text-center py-4">
-                No applications yet for this project.
+                No pending applications for this project.
               </div>
             )}
           </div>

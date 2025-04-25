@@ -119,31 +119,29 @@ export async function updateApplicationStatus(
         console.error("Error adding user to project:", userProjectError);
         throw userProjectError;
       }
-      //and delete the application
-      const { error: deleteError } = await supabase
-        .from("applications")
-        .delete()
-        .eq("application_id", applicationId);
-
-      if (deleteError) {
-        console.error("Error deleting application:", deleteError);
-        throw deleteError;
-      }
 
       return userProject;
     }
 
-    //if the status is rejected, delete the application
+    //if the status is rejected, change the application status to rejected
     if (status === "rejected") {
-      const { error: deleteError } = await supabase
-        .from("applications")
-        .delete()
-        .eq("application_id", applicationId);
+      const { data: rejectedApplication, error: rejectedApplicationError } =
+        await supabase
+          .from("applications")
+          .update({ application_status: "rejected" })
+          .eq("application_id", applicationId)
+          .select()
+          .single();
 
-      if (deleteError) {
-        console.error("Error deleting application:", deleteError);
-        throw deleteError;
+      if (rejectedApplicationError) {
+        console.error(
+          "Error updating application status to rejected:",
+          rejectedApplicationError
+        );
+        throw rejectedApplicationError;
       }
+
+      return rejectedApplication;
     }
 
     return application;
