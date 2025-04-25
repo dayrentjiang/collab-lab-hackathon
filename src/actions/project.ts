@@ -1,3 +1,5 @@
+import { supabase } from "@/lib/supabase";
+
 //fetch to /api/skills/route.ts
 export const getAvailableSkills = async () => {
   try {
@@ -19,6 +21,20 @@ export const getAvailableSkills = async () => {
 };
 
 //get all projects
+export const getAllProjects = async () => {
+  try {
+    const { data: projects, error } = await supabase.from("projects").select(`
+        *,
+        project_creator:users(*)
+      `);
+
+    if (error) throw error;
+    return projects;
+  } catch (error) {
+    console.error("Error fetching projects:", error);
+    return error;
+  }
+};
 
 //get recommended projects for user
 
