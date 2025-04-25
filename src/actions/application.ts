@@ -88,6 +88,7 @@ export async function updateApplicationStatus(
   applicationId: number,
   status: "pending" | "accepted" | "rejected"
 ) {
+  console.log("Updating application status:", applicationId, status);
   try {
     const { data: application, error } = await supabase
       .from("applications")
@@ -99,6 +100,50 @@ export async function updateApplicationStatus(
     if (error) {
       console.error("Error updating application status:", error);
       throw error;
+    }
+
+    //if the status is accepted, add the user to the project
+    if (status === "accepted") {
+      const { data: userProject, error: userProjectError } = await supabase
+        .from("user_projects")
+        .insert([
+          {
+            user_id: application.user_id,
+            project_id: application.project_id
+          }
+        ])
+        .select()
+        .single();
+
+      if (userProjectError) {
+        console.error("Error adding user to project:", userProjectError);
+        throw userProjectError;
+      }
+      //and delete the application
+      const { error: deleteError } = await supabase
+        .from("applications")
+        .delete()
+        .eq("application_id", applicationId);
+
+      if (deleteError) {
+        console.error("Error deleting application:", deleteError);
+        throw deleteError;
+      }
+
+      return userProject;
+    }
+
+    //if the status is rejected, delete the application
+    if (status === "rejected") {
+      const { error: deleteError } = await supabase
+        .from("applications")
+        .delete()
+        .eq("application_id", applicationId);
+
+      if (deleteError) {
+        console.error("Error deleting application:", deleteError);
+        throw deleteError;
+      }
     }
 
     return application;

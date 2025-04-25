@@ -65,6 +65,7 @@ export type Application = {
   application_id: number;
   project_id: number; // Foreign key to Project.project_id
   user_id: string; // Foreign key to User.user_id
+  user: User; // The user who applied
   application_msg: string;
   application_status: "pending" | "accepted" | "rejected";
   applied_at: string;
@@ -128,4 +129,22 @@ export interface ProjectFormData {
   project_vacancy: number;
   project_timeline?: string;
   required_skills: number[]; // Skill IDs
+}
+
+export interface ProjectCard {
+  project_id: number;
+  project_title: string;
+  project_description: string;
+  project_status: string;
+  project_vacancy: number;
+  project_timeline: string;
+  created_at: string;
+  projectSkills: Array<{
+    skill_id: string;
+    skills?: {
+      skill_name: string;
+      skill_category: string;
+    };
+  }>;
+  project_creator_id: string;
 }
