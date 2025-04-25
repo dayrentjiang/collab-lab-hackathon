@@ -14,20 +14,32 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { data: skill, error } = await supabase
-      .from('skills')
-      .select()
-      .eq('skill_id', parseInt(params.id))
-      .single();
+    // 숫자인 경우 ID로 검색
+    if (!isNaN(Number(params.id))) {
+      const { data: skill, error } = await supabase
+        .from('skills')
+        .select()
+        .eq('skill_id', parseInt(params.id))
+        .single();
 
-    if (error || !skill) {
-      return NextResponse.json(
-        { error: 'Skill not found' },
-        { status: 404 }
-      );
+      if (error || !skill) {
+        return NextResponse.json(
+          { error: 'Skill not found' },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json(skill);
     }
+    
+    // 문자열인 경우 이름으로 검색
+    const { data: skills, error } = await supabase
+      .from('skills')
+      .select('skill_id, skill_name')
+      .ilike('skill_name', `%${params.id}%`);
 
-    return NextResponse.json(skill);
+    if (error) throw error;
+    return NextResponse.json(skills);
   } catch (error) {
     console.error('Error fetching skill:', error);
     return NextResponse.json(
