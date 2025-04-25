@@ -23,7 +23,6 @@ export async function getUserSkills(userId: string) {
 }
 
 // Fixed createUser function
-// Fixed createUser function
 export async function createUser(formData: ProfileFormData) {
   // First create user in supabase using routes, get rid of the selected skills first
   const { selected_skills, ...userData } = formData;
@@ -119,7 +118,6 @@ export async function updateUser(
     }
 
     return { success: true, data };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Error updating user:", error);
     return { success: false, error: error.message };
@@ -154,13 +152,13 @@ export async function getUserProjects(userId: string) {
       .from("projects")
       .select(
         `
-        *,
-        creator:users!projects_project_creator_id_fkey(*),
-        members:user_projects!user_projects_project_id_fkey(
-          user:users(*)
-        ),
-        applications:applications(*)
-      `
+          *,
+          creator:users!projects_project_creator_id_fkey(*),
+          members:user_projects!user_projects_project_id_fkey(
+            user:users(*)
+          ),
+          applications:applications(*)
+        `
       )
       .or(`project_creator_id.eq.${userId},user_projects.user_id.eq.${userId}`);
 
@@ -183,13 +181,13 @@ export async function getProjectDetails(projectId: number) {
       .from("projects")
       .select(
         `
-        *,
-        creator:users!projects_project_creator_id_fkey(*),
-        members:user_projects!user_projects_project_id_fkey(
-          user:users(*)
-        ),
-        applications:applications(*)
-      `
+          *,
+          creator:users!projects_project_creator_id_fkey(*),
+          members:user_projects!user_projects_project_id_fkey(
+            user:users(*)
+          ),
+          applications:applications(*)
+        `
       )
       .eq("project_id", projectId)
       .single();
@@ -206,22 +204,89 @@ export async function getProjectDetails(projectId: number) {
   }
 }
 
+export async function updateUserSkills(userId: string, newSkills: number[]) {
+  try {
+    // Step 1: Fetch current user skills
+    const { data: currentSkills, error: fetchError } = await supabase
+      .from("user_skills")
+      .select("skill_id")
+      .eq("user_id", userId);
+
+    if (fetchError) {
+      console.error("Error fetching current user skills:", fetchError);
+      return { success: false, error: fetchError.message };
+    }
+
+    // Step 2: Find skills to add (not already present)
+    const skillsToAdd = newSkills.filter(
+      (skillId) => !currentSkills.some((skill) => skill.skill_id === skillId)
+    );
+
+    // Step 3: Find skills to remove (present in currentSkills but not in newSkills)
+    const skillsToRemove = currentSkills
+      .filter((skill) => !newSkills.includes(skill.skill_id))
+      .map((skill) => skill.skill_id);
+
+    // Step 4: Add new skills
+    const addPromises = skillsToAdd.map(async (skillId) => {
+      const { error: addError } = await supabase.from("user_skills").insert([
+        {
+          user_id: userId,
+          skill_id: skillId
+        }
+      ]);
+      if (addError) {
+        console.error(`Error adding skill ${skillId}:`, addError);
+        return { success: false, error: addError.message };
+      }
+      return { success: true };
+    });
+
+    // Step 5: Remove skills that are no longer selected
+    const removePromises = skillsToRemove.map(async (skillId) => {
+      const { error: removeError } = await supabase
+        .from("user_skills")
+        .delete()
+        .eq("user_id", userId)
+        .eq("skill_id", skillId);
+
+      if (removeError) {
+        console.error(`Error removing skill ${skillId}:`, removeError);
+        return { success: false, error: removeError.message };
+      }
+      return { success: true };
+    });
+
+    // Step 6: Wait for both add and remove promises to resolve
+    const results = await Promise.all([...addPromises, ...removePromises]);
+
+    // Check if any operation failed
+    if (results.some((result) => result.success === false)) {
+      return { success: false, error: "Some operations failed" };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating user skills:", error);
+    return { success: false, error: error.message };
+  }
+}
+
 //get user by user_clerk_id
 export async function getUserByClerkId(user_clerk_id: string) {
   try {
-    // Get user data
-    const { data: user, error: userError } = await supabase
+    const { data, error } = await supabase
       .from("users")
       .select("*")
       .eq("user_clerk_id", user_clerk_id)
       .single();
 
-    if (userError) {
-      console.error("Error fetching user:", userError);
+    if (error) {
+      console.error("Error fetching user:", error);
       return null;
     }
 
-    // Get user's skills
+    //for the user get the skills
     const { data: userSkills, error: skillsError } = await supabase
       .from("user_skills")
       .select("skill_id:skills(*)")
@@ -231,23 +296,13 @@ export async function getUserByClerkId(user_clerk_id: string) {
       console.error("Error fetching user skills:", skillsError);
       return null;
     }
-
-    // Get all available skills
-    const { data: allSkills, error: allSkillsError } = await supabase
-      .from("skills")
-      .select("*");
-
-    if (allSkillsError) {
-      console.error("Error fetching all skills:", allSkillsError);
-      return null;
-    }
-
+    //return the user with the skills
     return {
       ...data,
       skills: userSkills
     };
   } catch (error) {
-    console.error("Error fetching user data:", error);
+    console.error("Error fetching user:", error);
     return null;
   }
 }
@@ -261,16 +316,16 @@ export async function updateUserSkill(id: string, skill_id: number) {
       .eq("id", id)
       .select(
         `
-        id,
-        user_id,
-        skill_id,
-      
-        created_at,
-        skills (
           id,
-          name
-        )
-      `
+          user_id,
+          skill_id,
+        
+          created_at,
+          skills (
+            id,
+            name
+          )
+        `
       )
       .single();
 
@@ -284,11 +339,11 @@ export async function updateUserSkill(id: string, skill_id: number) {
       user_id: data.user_id,
       skill_id: data.skill_id,
       skill_name: data.skills.name,
+
       created_at: data.created_at
     };
 
     return { success: true, data: processedSkill };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Error updating user skill:", error);
     return { success: false, error: error.message };
@@ -306,7 +361,6 @@ export async function deleteUserSkill(id: string) {
     }
 
     return { success: true };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Error deleting user skill:", error);
     return { success: false, error: error.message };
