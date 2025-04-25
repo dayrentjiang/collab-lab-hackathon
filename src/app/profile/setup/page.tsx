@@ -11,8 +11,13 @@ type ProfileSetupStep = 'basics' | 'skills' | 'education' | 'review';
 
 // Form data structure
 interface ProfileFormData {
+<<<<<<< HEAD
     user_clerk_id: string | undefined;
     user_email: string;
+=======
+  user_clerk_id: string | undefined;
+  user_email: string;
+>>>>>>> origin/develop
   user_name: string;
   user_bio: string;
   user_role: 'student' | 'mentor' | 'admin';
