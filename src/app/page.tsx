@@ -5,6 +5,7 @@ import ProjectCard from "./components/ProjectCard";
 import SkillCategoryTabs from "./components/SkillCategoryTabs";
 import { PlusIcon, SearchIcon } from "lucide-react";
 import { ProjectWithRelations } from "@/types/types";
+import {getAllProjects} from "../actions/project";
 
 export default async function Home({
   searchParams
