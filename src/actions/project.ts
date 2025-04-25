@@ -21,6 +21,7 @@ export const getAvailableSkills = async () => {
 };
 
 export const getAllProjects = async () => {
+  const completeProject = [];
   try {
     // First, get all projects with their creators
     const { data: projects, error } = await supabase.from("projects").select(`
