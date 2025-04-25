@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { getRecommendedProjects } from "@/types/mockData";
+import { getAllProjects } from "../actions/project";
 import ProjectCard from "./components/ProjectCard";
 import SkillCategoryTabs from "./components/SkillCategoryTabs";
 import { PlusIcon, SearchIcon } from "lucide-react";
@@ -17,7 +17,8 @@ export default async function Home({
       : undefined;
 
   // Fetch recommended projects with the selected category filter
-  const projects = await getRecommendedProjects(category);
+  const projects = await getAllProjects();
+  console.log("Projects:", projects);
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -53,7 +54,7 @@ export default async function Home({
       {/* Skill Categories */}
       <div className="mb-8">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-          Browse by Category
+          Browse by Skill
         </h2>
         <SkillCategoryTabs />
       </div>
