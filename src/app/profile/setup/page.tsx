@@ -8,7 +8,7 @@ import { Skill } from '@/types/types';
 import { Check, X, ChevronRight, Loader2 } from 'lucide-react';
 import { getAvailableSkills } from '@/actions/project';
 import AddSkill from '../../components/AddSkill'; 
-import { createUser } from '../../../actions/user'
+import { createUser, getUserHasCompletedPersonalized } from '../../../actions/user'
 
 
 
@@ -58,9 +58,11 @@ const findSkillById = (id: number): Skill | undefined => {
       if (!user?.id) return;
   
       try {
-        const profile = await user_clerk_id(user.id);
-        if (profile?.has_completed_personalized) {
-          router.push('/'); // redirect if already completed
+        const response = await getUserHasCompletedPersonalized(user.id);
+        if (response?.has_completed_personalized) {
+            router.push('/');
+            } else {
+            setCurrentStep('basics');
         }
       } catch (error) {
         console.error('Error checking user profile:', error);
