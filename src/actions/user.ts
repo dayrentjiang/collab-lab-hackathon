@@ -1,23 +1,9 @@
 import { ProfileFormData } from "@/types/types";
 import { supabase } from "@/lib/supabase";
 
-export async function getUserSkills(userId: string): Promise<Skill[]> {
-  try {
-    const response = await fetch(`/api/users/${userId}/skills`);
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch user skills');
-    }
 
-    const data = await response.json();
-    return data.skills || [];
-  } catch (err) {
-    console.error(err);
-    throw new Error('Error fetching user skills');
-  }
-}
 
-// Fixed createUser function
+
 // Fixed createUser function
 export async function createUser(formData: ProfileFormData) {
   // First create user in supabase using routes, get rid of the selected skills first
@@ -198,6 +184,78 @@ export async function getProjectDetails(projectId: number) {
   } catch (error) {
     console.error("Error fetching project details:", error);
     return null;
+  }
+}
+
+
+
+export async function updateUserSkills(userId: string, newSkills: number[]) {
+  try {
+    // Step 1: Fetch current user skills
+    const { data: currentSkills, error: fetchError } = await supabase
+      .from("user_skills")
+      .select("skill_id")
+      .eq("user_id", userId);
+
+    if (fetchError) {
+      console.error("Error fetching current user skills:", fetchError);
+      return { success: false, error: fetchError.message };
+    }
+
+    // Step 2: Find skills to add (not already present)
+    const skillsToAdd = newSkills.filter(
+      (skillId) => !currentSkills.some((skill) => skill.skill_id === skillId)
+    );
+
+    // Step 3: Find skills to remove (present in currentSkills but not in newSkills)
+    const skillsToRemove = currentSkills
+      .filter((skill) => !newSkills.includes(skill.skill_id))
+      .map((skill) => skill.skill_id);
+
+    // Step 4: Add new skills
+    const addPromises = skillsToAdd.map(async (skillId) => {
+      const { error: addError } = await supabase
+        .from("user_skills")
+        .insert([
+          {
+            user_id: userId,
+            skill_id: skillId,
+          },
+        ]);
+      if (addError) {
+        console.error(`Error adding skill ${skillId}:`, addError);
+        return { success: false, error: addError.message };
+      }
+      return { success: true };
+    });
+
+    // Step 5: Remove skills that are no longer selected
+    const removePromises = skillsToRemove.map(async (skillId) => {
+      const { error: removeError } = await supabase
+        .from("user_skills")
+        .delete()
+        .eq("user_id", userId)
+        .eq("skill_id", skillId);
+
+      if (removeError) {
+        console.error(`Error removing skill ${skillId}:`, removeError);
+        return { success: false, error: removeError.message };
+      }
+      return { success: true };
+    });
+
+    // Step 6: Wait for both add and remove promises to resolve
+    const results = await Promise.all([...addPromises, ...removePromises]);
+
+    // Check if any operation failed
+    if (results.some((result) => result.success === false)) {
+      return { success: false, error: "Some operations failed" };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating user skills:", error);
+    return { success: false, error: error.message };
   }
 }
 
