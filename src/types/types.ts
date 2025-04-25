@@ -40,11 +40,8 @@ export type UserSkill = {
 };
 
 export type ProjectSkill = {
-  id: string;
   project_id: number; // Foreign key to Project.project_id
   skill_id: number; // Foreign key to Skill.skill_id
-  created_at: string;
-  updated_at: string;
 };
 
 export type CreateProjectSkillInput = {
@@ -120,4 +117,15 @@ export interface ProfileFormData {
   user_linkedin_link: string;
   user_university: string;
   selected_skills: number[]; // Skill IDs
+}
+
+//project form data structure
+export interface ProjectFormData {
+  project_title: string;
+  project_description: string;
+  project_creator_id: string; // Foreign key to User.user_id
+  project_status: "recruiting" | "in_progress" | "completed";
+  project_vacancy: number;
+  project_timeline?: string;
+  required_skills: number[]; // Skill IDs
 }
