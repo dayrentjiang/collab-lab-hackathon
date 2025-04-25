@@ -50,19 +50,24 @@ const [skills, setSkills] = useState<Skill[]>([]);
 const findSkillById = (id: number): Skill | undefined => {
     return skills.find(skill => skill.skill_id === id);
   };
+const [isLoading, setIsLoading] = useState(true);
 
   //check if user has_completed_personalized. redirect them to /
   
   useEffect(() => {
     const checkUserProfile = async () => {
+        setIsLoading(true);
+        //while doing this check we can show a loading spinner
       if (!user?.id) return;
-  
       try {
+        console.log(user.id)
         const response = await getUserHasCompletedPersonalized(user.id);
-        if (response?.has_completed_personalized) {
+        console.log(response)
+        if (response) {
             router.push('/');
             } else {
             setCurrentStep('basics');
+            setIsLoading(false);
         }
       } catch (error) {
         console.error('Error checking user profile:', error);
@@ -203,6 +208,14 @@ const toggleSkill = (skillId: number) => {
   };
 
   if (!isLoaded) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+      </div>
+    );
+  }
+
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
