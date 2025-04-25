@@ -1,30 +1,33 @@
 'use client';
 
 import { useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
-import { MOCK_SKILLS } from '@/types/mockData';
+import { Skill } from '@/types/types';
 import { Check, X, ChevronRight, Loader2 } from 'lucide-react';
+import { getAvailableSkills } from '@/actions/project';
+import AddSkill from '../../components/AddSkill'; 
+
+
 
 // For setup process tracking
 type ProfileSetupStep = 'basics' | 'skills' | 'education' | 'review';
 
 // Form data structure
 interface ProfileFormData {
-<<<<<<< HEAD
     user_clerk_id: string | undefined;
     user_email: string;
-=======
-  user_clerk_id: string | undefined;
-  user_email: string;
->>>>>>> origin/develop
   user_name: string;
   user_bio: string;
   user_role: 'student' | 'mentor' | 'admin';
   user_linkedin_link: string;
   user_university: string;
   selected_skills: number[]; // Skill IDs
+  has_completed_personalized: boolean;
 }
+
+
 
 export default function ProfileSetup() {
     const { isLoaded, user } = useUser();
@@ -38,6 +41,59 @@ export default function ProfileSetup() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<ProfileSetupStep>('basics');
   const [isSubmitting, setIsSubmitting] = useState(false);
+const [isLoadingSkills, setIsLoadingSkills] = useState(true);
+const [searchTerm, setSearchTerm] = useState('');
+const [allSkills, setAllSkills] = useState<Skill[]>([]);
+const [filteredSkills, setFilteredSkills] = useState<Skill[]>([]);
+const [skills, setSkills] = useState<Skill[]>([]);
+const findSkillById = (id: number): Skill | undefined => {
+    return skills.find(skill => skill.skill_id === id);
+  };
+
+  //check if user has_completed_personalized. redirect them to /
+  useEffect(()=> {
+    //fetch for the user has_completed_personalized
+    //if true
+    //redirect to /
+  })
+
+  useEffect(() => {
+    const fetchSkills = async () => {
+      setIsLoadingSkills(true);
+      try {
+        const fetchedSkills = await getAvailableSkills();
+        // Make sure skills have the correct format
+        const normalizedSkills = fetchedSkills.map(skill => ({
+          ...skill,
+          skill_id: Number(skill.skill_id),
+        }));
+        setAllSkills(normalizedSkills);
+        setFilteredSkills(normalizedSkills);
+        // Also set skills so findSkillById works correctly
+        setSkills(normalizedSkills);
+      } catch (error) {
+        console.error('Failed to fetch skills:', error);
+      } finally {
+        setIsLoadingSkills(false);
+      }
+    };
+  
+    fetchSkills();
+  }, []);
+
+const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+  
+    if (term.trim() === '') {
+      setFilteredSkills(allSkills);
+    } else {
+      const filtered = allSkills.filter(skill =>
+        skill.skill_name.toLowerCase().includes(term.toLowerCase())
+      );
+      setFilteredSkills(filtered);
+    }
+  };
   
   // Default form values
   const [formData, setFormData] = useState<ProfileFormData>({
@@ -48,17 +104,10 @@ export default function ProfileSetup() {
     user_role: 'student', // Default role
     user_linkedin_link: '',
     user_university: '',
+    has_completed_personalized: true,
     selected_skills: [],
   });
 
-  // Group skills by category for better organization
-  const skillsByCategory = MOCK_SKILLS.reduce((acc, skill) => {
-    if (!acc[skill.skill_category]) {
-      acc[skill.skill_category] = [];
-    }
-    acc[skill.skill_category].push(skill);
-    return acc;
-  }, {} as Record<string, typeof MOCK_SKILLS>);
 
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -70,21 +119,22 @@ export default function ProfileSetup() {
   };
 
   // Handle skill selection
-  const toggleSkill = (skillId: number) => {
-    setFormData(prev => {
-      if (prev.selected_skills.includes(skillId)) {
-        return {
-          ...prev,
-          selected_skills: prev.selected_skills.filter(id => id !== skillId)
-        };
-      } else {
-        return {
-          ...prev,
-          selected_skills: [...prev.selected_skills, skillId]
-        };
-      }
-    });
-  };
+
+// Make sure your toggleSkill function is compatible with the AddSkill component:
+const toggleSkill = (skillId: number) => {
+  setFormData(prev => {
+    const newSkills = prev.selected_skills.includes(skillId)
+      ? prev.selected_skills.filter(id => id !== skillId)
+      : [...prev.selected_skills, skillId];
+    return {
+      ...prev,
+      selected_skills: newSkills,
+    };
+  });
+};
+
+  // Find a skill by ID
+
 
   // Navigation functions
   const nextStep = () => {
@@ -146,7 +196,7 @@ export default function ProfileSetup() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         {/* Header */}
         <div className="bg-blue-500 px-6 py-4 text-white">
           <h1 className="text-xl font-semibold">Complete Your Profile</h1>
@@ -248,50 +298,21 @@ export default function ProfileSetup() {
               </div>
             </div>
           )}
+{currentStep === 'skills' && (
+  <div className="space-y-6">
+    <h2 className="text-lg font-semibold text-gray-800">Skills & Expertise</h2>
 
-          {/* Skills Step */}
-          {currentStep === 'skills' && (
-            <div className="space-y-6">
-              <h2 className="text-lg font-semibold text-gray-800">Skills & Expertise</h2>
-              <p className="text-sm text-gray-600 mb-4">
-                Select the skills you have that would be valuable in collaborative projects.
-              </p>
-              
-              {Object.entries(skillsByCategory).map(([category, skills]) => (
-                <div key={category} className="mb-6">
-                  <h3 className="text-md font-medium text-gray-700 mb-2 capitalize">{category}</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                    {skills.map(skill => (
-                      <button
-                        key={skill.skill_id}
-                        type="button"
-                        onClick={() => toggleSkill(skill.skill_id)}
-                        className={`flex items-center justify-between px-3 py-2 border rounded-md transition-colors ${
-                          formData.selected_skills.includes(skill.skill_id)
-                            ? 'bg-blue-50 border-blue-500 text-blue-700'
-                            : 'border-gray-300 hover:bg-gray-50'
-                        }`}
-                      >
-                        <span>{skill.skill_name}</span>
-                        {formData.selected_skills.includes(skill.skill_id) && (
-                          <Check className="h-4 w-4 text-blue-500" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              
-              {formData.selected_skills.length === 0 && (
-                <div className="text-yellow-600 bg-yellow-50 p-4 rounded-md flex items-start">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                  </svg>
-                  <p className="text-sm">Please select at least one skill to help match you with relevant projects.</p>
-                </div>
-              )}
-            </div>
-          )}
+    {/* Add a styled wrapper div around the AddSkill component */}
+    <div style={{ position: 'relative', zIndex: 50 }}>
+      <AddSkill
+        skills={allSkills}
+        selectedSkills={formData.selected_skills}
+        onSkillToggle={toggleSkill}
+        error={formData.selected_skills.length === 0 ? "Please select at least one skill to help match you with relevant projects." : null}
+      />
+    </div>
+  </div>
+)}
 
           {/* Education Step */}
           {currentStep === 'education' && (
@@ -361,7 +382,7 @@ export default function ProfileSetup() {
                   <div className="flex flex-wrap gap-1 mt-1">
                     {formData.selected_skills.length > 0 ? (
                       formData.selected_skills.map(skillId => {
-                        const skill = MOCK_SKILLS.find(s => s.skill_id === skillId);
+                        const skill = allSkills.find(s => s.skill_id === skillId);
                         return skill ? (
                           <span 
                             key={skill.skill_id}
