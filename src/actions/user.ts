@@ -47,3 +47,24 @@ export async function createUser(formData: ProfileFormData) {
     return error;
   }
 }
+
+//now get the has_completed_personalized value from the user table and return it
+export async function getUserHasCompletedPersonalized(userId: string) {
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .select("has_completed_personalized")
+      .eq("user_id", userId)
+      .single();
+
+    if (error) {
+      console.error("Error fetching user:", error);
+      return null;
+    }
+
+    return data?.has_completed_personalized;
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    return null;
+  }
+}
