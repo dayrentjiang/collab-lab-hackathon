@@ -181,3 +181,20 @@ export async function getUserByClerkId(user_clerk_id: string) {
     return null;
   }
 }
+
+//get all users
+export async function getAllUsers() {
+  try {
+    const { data, error } = await supabase.from("users").select("*");
+
+    if (error) {
+      console.error("Error fetching users:", error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return null;
+  }
+}
