@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useUser } from '@clerk/nextjs';
-import { Skill } from '@/types/types';
-import { getAvailableSkills } from '@/actions/project';
-import { Check, X, Loader2, LayoutGrid, Users } from 'lucide-react';
-import AddSkill from '../../components/AddSkill';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
+import { Skill } from "@/types/types";
+import { createProject, getAvailableSkills } from "@/actions/project";
+import { Check, X, Loader2, LayoutGrid, Users } from "lucide-react";
+import AddSkill from "../../components/AddSkill";
 
 interface ProjectFormData {
   project_creator_id: string;
   project_title: string;
   project_description: string;
-  project_status: 'recruiting' | 'in_progress' | 'completed';
+  project_status: "recruiting" | "in_progress" | "completed";
   project_vacancy: number;
   project_timeline?: string;
 
@@ -23,7 +23,6 @@ export default function CreateProjectPage() {
   const { isLoaded, user } = useUser();
 
   if (!isLoaded) {
-   
     return null;
   }
 
@@ -34,39 +33,39 @@ export default function CreateProjectPage() {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [isLoadingSkills, setIsLoadingSkills] = useState(true);
   const [skillError, setSkillError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [filteredSkills, setFilteredSkills] = useState<Skill[]>([]);
 
   // Default form state
   const [formData, setFormData] = useState<ProjectFormData>({
     project_creator_id: user.id,
-    project_title: '',
-    project_description: '',
-    project_status: 'recruiting',
+    project_title: "",
+    project_description: "",
+    project_status: "recruiting",
     project_vacancy: 1,
-    project_timeline: '',
-    required_skills: [],
+    project_timeline: "",
+    required_skills: []
   });
 
   useEffect(() => {
     const fetchSkills = async () => {
       try {
         const data = await getAvailableSkills();
-        const normalizedSkills = data.map(skill => ({
+        const normalizedSkills = data.map((skill) => ({
           ...skill,
-          skill_id: Number(skill.skill_id),
+          skill_id: Number(skill.skill_id)
         }));
         setSkills(normalizedSkills);
         setFilteredSkills(normalizedSkills); // Initialize filteredSkills
-        console.log(normalizedSkills);  // <-- Add this to see if the skills are loaded
+        console.log(normalizedSkills); // <-- Add this to see if the skills are loaded
       } catch (err) {
-        console.error('Failed to load skills:', err);
-        setSkillError('Failed to load skills. Please try again later.');
+        console.error("Failed to load skills:", err);
+        setSkillError("Failed to load skills. Please try again later.");
       } finally {
         setIsLoadingSkills(false);
       }
     };
-  
+
     fetchSkills();
   }, []);
 
@@ -75,14 +74,14 @@ export default function CreateProjectPage() {
     const term = e.target.value;
     setSearchTerm(term);
 
-    if (term.trim() === '') {
+    if (term.trim() === "") {
       setFilteredSkills(skills); // Show all skills when search is empty
       return;
     }
 
     // Filter skills based on search term
     const filtered = skills.filter(
-      skill =>
+      (skill) =>
         skill.skill_name.toLowerCase().includes(term.toLowerCase()) ||
         skill.skill_category.toLowerCase().includes(term.toLowerCase())
     );
@@ -91,24 +90,26 @@ export default function CreateProjectPage() {
 
   // Handle input changes
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
 
-    if (name === 'project_vacancy') {
-      setFormData(prev => ({
+    if (name === "project_vacancy") {
+      setFormData((prev) => ({
         ...prev,
-        [name]: parseInt(value) || 0,
+        [name]: parseInt(value) || 0
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [name]: value,
+        [name]: value
       }));
     }
 
     if (errors[name]) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[name];
         return newErrors;
@@ -118,22 +119,22 @@ export default function CreateProjectPage() {
 
   // Toggle skill selection
   const toggleSkill = (skillId: number) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const newSkills = prev.required_skills.includes(skillId)
-        ? prev.required_skills.filter(id => id !== skillId)
+        ? prev.required_skills.filter((id) => id !== skillId)
         : [...prev.required_skills, skillId];
       return {
         ...prev,
-        required_skills: newSkills,
+        required_skills: newSkills
       };
     });
 
     // Clear search term and reset filtered skills to show all skills
-    setSearchTerm('');
+    setSearchTerm("");
     setFilteredSkills(skills);
 
     if (errors.required_skills) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors.required_skills;
         return newErrors;
@@ -143,7 +144,7 @@ export default function CreateProjectPage() {
 
   // Find a skill by ID
   const findSkillById = (id: number): Skill | undefined => {
-    return skills.find(skill => skill.skill_id === id);
+    return skills.find((skill) => skill.skill_id === id);
   };
 
   // Validate the form
@@ -151,21 +152,22 @@ export default function CreateProjectPage() {
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.project_title.trim()) {
-      newErrors.project_title = 'Project title is required';
+      newErrors.project_title = "Project title is required";
     }
 
     if (!formData.project_description.trim()) {
-      newErrors.project_description = 'Project description is required';
+      newErrors.project_description = "Project description is required";
     } else if (formData.project_description.length < 50) {
-      newErrors.project_description = 'Description should be at least 50 characters';
+      newErrors.project_description =
+        "Description should be at least 50 characters";
     }
 
     if (formData.project_vacancy < 1) {
-      newErrors.project_vacancy = 'At least one vacancy is required';
+      newErrors.project_vacancy = "At least one vacancy is required";
     }
 
     if (formData.required_skills.length === 0) {
-      newErrors.required_skills = 'At least one skill is required';
+      newErrors.required_skills = "At least one skill is required";
     }
 
     setErrors(newErrors);
@@ -183,13 +185,16 @@ export default function CreateProjectPage() {
     setIsSubmitting(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      router.push('/projects');
+      //use the createProject action
+      console.log("Creating project with data:", formData);
+      await createProject(formData);
+      console.log("Project created successfully!");
+      router.push("/projects");
     } catch (error) {
-      console.error('Error creating project:', error);
-      setErrors(prev => ({
+      console.error("Error creating project:", error);
+      setErrors((prev) => ({
         ...prev,
-        submit: 'Failed to create project. Please try again.',
+        submit: "Failed to create project. Please try again."
       }));
     } finally {
       setIsSubmitting(false);
@@ -207,7 +212,9 @@ export default function CreateProjectPage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Create a New Project</h1>
+        <h1 className="text-3xl font-bold text-gray-800">
+          Create a New Project
+        </h1>
         <p className="text-gray-600 mt-1">
           Share your project idea with the community and find collaborators
         </p>
@@ -236,12 +243,14 @@ export default function CreateProjectPage() {
                 value={formData.project_title}
                 onChange={handleInputChange}
                 className={`w-full px-3 py-2 border ${
-                  errors.project_title ? 'border-red-500' : 'border-gray-300'
+                  errors.project_title ? "border-red-500" : "border-gray-300"
                 } rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
                 placeholder="Give your project a clear, descriptive title"
               />
               {errors.project_title && (
-                <p className="mt-1 text-sm text-red-500">{errors.project_title}</p>
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.project_title}
+                </p>
               )}
             </div>
 
@@ -260,7 +269,9 @@ export default function CreateProjectPage() {
                 onChange={handleInputChange}
                 rows={5}
                 className={`w-full px-3 py-2 border ${
-                  errors.project_description ? 'border-red-500' : 'border-gray-300'
+                  errors.project_description
+                    ? "border-red-500"
+                    : "border-gray-300"
                 } rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
                 placeholder="Describe your project, its goals, and what you're looking for in collaborators"
               />
@@ -289,7 +300,9 @@ export default function CreateProjectPage() {
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="recruiting">Recruiting - Looking for team members</option>
+                <option value="recruiting">
+                  Recruiting - Looking for team members
+                </option>
                 <option value="in_progress">
                   In Progress - Already started but need more help
                 </option>
@@ -304,7 +317,6 @@ export default function CreateProjectPage() {
             <Users className="h-5 w-5 mr-2 text-blue-500" />
             Team Requirements
           </h2>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             {/* Vacancies */}
             <div>
@@ -312,7 +324,8 @@ export default function CreateProjectPage() {
                 htmlFor="project_vacancy"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Number of Collaborators Needed <span className="text-red-500">*</span>
+                Number of Collaborators Needed{" "}
+                <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -323,11 +336,13 @@ export default function CreateProjectPage() {
                 min={1}
                 max={10}
                 className={`w-full px-3 py-2 border ${
-                  errors.project_vacancy ? 'border-red-500' : 'border-gray-300'
+                  errors.project_vacancy ? "border-red-500" : "border-gray-300"
                 } rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
               />
               {errors.project_vacancy && (
-                <p className="mt-1 text-sm text-red-500">{errors.project_vacancy}</p>
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.project_vacancy}
+                </p>
               )}
             </div>
 
@@ -342,7 +357,7 @@ export default function CreateProjectPage() {
               <select
                 id="project_timeline"
                 name="project_timeline"
-                value={formData.project_timeline || ''}
+                value={formData.project_timeline || ""}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
@@ -355,10 +370,7 @@ export default function CreateProjectPage() {
               </select>
             </div>
           </div>
-
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-           
-
             {skillError && (
               <div className="mb-4 p-2 bg-red-50 border border-red-100 rounded-md">
                 <p className="text-sm text-red-600">{skillError}</p>
@@ -371,48 +383,50 @@ export default function CreateProjectPage() {
               </div>
             )}
 
-<AddSkill 
-  skills={skills}
-  selectedSkills={formData.required_skills}
-  onSkillToggle={toggleSkill}
-  error={errors.required_skills}
-/>
+            <AddSkill
+              skills={skills}
+              selectedSkills={formData.required_skills}
+              onSkillToggle={toggleSkill}
+              error={errors.required_skills}
+            />
 
-
-        {/* Submit Error Message */}
-        {errors.submit && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
-            {errors.submit}
-          </div>
-        )}
-
-        {/* Action Buttons */}
-        <div className="flex justify-end space-x-4">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isSubmitting || isLoadingSkills}
-            className={`px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-              isSubmitting || isLoadingSkills ? 'opacity-70 cursor-not-allowed' : ''
-            }`}
-          >
-            {isSubmitting ? (
-              <span className="flex items-center">
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Creating...
-              </span>
-            ) : (
-              'Create Project'
+            {/* Submit Error Message */}
+            {errors.submit && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+                {errors.submit}
+              </div>
             )}
-          </button>
+
+            {/* Action Buttons */}
+            <div className="flex justify-end space-x-4">
+              <button
+                type="button"
+                onClick={() => router.back()}
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting || isLoadingSkills}
+                className={`px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                  isSubmitting || isLoadingSkills
+                    ? "opacity-70 cursor-not-allowed"
+                    : ""
+                }`}
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center">
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Creating...
+                  </span>
+                ) : (
+                  "Create Project"
+                )}
+              </button>
+            </div>
+          </div>{" "}
         </div>
-        </div> </div>
       </form>
     </div>
   );

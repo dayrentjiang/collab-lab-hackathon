@@ -102,32 +102,82 @@ export async function getUserHasCompletedPersonalized(userId: string) {
   }
 }
 
-//get all user projects that they are part of
-export const getUserProjects = async (userId: string) => {
+// Get user's projects (both created and joined)
+export async function getUserProjects(userId: string) {
   try {
-    const { data: userProjects } = await supabase
-      .from("user_projects")
-      .select("*, project:projects(*)")
-      .eq("user_id", userId);
-
-    return userProjects;
-  } catch (error) {
-    console.error("[GET_USER_PROJECTS]", error);
-    throw new Error("Failed to fetch user projects");
-  }
-};
-
-//get all user project that they are the creator
-export const getUserCreatedProjects = async (userId: string) => {
-  try {
-    const { data: userProjects } = await supabase
+    const { data: projects, error } = await supabase
       .from("projects")
-      .select("*, user:user_projects(*)")
-      .eq("project_creator_id", userId);
+      .select(
+        `
+        *,
+        creator:users!projects_project_creator_id_fkey(*),
+        members:user_projects!user_projects_project_id_fkey(
+          user:users(*)
+        ),
+        applications:applications(*)
+      `
+      )
+      .or(`project_creator_id.eq.${userId},user_projects.user_id.eq.${userId}`);
 
-    return userProjects;
+    if (error) {
+      console.error("Error fetching user projects:", error);
+      return [];
+    }
+
+    return projects || [];
   } catch (error) {
-    console.error("[GET_USER_PROJECTS]", error);
-    throw new Error("Failed to fetch user projects");
+    console.error("Error fetching user projects:", error);
+    return [];
   }
-};
+}
+
+// Get project details with relations
+export async function getProjectDetails(projectId: number) {
+  try {
+    const { data: project, error } = await supabase
+      .from("projects")
+      .select(
+        `
+        *,
+        creator:users!projects_project_creator_id_fkey(*),
+        members:user_projects!user_projects_project_id_fkey(
+          user:users(*)
+        ),
+        applications:applications(*)
+      `
+      )
+      .eq("project_id", projectId)
+      .single();
+
+    if (error) {
+      console.error("Error fetching project details:", error);
+      return null;
+    }
+
+    return project;
+  } catch (error) {
+    console.error("Error fetching project details:", error);
+    return null;
+  }
+}
+
+//get user by user_clerk_id
+export async function getUserByClerkId(user_clerk_id: string) {
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("user_clerk_id", user_clerk_id)
+      .single();
+
+    if (error) {
+      console.error("Error fetching user:", error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    return null;
+  }
+}

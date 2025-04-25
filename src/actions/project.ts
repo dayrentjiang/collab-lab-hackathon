@@ -1,23 +1,21 @@
 import { supabase } from "@/lib/supabase";
 import { ProjectFormData } from "@/types/types";
 
-//fetch to /api/skills/route.ts
+//fetch to using supabase
+//get all skills
 export const getAvailableSkills = async () => {
   try {
-    const response = await fetch(`/api/skills`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
-    if (!response.ok) {
-      throw new Error("Failed to fetch skills");
+    const { data: skills, error } = await supabase.from("skills").select("*");
+
+    if (error) {
+      console.error("Error fetching skills:", error);
+      return [];
     }
-    const skills = await response.json();
+
     return skills;
   } catch (error) {
     console.error("Error fetching skills:", error);
-    return error;
+    return [];
   }
 };
 
@@ -117,6 +115,20 @@ export const createProject = async (formData: ProjectFormData) => {
       await Promise.all(skillPromises);
     }
 
+    //add to user_project table
+    const { error: userProjectError } = await supabase
+      .from("user_projects")
+      .insert([
+        {
+          user_id: project_creator_id,
+          project_id: project.project_id,
+          user_role: "creator",
+          joined_at: new Date().toISOString()
+        }
+      ]);
+
+    if (userProjectError) throw userProjectError;
+
     return project;
   } catch (error) {
     console.error("Error creating project:", error);
@@ -165,5 +177,26 @@ export const getProjectById = async (projectId: number) => {
   } catch (error) {
     console.error("Error fetching project:", error);
     return error;
+  }
+};
+
+//check project status
+export const checkProjectStatus = async (projectId: number) => {
+  try {
+    const { data: project, error } = await supabase
+      .from("projects")
+      .select("project_status")
+      .eq("project_id", projectId)
+      .single();
+
+    if (error) {
+      console.error("Error fetching project status:", error);
+      return null;
+    }
+
+    return project?.project_status;
+  } catch (error) {
+    console.error("Error fetching project status:", error);
+    return null;
   }
 };

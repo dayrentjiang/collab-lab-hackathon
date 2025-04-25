@@ -26,7 +26,7 @@ export type Project = {
   project_id: number;
   project_title: string;
   project_description: string;
-  project_creator_id: number; // Foreign key to User.user_id
+  project_creator_id: string; // Foreign key to User.user_id
   project_status: "recruiting" | "in_progress" | "completed";
   project_vacancy: number;
   project_timeline?: string;

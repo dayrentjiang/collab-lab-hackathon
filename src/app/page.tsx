@@ -5,8 +5,7 @@ import ProjectCard from "./components/ProjectCard";
 import SkillCategoryTabs from "./components/SkillCategoryTabs";
 import FilteredProjectGrid from "./components/FilteredProjectGrid";
 import { PlusIcon, SearchIcon } from "lucide-react";
-import SearchBar from './components/SearchBar';
-
+import SearchBar from "./components/SearchBar";
 
 export default async function Home({
   searchParams
@@ -59,7 +58,8 @@ export default async function Home({
         </div>
       </section>
 
-     
+      {/* Search Bar */}
+      <SearchBar />
 
       {/* Recommended Projects */}
       <section className="mb-12">
