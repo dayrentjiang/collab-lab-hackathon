@@ -67,7 +67,7 @@ export default function ApplicationSuccessPage({
               </div>
               <div>
                 <p className="text-gray-600">
-                  You'll receive a notification when your application status
+                  You&apos;ll receive a notification when your application status
                   changes.
                 </p>
               </div>
@@ -79,7 +79,7 @@ export default function ApplicationSuccessPage({
               </div>
               <div>
                 <p className="text-gray-600">
-                  If accepted, you'll be added to the project team and can begin
+                  If accepted, you&apos;ll be added to the project team and can begin
                   collaborating.
                 </p>
               </div>

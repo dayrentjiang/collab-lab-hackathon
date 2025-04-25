@@ -186,6 +186,7 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
       };
 
       setMessages((prev) => [...prev, aiMessage]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Error:", err);
       setError(err.message || "Failed to get a response. Please try again.");

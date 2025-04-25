@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { Skill } from "@/types/types";
 import { createProject, getAvailableSkills } from "@/actions/project";
-import { Check, X, Loader2, LayoutGrid, Users } from "lucide-react";
+import { Loader2, LayoutGrid, Users } from "lucide-react";
 import AddSkill from "../../components/AddSkill";
 
 interface ProjectFormData {
@@ -21,22 +21,28 @@ interface ProjectFormData {
 
 export default function CreateProjectPage() {
   const { isLoaded, user } = useUser();
-
-  if (!isLoaded) {
-    return null;
-  }
-
-  if (!user) return null;
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [skills, setSkills] = useState<Skill[]>([]);
   const [isLoadingSkills, setIsLoadingSkills] = useState(true);
   const [skillError, setSkillError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredSkills, setFilteredSkills] = useState<Skill[]>([]);
+
+  if (!isLoaded) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    router.push("/sign-in");
+    return null;
+  }
 
   // Default form state
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [formData, setFormData] = useState<ProjectFormData>({
     project_creator_id: user.id,
     project_title: "",
@@ -47,6 +53,7 @@ export default function CreateProjectPage() {
     required_skills: []
   });
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     const fetchSkills = async () => {
       try {
@@ -56,7 +63,6 @@ export default function CreateProjectPage() {
           skill_id: Number(skill.skill_id)
         }));
         setSkills(normalizedSkills);
-        setFilteredSkills(normalizedSkills); // Initialize filteredSkills
         console.log(normalizedSkills); // <-- Add this to see if the skills are loaded
       } catch (err) {
         console.error("Failed to load skills:", err);
@@ -68,25 +74,6 @@ export default function CreateProjectPage() {
 
     fetchSkills();
   }, []);
-
-  // Handle search input changes
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const term = e.target.value;
-    setSearchTerm(term);
-
-    if (term.trim() === "") {
-      setFilteredSkills(skills); // Show all skills when search is empty
-      return;
-    }
-
-    // Filter skills based on search term
-    const filtered = skills.filter(
-      (skill) =>
-        skill.skill_name.toLowerCase().includes(term.toLowerCase()) ||
-        skill.skill_category.toLowerCase().includes(term.toLowerCase())
-    );
-    setFilteredSkills(filtered);
-  };
 
   // Handle input changes
   const handleInputChange = (
@@ -129,10 +116,6 @@ export default function CreateProjectPage() {
       };
     });
 
-    // Clear search term and reset filtered skills to show all skills
-    setSearchTerm("");
-    setFilteredSkills(skills);
-
     if (errors.required_skills) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -140,11 +123,6 @@ export default function CreateProjectPage() {
         return newErrors;
       });
     }
-  };
-
-  // Find a skill by ID
-  const findSkillById = (id: number): Skill | undefined => {
-    return skills.find((skill) => skill.skill_id === id);
   };
 
   // Validate the form

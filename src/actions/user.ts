@@ -2,7 +2,7 @@ import { ProfileFormData } from "@/types/types";
 import { supabase } from "@/lib/supabase";
 
 //get the user skills from the user_skills table
-export async function getUserSkills(userId: string): Promise<Skill[]> {
+export async function getUserSkills(userId: string) {
   try {
     const { data: userSkills, error } = await supabase
       .from("user_skills")
@@ -119,6 +119,7 @@ export async function updateUser(
     }
 
     return { success: true, data };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Error updating user:", error);
     return { success: false, error: error.message };
@@ -272,11 +273,11 @@ export async function updateUserSkill(id: string, skill_id: number) {
       user_id: data.user_id,
       skill_id: data.skill_id,
       skill_name: data.skills.name,
-
       created_at: data.created_at
     };
 
     return { success: true, data: processedSkill };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Error updating user skill:", error);
     return { success: false, error: error.message };
@@ -294,6 +295,7 @@ export async function deleteUserSkill(id: string) {
     }
 
     return { success: true };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Error deleting user skill:", error);
     return { success: false, error: error.message };

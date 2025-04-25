@@ -8,10 +8,10 @@ const openai = new OpenAI({
 });
 
 // Define TypeScript interfaces
-interface ChatMessage {
-  role: string;
-  content: string;
-}
+import { ChatCompletionMessageParam } from "openai/resources";
+
+// Using OpenAI's type directly instead of our custom interface
+type ChatMessage = ChatCompletionMessageParam;
 
 interface RequestBody {
   messages: ChatMessage[];
@@ -79,6 +79,7 @@ export async function POST(request: NextRequest) {
     const aiMessage = completion.choices[0].message;
 
     return NextResponse.json({ message: aiMessage });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("OpenAI API error:", error);
 

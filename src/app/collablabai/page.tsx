@@ -10,7 +10,7 @@ const CollabLabAI = async () => {
       <p className="text-lg mb-8">
         Your AI assistant for project collaboration.
       </p>
-      <AIChatBot userId={userId} />
+      <AIChatBot userId={userId || ""} />
     </div>
   );
 };
