@@ -11,7 +11,7 @@ export async function GET(
     const { userId } = params;
     const { data: user, error } = await supabase
       .from('users')
-      .select('user_id, user_email, user_name, user_bio, user_role, user_linkedin_link, user_university, user_clerk_id, created_at, updated_at')
+      .select('user_id, user_email, user_name, user_bio, user_role, user_linkedin_link, user_university, user_clerk_id, has_completed_personalized, created_at, updated_at')
       .eq('user_id', userId)
       .single();
 
@@ -34,7 +34,7 @@ export async function PATCH(
   try {
     const { userId } = params;
     const body = await req.json();
-    const { user_email, user_password, user_name, user_bio, user_linkedin_link, user_university, user_clerk_id, user_role } = body;
+    const { user_email, user_password, user_name, user_bio, user_linkedin_link, user_university, user_clerk_id, user_role, has_completed_personalized } = body;
 
     // Build update query dynamically based on provided fields
     const updates: string[] = [];
@@ -82,6 +82,11 @@ export async function PATCH(
       values.push(user_role);
       paramCount++;
     }
+    if (has_completed_personalized !== undefined) {
+      updates.push(`has_completed_personalized = $${paramCount}`);
+      values.push(has_completed_personalized);
+      paramCount++;
+    }
 
     updates.push(`updated_at = NOW()`);
 
@@ -101,6 +106,7 @@ export async function PATCH(
         ...(user_university && { user_university }),
         ...(user_clerk_id && { user_clerk_id }),
         ...(user_role && { user_role }),
+        ...(has_completed_personalized !== undefined && { has_completed_personalized }),
         updated_at: new Date().toISOString()
       })
       .eq('user_id', userId)
