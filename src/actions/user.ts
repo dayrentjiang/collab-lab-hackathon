@@ -10,23 +10,29 @@ export async function createUser(formData: ProfileFormData) {
   console.log("selected_skills", selected_skills);
 
   try {
-    // Step 1: Create the user
-    const response = await fetch(`/api/users`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(userData)
-    });
+    const user_clerk_id = userData.user_clerk_id;
+    const { data: user, error } = await supabase
+      .from("users")
+      .insert([
+        {
+          user_email: userData.user_email,
+          user_name: userData.user_name,
+          user_bio: userData.user_bio,
+          user_linkedin_link: userData.user_linkedin_link,
+          user_university: userData.user_university,
+          user_role: userData.user_role,
+          user_clerk_id,
+          has_completed_personalized: true // Default value
+        }
+      ])
+      .select()
+      .single();
 
-    if (!response.ok) {
-      throw new Error("Failed to create user");
+    if (error) {
+      console.error("Error creating user:", error);
     }
 
-    const user = await response.json();
-    const userId = user.user_id; // Assuming the response contains the user ID
-
-    // Step 2: If there are selected skills, create user_skills entries
+    //after creating the user, we need to insert the selected skills into the user_skills table
     if (selected_skills && selected_skills.length > 0) {
       // Map through the selected skills array and create skill associations
       const skillPromises = selected_skills.map(async (skillId) => {
