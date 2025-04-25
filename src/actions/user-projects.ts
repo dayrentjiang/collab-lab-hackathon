@@ -7,8 +7,12 @@ export const getUserProjects = async (userId: string) => {
   try {
     const { data: userProjects } = await supabase
       .from("user_projects")
-      .select("*, project:projects(*)")
+      .select("*, project_id")
       .eq("user_id", userId);
+
+    if (!userProjects) {
+      throw new Error("No user projects found");
+    }
 
     return userProjects;
   } catch (error) {
@@ -235,5 +239,27 @@ export const getProjectUsers = async (projectId: number) => {
   } catch (error) {
     console.error("[GET_PROJECT_USERS]", error);
     throw new Error("Failed to fetch project users");
+  }
+};
+
+//remove user from project
+export const removeUserFromProject = async (
+  userId: string,
+  projectId: string
+) => {
+  try {
+    console.log("Removing user from project:", userId, projectId);
+    const { data: userProject } = await supabase
+      .from("user_projects")
+      .delete()
+      .eq("user_id", userId)
+      .eq("project_id", projectId)
+      .select()
+      .single();
+
+    return userProject;
+  } catch (error) {
+    console.error("[REMOVE_USER_FROM_PROJECT]", error);
+    throw new Error("Failed to remove user from project");
   }
 };

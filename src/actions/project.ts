@@ -200,3 +200,38 @@ export const checkProjectStatus = async (projectId: number) => {
     return null;
   }
 };
+
+//get project by project id
+export const getProjectByProjectId = async (projectId: number) => {
+  try {
+    const { data: project, error } = await supabase
+      .from("projects")
+      .select("*")
+      .eq("project_id", projectId)
+      .single();
+
+    if (error) throw error;
+
+    return project;
+  } catch (error) {
+    console.error("Error fetching project:", error);
+    return error;
+  }
+};
+
+//remove project by id
+export const removeProjectById = async (projectId: number) => {
+  try {
+    const { error } = await supabase
+      .from("projects")
+      .delete()
+      .eq("project_id", projectId);
+
+    if (error) throw error;
+
+    return true;
+  } catch (error) {
+    console.error("Error removing project:", error);
+    return false;
+  }
+};

@@ -7,7 +7,11 @@ const Page = async () => {
 
   if (!userId) return <div>You must be logged in to view your projects.</div>;
 
-  return <ProjectPage userId={userId} />;
+  return (
+    <div className="">
+      <ProjectPage userId={userId} />
+    </div>
+  );
 };
 
 export default Page;

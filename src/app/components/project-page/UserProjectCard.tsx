@@ -7,10 +7,22 @@ import {
   UsersIcon,
   MessageCircle,
   CheckCircle,
-  XCircle
+  XCircle,
+  Users,
+  Star,
+  Trash2,
+  X
 } from "lucide-react";
-import { getApplicationsByProjectId } from "../../../actions/application"; // Adjust the import path as necessary
-import { getProjectUsers } from "../../../actions/user-projects"; // Adjust the import path as necessary
+import {
+  getApplicationsByProjectId,
+  updateApplicationStatus
+} from "../../../actions/application"; // Adjust the import path as necessary
+import {
+  getProjectUsers,
+  removeUserFromProject
+} from "../../../actions/user-projects"; // Add this import
+import { removeProjectById } from "../../../actions/project"; // Adjust the import path as necessary
+import { useRouter } from "next/navigation";
 
 // Define the skill category color mapping
 const getSkillCategoryColor = (category) => {
@@ -56,24 +68,35 @@ export default function UserProjectCard({ project }) {
   const [applications, setApplications] = useState([]);
   const [projectUsers, setProjectUsers] = useState([]);
   const [expandedApplications, setExpandedApplications] = useState(false);
+  const [expandedMembers, setExpandedMembers] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [updateInProgress, setUpdateInProgress] = useState(false);
+  const router = useRouter(); // Initialize the router
 
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        console.log("Fetching applications for project ID:", project_id);
         const apps = await getApplicationsByProjectId(project_id);
         console.log("Fetched applications:", apps);
         setApplications(apps || []);
-
-        const member = await getProjectUsers(project_id);
-        console.log("Fetched project members:", member);
-        setProjectUsers(member || []);
       } catch (error) {
         console.error("Failed to load applications:", error);
       }
     };
 
+    const fetchProjectMembers = async () => {
+      try {
+        const members = await getProjectUsers(project_id);
+        console.log("Fetched project members:", members);
+        setProjectUsers(members);
+      } catch (error) {
+        console.error("Failed to load project members:", error);
+      }
+    };
+
     fetchApplications();
+    fetchProjectMembers();
   }, [project_id]);
 
   // Format the creation date
@@ -114,10 +137,118 @@ export default function UserProjectCard({ project }) {
     setExpandedApplications(!expandedApplications);
   };
 
+  // Toggle members view
+  const toggleMembersView = () => {
+    setExpandedMembers(!expandedMembers);
+  };
+
+  // Handle application status update
+  const handleStatusUpdate = async (applicationId, newStatus) => {
+    try {
+      setUpdateInProgress(true);
+      await updateApplicationStatus(applicationId, newStatus);
+
+      // Update UI by refetching applications
+      const updatedApps = await getApplicationsByProjectId(project_id);
+      setApplications(updatedApps || []);
+
+      // If we accepted someone, refresh the members list too
+      if (newStatus === "accepted") {
+        const updatedMembers = await getProjectUsers(project_id);
+        setProjectUsers(updatedMembers || []);
+      }
+    } catch (error) {
+      console.error(`Failed to ${newStatus} application:`, error);
+      // You could add toast notification here
+    } finally {
+      setUpdateInProgress(false);
+    }
+  };
+
+  // Handle project deletion
+  const handleDeleteProject = async () => {
+    try {
+      setIsDeleting(true);
+      // Leave this empty for now as requested
+      // Will implement actual delete functionality later
+
+      // For UI mockup, let's simulate a successful deletion after a delay
+      await removeProjectById(project_id);
+      console.log("Project deleted successfully");
+      // You would update UI or redirect here after successful deletion
+      console.log("Project deleted:", project_id);
+    } catch (error) {
+      console.error("Failed to delete project:", error);
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-300">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-300 relative">
+      {/* Delete Button at the top right */}
+      <button
+        onClick={() => setShowDeleteConfirm(true)}
+        className="absolute top-2 right-2 text-gray-400 hover:text-red-500 z-10"
+        title="Delete Project"
+      >
+        <Trash2 className="h-5 w-5" />
+      </button>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Delete Project
+              </h3>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="text-gray-400 hover:text-gray-500"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <p className="mb-6 text-gray-600">
+              Are you sure you want to delete this project? This action cannot
+              be undone and all project data will be permanently lost.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteProject}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 flex items-center"
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <>
+                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Delete Project
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="p-5">
-        <div className="flex justify-between items-start mb-3">
+        <div className="flex justify-between items-start mb-3 mt-4">
+          {" "}
+          {/* Added margin top for delete button space */}
           <h3 className="text-lg font-semibold text-gray-800 line-clamp-1">
             {project_title}
           </h3>
@@ -190,11 +321,159 @@ export default function UserProjectCard({ project }) {
           className="block w-full py-2 bg-blue-500 text-white text-center rounded-full text-sm font-medium hover:bg-blue-600 transition-colors"
         >
           {project_status === "recruiting"
-            ? "View & Apply"
+            ? "View Project"
             : project_status === "in_progress"
             ? "View Details"
             : "View Project"}
         </Link>
+      </div>
+
+      {/* Project Members Section with Toggle */}
+      <div className="border-t border-gray-200">
+        <div
+          className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50"
+          onClick={toggleMembersView}
+        >
+          <h3 className="text-md font-medium flex items-center">
+            <Users className="h-4 w-4 mr-2 text-gray-500" />
+            Team Members ({projectUsers.length})
+          </h3>
+          <span className="text-blue-500 text-sm">
+            {expandedMembers ? "Hide" : "Show"}
+          </span>
+        </div>
+
+        {/* Project Members List */}
+        {expandedMembers && (
+          <div className="px-4 pb-4">
+            {projectUsers.length > 0 ? (
+              <div className="grid grid-cols-1 gap-3">
+                {projectUsers.map((member) => (
+                  <div
+                    key={member.user_project_id}
+                    className="p-3 rounded-md border border-gray-200 hover:border-blue-300 transition-colors"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center">
+                        <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm mr-3">
+                          {getUserInitials(member.userDetails?.user_name)}
+                        </div>
+                        <div>
+                          <div className="font-medium">
+                            {member.userDetails?.user_name}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {member.userDetails?.user_email}
+                          </div>
+                          {member.userDetails?.user_university && (
+                            <div className="text-xs text-gray-500 mt-1">
+                              {member.userDetails.user_university}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span
+                          className={`flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            member.user_role === "creator"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-blue-100 text-blue-800"
+                          }`}
+                        >
+                          {member.user_role === "creator" && (
+                            <Star className="h-3 w-3 mr-1" />
+                          )}
+                          {member.user_role.charAt(0).toUpperCase() +
+                            member.user_role.slice(1)}
+                        </span>
+
+                        {member.user_role !== "creator" && (
+                          <button
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              try {
+                                console.log(
+                                  "Removing user from project...",
+                                  member.user_id,
+                                  member.project_id
+                                );
+                                await removeUserFromProject(
+                                  member.user_id,
+                                  member.project_id
+                                );
+                                // Update UI by refetching project members
+                                const updatedMembers = await getProjectUsers(
+                                  project_id
+                                );
+                                setProjectUsers(updatedMembers || []);
+                              } catch (error) {
+                                console.error(
+                                  "Failed to remove member from project:",
+                                  error
+                                );
+                              }
+                            }}
+                            className="p-1 text-gray-400 hover:text-red-500 rounded-full hover:bg-gray-100"
+                            title="Remove Member"
+                          >
+                            <XCircle className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {member.userDetails?.user_bio && (
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded-md">
+                          {member.userDetails.user_bio.length > 100
+                            ? `${member.userDetails.user_bio.substring(
+                                0,
+                                100
+                              )}...`
+                            : member.userDetails.user_bio}
+                        </p>
+                      </div>
+                    )}
+
+                    {member.userDetails?.skills &&
+                      member.userDetails.skills.length > 0 && (
+                        <div className="mt-2">
+                          <div className="text-xs text-gray-500 mb-1">
+                            Skills:
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {member.userDetails.skills
+                              .slice(0, 3)
+                              .map((skill, index) => (
+                                <span
+                                  key={index}
+                                  className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                                >
+                                  {skill.skill_name || "Skill"}
+                                </span>
+                              ))}
+                            {member.userDetails.skills.length > 3 && (
+                              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                                +{member.userDetails.skills.length - 3} more
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                    <div className="mt-2 text-xs text-gray-500">
+                      Joined: {formatApplicationDate(member.joined_at)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-gray-500 text-center py-4">
+                No team members yet.
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Applications Section with Toggle */}
@@ -215,6 +494,13 @@ export default function UserProjectCard({ project }) {
         {/* Applications List */}
         {expandedApplications && (
           <div className="px-4 pb-4">
+            {updateInProgress && (
+              <div className="flex justify-center items-center py-2 mb-3 bg-blue-50 text-blue-700 rounded-md">
+                <div className="h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-2"></div>
+                Updating application status...
+              </div>
+            )}
+
             {applications.length > 0 ? (
               <div className="space-y-3">
                 {applications.map((app) => (
@@ -237,7 +523,7 @@ export default function UserProjectCard({ project }) {
                         </div>
                       </div>
                       <span
-                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                        className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           applicationStatusColors[app.application_status] ||
                           "bg-gray-100 text-gray-800"
                         }`}
@@ -269,29 +555,21 @@ export default function UserProjectCard({ project }) {
                       {app.application_status === "pending" && (
                         <div className="flex space-x-2">
                           <button
-                            className="flex items-center text-xs text-green-600 hover:text-green-800"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              console.log(
-                                "Accept applicant:",
-                                app.application_id
-                              );
-                              // Add your accept function here
-                            }}
+                            className="flex items-center text-xs text-green-600 hover:text-green-800 disabled:opacity-50"
+                            onClick={() =>
+                              handleStatusUpdate(app.application_id, "accepted")
+                            }
+                            disabled={updateInProgress}
                           >
                             <CheckCircle className="h-3.5 w-3.5 mr-1" />
                             Accept
                           </button>
                           <button
-                            className="flex items-center text-xs text-red-600 hover:text-red-800"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              console.log(
-                                "Reject applicant:",
-                                app.application_id
-                              );
-                              // Add your reject function here
-                            }}
+                            className="flex items-center text-xs text-red-600 hover:text-red-800 disabled:opacity-50"
+                            onClick={() =>
+                              handleStatusUpdate(app.application_id, "rejected")
+                            }
+                            disabled={updateInProgress}
                           >
                             <XCircle className="h-3.5 w-3.5 mr-1" />
                             Reject
