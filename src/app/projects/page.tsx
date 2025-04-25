@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { getAllProjects } from '@/types/mockData';
+import { getAllProjects } from '../../actions/project';
 import ProjectCard from '../components/ProjectCard';
 import { FilterIcon, PlusIcon, SearchIcon } from 'lucide-react';
 import ProjectsFilter from '../components/ProjectsFilter';
@@ -19,7 +19,7 @@ export default async function ProjectsPage({
   const query = typeof searchParams.q === 'string' ? searchParams.q : undefined;
   
   // Fetch projects with filters
-  const projects = await getAllProjects({ category, status, query });
+  const projects = await getAllProjects();
   
   return (
     <main className="container mx-auto px-4 py-8">
