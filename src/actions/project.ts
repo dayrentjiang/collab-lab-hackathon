@@ -22,14 +22,35 @@ export const getAvailableSkills = async () => {
 
 //get all projects
 export const getAllProjects = async () => {
+  const completeProject = [];
   try {
     const { data: projects, error } = await supabase.from("projects").select(`
-        *,
-        project_creator:users(*)
-      `);
+            *,
+            project_creator:users(*)
+        `);
 
     if (error) throw error;
-    return projects;
+
+    //get all projects with skills, map through the projects and get the skills for each project and insert them into the completeProject object
+    for (let i = 0; i < projects.length; i++) {
+      const { data: projectSkills, error } = await supabase
+        .from("project_skills")
+        .select(
+          `
+                *,
+                skill:skills(*)
+            `
+        )
+        .eq("project_id", projects[i].project_id);
+
+      if (error) throw error;
+
+      completeProject.push({
+        ...projects[i],
+        skills: projectSkills
+      });
+    }
+    return completeProject;
   } catch (error) {
     console.error("Error fetching projects:", error);
     return error;
