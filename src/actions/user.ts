@@ -209,18 +209,19 @@ export async function getProjectDetails(projectId: number) {
 //get user by user_clerk_id
 export async function getUserByClerkId(user_clerk_id: string) {
   try {
-    const { data, error } = await supabase
+    // Get user data
+    const { data: user, error: userError } = await supabase
       .from("users")
       .select("*")
       .eq("user_clerk_id", user_clerk_id)
       .single();
 
-    if (error) {
-      console.error("Error fetching user:", error);
+    if (userError) {
+      console.error("Error fetching user:", userError);
       return null;
     }
 
-    //for the user get the skills
+    // Get user's skills
     const { data: userSkills, error: skillsError } = await supabase
       .from("user_skills")
       .select("skill_id:skills(*)")
@@ -230,13 +231,23 @@ export async function getUserByClerkId(user_clerk_id: string) {
       console.error("Error fetching user skills:", skillsError);
       return null;
     }
-    //return the user with the skills
+
+    // Get all available skills
+    const { data: allSkills, error: allSkillsError } = await supabase
+      .from("skills")
+      .select("*");
+
+    if (allSkillsError) {
+      console.error("Error fetching all skills:", allSkillsError);
+      return null;
+    }
+
     return {
       ...data,
       skills: userSkills
     };
   } catch (error) {
-    console.error("Error fetching user:", error);
+    console.error("Error fetching user data:", error);
     return null;
   }
 }

@@ -6,12 +6,9 @@ import { getUserByClerkId } from '@/actions/user';
 import Link from 'next/link';
 
 interface UserSkill {
-  id: string;
-  user_id: string;
-  skill_id: string;
+  skill_id: number;
   skill_name: string;
-  proficiency_level: number;
-  created_at: string;
+  skill_category: string;
 }
 
 interface User {
@@ -123,17 +120,13 @@ export default function UserProfilePage() {
         
         {userProfile.skills && userProfile.skills.length > 0 ? (
           <div className="flex flex-wrap gap-2">
-            {userProfile.skills.map((skillObj) => (
-  <div 
-    
-  >
-    <span className="bg-gray-100 px-3 py-1 rounded-full flex items-center">
-      {skillObj.skill_id.skill_name}
-    </span>
-  </div>
-))}
-
-           
+            {userProfile.skills.map((skill) => (
+              <div key={skill.skill_id}>
+                <span className="bg-gray-100 px-3 py-1 rounded-full flex items-center">
+                  {skill.skill_name}
+                </span>
+              </div>
+            ))}
           </div>
         ) : (
           <p className="text-gray-500">No skills added yet.</p>
@@ -141,7 +134,7 @@ export default function UserProfilePage() {
         
         <div className="mt-4">
           <Link
-            href="/manage-skills"
+            href="/profile/edit"
             className="text-blue-500 hover:text-blue-700 font-medium"
           >
             Manage skills

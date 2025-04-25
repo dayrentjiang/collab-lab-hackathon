@@ -1,40 +1,51 @@
+"use client";
+
 import { useState, useEffect, useRef } from "react";
-import { Skill } from "@/types/types";
+import { Skill } from "@/types/types"; // Assuming this type is already defined for your skills.
 import { Check, X, Plus, Search, Tag } from "lucide-react";
-import { getUserSkills } from "@/actions/user"; // Import the getUserSkills function
+import { useUser } from "@clerk/clerk-react"; // Clerk hook
+import { getUserByClerkId, updateUserSkills } from "@/actions/user"; // Assuming this fetches and updates the user data with skills.
 
-interface ManageSkillsProps {
-  userId: string; // Assuming the userId is passed down as a prop or comes from Clerk
-  skills: Skill[];
-  error?: string | null;
-}
+export default function ManageSkills() {
+  const { user, isLoaded, isSignedIn } = useUser(); // Get the current user data from Clerk
 
-export default function ManageSkills({
-  userId,
-  skills,
-  error
-}: ManageSkillsProps) {
-  const [selectedSkills, setSelectedSkills] = useState<number[]>([]);
+  const [userSkills, setUserSkills] = useState<Skill[]>([]);  // State to store fetched user skills
+  const [allSkills, setAllSkills] = useState<Skill[]>([]);    // All available skills
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredSkills, setFilteredSkills] = useState<Skill[]>([]);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch user's current skills on component mount using getUserSkills function
+  // Fetch user's existing skills and all available skills
   useEffect(() => {
-    async function fetchUserSkills() {
-      try {
-        const userSkills = await getUserSkills(userId); // Fetch the skills using the userId
-        setSelectedSkills(userSkills.map((skill) => skill.skill_id)); // Assuming skill_id is the identifier
-      } catch (err) {
-        console.error("Error fetching user skills:", err);
-      }
-    }
+    const fetchSkills = async () => {
+      if (isSignedIn && user?.id) {
+        const userId = user.id; // Clerk's user ID
+        const userData = await getUserByClerkId(userId); // Fetch user data using Clerk ID
+        
+        if (userData) {
+          // Ensure skills and allSkills are defined as arrays
+          const skills = Array.isArray(userData.skills) ? userData.skills : [];
+          const allSkills = Array.isArray(userData.allSkills) ? userData.allSkills : [];
 
-    fetchUserSkills();
-  }, [userId]);
+          setUserSkills(skills);  // Set the user skills
+          setAllSkills(allSkills);  // Set the all available skills
+          setFilteredSkills(allSkills);  // Filtered skills are initially set to allSkills
+        }
+      }
+    };
+
+    if (isLoaded && isSignedIn) {
+      fetchSkills(); // Run the fetch when Clerk data is loaded and the user is signed in
+    }
+  }, [isLoaded, isSignedIn, user?.id]); // Dependency array to rerun when the user data changes
+
+  // Get unique categories from all skills
+  const categories = Array.from(
+    new Set(allSkills.map((skill) => skill.skill_category))
+  );
 
   // Handle search input changes
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +56,7 @@ export default function ManageSkills({
 
   // Filter skills based on search term and category filters
   const filterSkills = (term: string = searchTerm) => {
-    let filtered = skills;
+    let filtered = allSkills || [];  // Ensure allSkills is defined as an empty array if undefined
 
     // Apply category filters if any
     if (categoryFilters.length > 0) {
@@ -77,31 +88,31 @@ export default function ManageSkills({
     });
   };
 
-  // Find a skill by ID
-  const findSkillById = (id: number): Skill | undefined => {
-    return skills.find((skill) => skill.skill_id === id);
+  // Handle skill removal
+  const handleRemoveSkill = async (skillId: number) => {
+    if (!user?.id) return;
+    
+    const updatedSkills = userSkills.filter((skill) => skill.skill_id !== skillId);
+    setUserSkills(updatedSkills);
+    await updateUserSkills(user.id, updatedSkills.map(skill => skill.skill_id));
   };
 
-  // Add or remove skill from selected skills
-  const handleSkillToggle = async (skillId: number) => {
-    const isSelected = selectedSkills.includes(skillId);
-    try {
-      if (isSelected) {
-        // Remove skill (delete it)
-        setSelectedSkills(prevSkills => prevSkills.filter(id => id !== skillId));
-      } else {
-        // Add skill (update it)
-        setSelectedSkills(prevSkills => [...prevSkills, skillId]);
-      }
-    } catch (error) {
-      console.error("Error updating skills:", error);
+  // Handle skill addition
+  const handleAddSkill = async (skillId: number) => {
+    if (!user?.id) return;
+    
+    const skillToAdd = allSkills.find((skill) => skill.skill_id === skillId);
+    if (skillToAdd && !userSkills.some((skill) => skill.skill_id === skillId)) {
+      const updatedSkills = [...userSkills, skillToAdd];
+      setUserSkills(updatedSkills);
+      await updateUserSkills(user.id, updatedSkills.map(skill => skill.skill_id));
     }
   };
 
   // Open dropdown and focus search input
   const openDropdown = () => {
     setIsDropdownOpen(true);
-    setFilteredSkills(skills);
+    setFilteredSkills(allSkills);
     setTimeout(() => {
       inputRef.current?.focus();
     }, 0);
@@ -125,15 +136,13 @@ export default function ManageSkills({
     };
   }, []);
 
-  // Get unique categories from skills
-  const categories = Array.from(
-    new Set(skills.map((skill) => skill.skill_category))
-  );
+  if (!isLoaded) {
+    return <div>Loading...</div>; // Optionally show loading while Clerk user data is fetched
+  }
 
-  // Initial filtering
-  useEffect(() => {
-    setFilteredSkills(skills);
-  }, [skills]);
+  if (!isSignedIn) {
+    return <div>You need to sign in to see your data.</div>; // Show message if user is not signed in
+  }
 
   return (
     <div className="space-y-4">
@@ -142,53 +151,35 @@ export default function ManageSkills({
           Manage Skills <span className="text-red-500">*</span>
         </label>
         <p className="text-sm text-gray-500 mb-3">
-          Select or remove skills as needed
+          Select or remove skills from your profile
         </p>
       </div>
 
-      {/* Error message */}
-      {error && (
-        <div className="mb-3 p-2 bg-red-50 border border-red-100 rounded-md">
-          <p className="text-sm text-red-600">{error}</p>
-        </div>
-      )}
-
-      {/* Selected Skills Display */}
+      {/* User's Current Skills Display */}
       <div className="mb-4">
-        <div
-          className={`flex flex-wrap gap-2 p-3 ${
-            selectedSkills.length > 0 ? "bg-gray-50" : ""
-          } rounded-md border border-gray-200 min-h-16`}
-        >
-          {selectedSkills.length === 0 ? (
+        <div className={`flex flex-wrap gap-2 p-3 ${userSkills.length > 0 ? "bg-gray-50" : ""} rounded-md border border-gray-200 min-h-16`}>
+          {userSkills.length === 0 ? (
             <p className="text-sm text-gray-400 flex items-center">
               No skills selected
             </p>
           ) : (
-            selectedSkills.map((skillId) => {
-              const skill = findSkillById(skillId);
-              return skill ? (
-                <div
-                  key={skillId}
-                  className="flex items-center bg-white px-3 py-1 rounded-full border border-gray-200 text-sm shadow-sm"
+            userSkills.map((skillObj) => (
+              <div key={skillObj.skill_id} className="flex items-center bg-white px-3 py-1 rounded-full border border-gray-200 text-sm shadow-sm">
+                <span className="mr-2">{skillObj.skill_name}</span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveSkill(skillObj.skill_id)}
+                  className="text-gray-400 hover:text-red-500 focus:outline-none"
+                  aria-label={`Remove ${skillObj.skill_name}`}
                 >
-                  <span className="mr-2">{skill.skill_name}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleSkillToggle(skillId)}
-                    className="text-gray-400 hover:text-red-500 focus:outline-none"
-                    aria-label={`Remove ${skill.skill_name}`}
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ) : null;
-            })
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ))
           )}
         </div>
       </div>
 
-      {/* Skill Selector */}
       <div className="relative" ref={dropdownRef}>
         <button
           type="button"
@@ -197,19 +188,16 @@ export default function ManageSkills({
         >
           <span className="flex items-center text-gray-700">
             <Plus className="h-4 w-4 mr-2" />
-            Manage Skills
+            Add Skills
           </span>
           <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-            {selectedSkills.length} selected
+            {userSkills.length} selected
           </span>
         </button>
 
         {isDropdownOpen && (
-          <div
-            className="absolute z-50 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 overflow-visible"
-            style={{ maxHeight: "70vh" }}
-          >
-            {/* Search input */}
+          <div className="absolute z-50 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 overflow-visible" style={{ maxHeight: "70vh" }}>
+            {/* Search */}
             <div className="p-3 border-b border-gray-200">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -224,12 +212,9 @@ export default function ManageSkills({
               </div>
             </div>
 
-            {/* Category filters */}
+            {/* Category Filters */}
             <div className="px-3 py-2 border-b border-gray-200">
-              <div
-                className="flex flex-wrap gap-2 overflow-y-auto"
-                style={{ maxHeight: "6rem" }}
-              >
+              <div className="flex flex-wrap gap-2 overflow-y-auto" style={{ maxHeight: "6rem" }}>
                 {categories.map((category) => (
                   <button
                     key={category}
@@ -248,16 +233,16 @@ export default function ManageSkills({
               </div>
             </div>
 
-            {/* Skills list */}
+            {/* Skills List */}
             <div className="overflow-y-auto" style={{ maxHeight: "15rem" }}>
               {filteredSkills.length > 0 ? (
                 filteredSkills.map((skill) => (
                   <button
                     key={skill.skill_id}
                     type="button"
-                    onClick={() => handleSkillToggle(skill.skill_id)}
+                    onClick={() => handleAddSkill(skill.skill_id)}
                     className={`w-full text-left px-4 py-2 hover:bg-gray-50 focus:bg-gray-50 ${
-                      selectedSkills.includes(skill.skill_id)
+                      userSkills.some((s) => s.skill_id === skill.skill_id)
                         ? "bg-blue-50"
                         : ""
                     }`}
@@ -268,7 +253,7 @@ export default function ManageSkills({
                         <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full capitalize mr-2">
                           {skill.skill_category}
                         </span>
-                        {selectedSkills.includes(skill.skill_id) && (
+                        {userSkills.some((s) => s.skill_id === skill.skill_id) && (
                           <Check className="h-4 w-4 text-blue-500" />
                         )}
                       </div>
@@ -282,7 +267,7 @@ export default function ManageSkills({
               )}
             </div>
 
-            {/* Footer with close button */}
+            {/* Dropdown Footer */}
             <div className="p-3 border-t border-gray-200 bg-gray-50 flex justify-end">
               <button
                 type="button"
