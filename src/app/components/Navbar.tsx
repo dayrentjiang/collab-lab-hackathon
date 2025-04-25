@@ -67,6 +67,16 @@ export default function Navbar() {
               >
                 Projects
               </Link>
+              <Link 
+                href="/profile" 
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                  isActive('/profile') 
+                    ? 'border-blue-500 text-gray-900' 
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                }`}
+              >
+                Profile
+              </Link>
               </SignedIn>
             </div>
           </div>
@@ -92,6 +102,8 @@ export default function Navbar() {
                 <PlusCircle className="h-4 w-4 mr-1" />
                 <span>Create</span>
               </Link>
+
+             
               
               {/* User dropdown */}
               <div className="ml-3 relative">

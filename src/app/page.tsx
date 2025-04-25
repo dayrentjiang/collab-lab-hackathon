@@ -58,8 +58,9 @@ export default async function Home({
         </div>
       </section>
 
-      {/* Search Bar */}
-      <SearchBar />
+    
+
+    
 
       {/* Recommended Projects */}
       <section className="mb-12">

@@ -1,6 +1,22 @@
 import { ProfileFormData } from "@/types/types";
 import { supabase } from "@/lib/supabase";
 
+export async function getUserSkills(userId: string): Promise<Skill[]> {
+  try {
+    const response = await fetch(`/api/users/${userId}/skills`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch user skills');
+    }
+
+    const data = await response.json();
+    return data.skills || [];
+  } catch (err) {
+    console.error(err);
+    throw new Error('Error fetching user skills');
+  }
+}
+
 // Fixed createUser function
 // Fixed createUser function
 export async function createUser(formData: ProfileFormData) {
@@ -79,6 +95,31 @@ export async function createUser(formData: ProfileFormData) {
     return error;
   }
 }
+
+export async function updateUser(user_clerk_id: string, input: Partial<ProfileFormData>) {
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .update(input)
+      .eq("user_clerk_id", user_clerk_id)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error("Error updating user:", error);
+      return { success: false, error: error.message };
+    }
+    
+    
+    
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("Error updating user:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+
 
 //now get the has_completed_personalized value from the user table and return it
 export async function getUserHasCompletedPersonalized(userId: string) {
@@ -194,20 +235,74 @@ export async function getUserByClerkId(user_clerk_id: string) {
     return null;
   }
 }
+export async function updateUserSkill(
+  id: string,
+  skill_id: number,
 
-//get all users
-export async function getAllUsers() {
+) {
   try {
-    const { data, error } = await supabase.from("users").select("*");
+    const { data, error } = await supabase
+      .from("user_skills")
+      .update({
+        skill_id,
+    
+      })
+      .eq("id", id)
+      .select(`
+        id,
+        user_id,
+        skill_id,
+      
+        created_at,
+        skills (
+          id,
+          name
+        )
+      `)
+      .single();
 
     if (error) {
-      console.error("Error fetching users:", error);
-      return null;
+      console.error("Error updating user skill:", error);
+      return { success: false, error: error.message };
     }
 
-    return data;
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    return null;
+    const processedSkill = {
+      id: data.id,
+      user_id: data.user_id,
+      skill_id: data.skill_id,
+      skill_name: data.skills.name,
+     
+      created_at: data.created_at
+    };
+
+    
+
+    return { success: true, data: processedSkill };
+  } catch (error: any) {
+    console.error("Error updating user skill:", error);
+    return { success: false, error: error.message };
   }
+}
+
+// Delete user skill
+export async function deleteUserSkill(id: string) {
+  try {
+    const { error } = await supabase
+      .from("user_skills")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error deleting user skill:", error);
+      return { success: false, error: error.message };
+    }
+
+    
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error deleting user skill:", error);
+    return { success: false, error: error.message };
+  }
+
 }
