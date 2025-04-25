@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { Skill } from '@/types/types';
-import { Check, X, Plus, Search, Tag } from 'lucide-react';
+import { useState, useEffect, useRef } from "react";
+import { Skill } from "@/types/types";
+import { Check, X, Plus, Search, Tag } from "lucide-react";
 
 interface AddSkillProps {
   skills: Skill[];
@@ -15,9 +15,9 @@ export default function AddSkill({
   skills,
   selectedSkills,
   onSkillToggle,
-  error,
+  error
 }: AddSkillProps) {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [filteredSkills, setFilteredSkills] = useState<Skill[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
@@ -25,7 +25,9 @@ export default function AddSkill({
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Get unique categories from skills
-  const categories = Array.from(new Set(skills.map(skill => skill.skill_category)));
+  const categories = Array.from(
+    new Set(skills.map((skill) => skill.skill_category))
+  );
 
   // Handle search input changes
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,16 +42,17 @@ export default function AddSkill({
 
     // Apply category filters if any
     if (categoryFilters.length > 0) {
-      filtered = filtered.filter(skill =>
+      filtered = filtered.filter((skill) =>
         categoryFilters.includes(skill.skill_category)
       );
     }
 
     // Apply search term filter if any
-    if (term.trim() !== '') {
-      filtered = filtered.filter(skill =>
-        skill.skill_name.toLowerCase().includes(term.toLowerCase()) ||
-        skill.skill_category.toLowerCase().includes(term.toLowerCase())
+    if (term.trim() !== "") {
+      filtered = filtered.filter(
+        (skill) =>
+          skill.skill_name.toLowerCase().includes(term.toLowerCase()) ||
+          skill.skill_category.toLowerCase().includes(term.toLowerCase())
       );
     }
 
@@ -58,9 +61,9 @@ export default function AddSkill({
 
   // Toggle category filter
   const toggleCategoryFilter = (category: string) => {
-    setCategoryFilters(prev => {
+    setCategoryFilters((prev) => {
       const newFilters = prev.includes(category)
-        ? prev.filter(c => c !== category)
+        ? prev.filter((c) => c !== category)
         : [...prev, category];
       filterSkills();
       return newFilters;
@@ -69,7 +72,7 @@ export default function AddSkill({
 
   // Find a skill by ID
   const findSkillById = (id: number): Skill | undefined => {
-    return skills.find(skill => skill.skill_id === id);
+    return skills.find((skill) => skill.skill_id === id);
   };
 
   // Open dropdown and focus search input
@@ -84,15 +87,18 @@ export default function AddSkill({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
-        setSearchTerm('');
+        setSearchTerm("");
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -123,13 +129,15 @@ export default function AddSkill({
       <div className="mb-4">
         <div
           className={`flex flex-wrap gap-2 p-3 ${
-            selectedSkills.length > 0 ? 'bg-gray-50' : ''
+            selectedSkills.length > 0 ? "bg-gray-50" : ""
           } rounded-md border border-gray-200 min-h-16`}
         >
           {selectedSkills.length === 0 ? (
-            <p className="text-sm text-gray-400 flex items-center">No skills selected</p>
+            <p className="text-sm text-gray-400 flex items-center">
+              No skills selected
+            </p>
           ) : (
-            selectedSkills.map(skillId => {
+            selectedSkills.map((skillId) => {
               const skill = findSkillById(skillId);
               return skill ? (
                 <div
@@ -171,14 +179,12 @@ export default function AddSkill({
         {isDropdownOpen && (
           <div
             className="absolute z-50 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 overflow-visible"
-            style={{ maxHeight: '70vh' }}
+            style={{ maxHeight: "70vh" }}
           >
             {/* Search input */}
             <div className="p-3 border-b border-gray-200">
               <div className="relative">
-                <Search
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"
-                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   ref={inputRef}
                   type="text"
@@ -194,17 +200,17 @@ export default function AddSkill({
             <div className="px-3 py-2 border-b border-gray-200">
               <div
                 className="flex flex-wrap gap-2 overflow-y-auto"
-                style={{ maxHeight: '6rem' }}
+                style={{ maxHeight: "6rem" }}
               >
-                {categories.map(category => (
+                {categories.map((category) => (
                   <button
                     key={category}
                     type="button"
                     onClick={() => toggleCategoryFilter(category)}
                     className={`px-2 py-1 text-xs rounded-full flex items-center ${
                       categoryFilters.includes(category)
-                        ? 'bg-blue-100 text-blue-800 border border-blue-300'
-                        : 'bg-gray-100 text-gray-700 border border-gray-200'
+                        ? "bg-blue-100 text-blue-800 border border-blue-300"
+                        : "bg-gray-100 text-gray-700 border border-gray-200"
                     }`}
                   >
                     <Tag className="h-3 w-3 mr-1" />
@@ -215,18 +221,17 @@ export default function AddSkill({
             </div>
 
             {/* Skills list */}
-            <div
-              className="overflow-y-auto"
-              style={{ maxHeight: '15rem' }}
-            >
+            <div className="overflow-y-auto" style={{ maxHeight: "15rem" }}>
               {filteredSkills.length > 0 ? (
-                filteredSkills.map(skill => (
+                filteredSkills.map((skill) => (
                   <button
                     key={skill.skill_id}
                     type="button"
                     onClick={() => onSkillToggle(skill.skill_id)}
                     className={`w-full text-left px-4 py-2 hover:bg-gray-50 focus:bg-gray-50 ${
-                      selectedSkills.includes(skill.skill_id) ? 'bg-blue-50' : ''
+                      selectedSkills.includes(skill.skill_id)
+                        ? "bg-blue-50"
+                        : ""
                     }`}
                   >
                     <div className="flex items-center justify-between">

@@ -117,6 +117,20 @@ export const createProject = async (formData: ProjectFormData) => {
       await Promise.all(skillPromises);
     }
 
+    //add to user_project table
+    const { error: userProjectError } = await supabase
+      .from("user_projects")
+      .insert([
+        {
+          user_id: project_creator_id,
+          project_id: project.project_id,
+          user_role: "creator",
+          joined_at: new Date().toISOString()
+        }
+      ]);
+
+    if (userProjectError) throw userProjectError;
+
     return project;
   } catch (error) {
     console.error("Error creating project:", error);
