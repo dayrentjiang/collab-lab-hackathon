@@ -58,7 +58,7 @@ export async function createUser(formData: ProfileFormData) {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            user_id: userId,
+            user_id: user_clerk_id,
             skill_id: skillId
           })
         });
