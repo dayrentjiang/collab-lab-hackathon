@@ -21,6 +21,7 @@ export const getAvailableSkills = async () => {
 };
 
 export const getAllProjects = async () => {
+<<<<<<< HEAD
   const completeProject = [];
   try {
     // First, get all projects with their creators
@@ -52,10 +53,19 @@ export const getAllProjects = async () => {
       return {
         ...project,
         skills: projectSkills
-      };
-    });
+      });
+    }
+    return completeProject;
+=======
+  try {
+    const { data: projects, error } = await supabase.from("projects").select(`
+        *,
+        project_creator:users(*)
+      `);
 
-    return completeProjects;
+    if (error) throw error;
+    return projects;
+>>>>>>> 7ded68b (get all projects)
   } catch (error) {
     console.error("Error fetching projects:", error);
     return error;
