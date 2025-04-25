@@ -40,8 +40,20 @@ export type UserSkill = {
 };
 
 export type ProjectSkill = {
+  id: string;
   project_id: number; // Foreign key to Project.project_id
   skill_id: number; // Foreign key to Skill.skill_id
+  created_at: string;
+  updated_at: string;
+};
+
+export type CreateProjectSkillInput = {
+  project_id: number;
+  skill_id: number;
+};
+
+export type UpdateProjectSkillInput = {
+  skill_id?: number;
 };
 
 export type UserProject = {
