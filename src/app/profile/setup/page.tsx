@@ -8,6 +8,7 @@ import { Skill } from '@/types/types';
 import { Check, X, ChevronRight, Loader2 } from 'lucide-react';
 import { getAvailableSkills } from '@/actions/project';
 import AddSkill from '../../components/AddSkill'; 
+import { createUser } from '../../../actions/user'
 
 
 
@@ -51,11 +52,23 @@ const findSkillById = (id: number): Skill | undefined => {
   };
 
   //check if user has_completed_personalized. redirect them to /
-  useEffect(()=> {
-    //fetch for the user has_completed_personalized
-    //if true
-    //redirect to /
-  })
+  
+  useEffect(() => {
+    const checkUserProfile = async () => {
+      if (!user?.id) return;
+  
+      try {
+        const profile = await user_clerk_id(user.id);
+        if (profile?.has_completed_personalized) {
+          router.push('/'); // redirect if already completed
+        }
+      } catch (error) {
+        console.error('Error checking user profile:', error);
+      }
+    };
+  
+    checkUserProfile();
+  }, [user, router]);
 
   useEffect(() => {
     const fetchSkills = async () => {
@@ -176,10 +189,11 @@ const toggleSkill = (skillId: number) => {
       // In a real app, you would make an API call to save the profile data
       console.log (formData)
       // For this example, we'll simulate a successful submission
-      await new Promise(resolve => setTimeout(resolve, 1500));
+    await createUser(formData);
+
       
       // Redirect to dashboard after successful submission
-      router.push('/dashboard');
+      router.push('/');
     } catch (error) {
       console.error('Error saving profile:', error);
       setIsSubmitting(false);

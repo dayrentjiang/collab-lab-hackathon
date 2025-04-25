@@ -34,7 +34,7 @@ export async function createUser(formData: ProfileFormData) {
         // because it seems we're already working with skill IDs
 
         // Create the user skill in the user_skills table
-        const userSkillResponse = await fetch(`/api/user-skills`, {
+        const userSkillResponse = await fetch(`/api/user/skills`, {
           // Changed to kebab case format
           method: "POST",
           headers: {
