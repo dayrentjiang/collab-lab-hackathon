@@ -9,6 +9,17 @@ export async function createUser(formData: ProfileFormData) {
   console.log("selected_skills", selected_skills);
   try {
     const user_clerk_id = userData.user_clerk_id;
+    // Check if user already exists
+    const { data: existingUser } = await supabase
+      .from("users")
+      .select("user_id")
+      .eq("user_clerk_id", user_clerk_id)
+      .single();
+    if (existingUser) {
+      console.log("User already exists:", existingUser);
+      return existingUser;
+    }
+
     const { data: user, error } = await supabase
       .from("users")
       .insert([
