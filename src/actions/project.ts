@@ -18,5 +18,11 @@ export const getAvailableSkills = async () => {
   }
 };
 
+//get all projects
+
+//get recommended projects for user
+
+//get all user projects
+
 //create project
 //we will create[]= the project and then create the project_skills
