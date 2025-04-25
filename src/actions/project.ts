@@ -243,6 +243,7 @@ export const updateProjectStatus = async (
   userId: string
 ) => {
   try {
+    console.log("Updating project status:", projectId, status, userId);
     // Check if the user is the creator of the project
     const { data: project, error: fetchError } = await supabase
       .from("projects")

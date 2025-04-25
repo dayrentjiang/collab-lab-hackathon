@@ -11,7 +11,8 @@ import {
   Users,
   Star,
   Trash2,
-  X
+  X,
+  ChevronDown
 } from "lucide-react";
 import {
   getApplicationsByProjectId,
@@ -21,8 +22,11 @@ import {
   getProjectUsers,
   removeUserFromProject
 } from "../../../actions/user-projects"; // Add this import
-import { removeProjectById } from "../../../actions/project"; // Adjust the import path as necessary
-import { useRouter } from "next/navigation";
+import {
+  removeProjectById,
+  updateProjectStatus
+} from "../../../actions/project"; // Added updateProjectStatus import
+import { getUserByClerkId } from "../../../actions/user"; // Adjust the import path as necessary
 
 // Define the skill category color mapping
 const getSkillCategoryColor = (category) => {
@@ -45,6 +49,13 @@ const statusColors = {
   "completed": "bg-gray-100 text-gray-800"
 };
 
+// Status display names
+const statusDisplayNames = {
+  "recruiting": "Recruiting",
+  "in_progress": "In Progress",
+  "completed": "Completed"
+};
+
 // Application status color mapping
 const applicationStatusColors = {
   "pending": "bg-yellow-100 text-yellow-800",
@@ -62,7 +73,7 @@ export default function UserProjectCard({ project }) {
     project_timeline,
     created_at,
     projectSkills,
-    project_creator
+    project_creator_id
   } = project;
 
   const [applications, setApplications] = useState([]);
@@ -72,7 +83,10 @@ export default function UserProjectCard({ project }) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [updateInProgress, setUpdateInProgress] = useState(false);
-  const router = useRouter(); // Initialize the router
+  const [currentStatus, setCurrentStatus] = useState(project_status);
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+  const [statusUpdateInProgress, setStatusUpdateInProgress] = useState(false);
+  const [projectCreator, setProjectCreator] = useState(null);
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -87,17 +101,32 @@ export default function UserProjectCard({ project }) {
 
     const fetchProjectMembers = async () => {
       try {
+        // This gets all members of the project
         const members = await getProjectUsers(project_id);
         console.log("Fetched project members:", members);
-        setProjectUsers(members);
+        setProjectUsers(members || []);
       } catch (error) {
         console.error("Failed to load project members:", error);
       }
     };
 
+    // Fetch project creator details
+    const fetchProjectCreator = async () => {
+      try {
+        if (project_creator_id) {
+          const creator = await getUserByClerkId(project_creator_id);
+          console.log("Fetched project creator:", creator);
+          setProjectCreator(creator);
+        }
+      } catch (error) {
+        console.error("Failed to load project creator:", error);
+      }
+    };
+
     fetchApplications();
-    fetchProjectMembers();
-  }, [project_id]);
+    fetchProjectMembers(); // Fetch all team members
+    fetchProjectCreator(); // Fetch project creator details
+  }, [project_id, project_creator_id]);
 
   // Format the creation date
   const formattedDate = new Date(created_at).toLocaleDateString("en-US", {
@@ -130,7 +159,7 @@ export default function UserProjectCard({ project }) {
 
   // Get status color
   const statusColor =
-    statusColors[project_status] || "bg-gray-100 text-gray-800";
+    statusColors[currentStatus] || "bg-gray-100 text-gray-800";
 
   // Toggle applications view
   const toggleApplicationsView = () => {
@@ -140,6 +169,49 @@ export default function UserProjectCard({ project }) {
   // Toggle members view
   const toggleMembersView = () => {
     setExpandedMembers(!expandedMembers);
+  };
+
+  // Toggle status dropdown
+  const toggleStatusDropdown = (e) => {
+    e.stopPropagation();
+    setStatusDropdownOpen(!statusDropdownOpen);
+  };
+
+  // Close status dropdown if clicked outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setStatusDropdownOpen(false);
+    };
+
+    if (statusDropdownOpen) {
+      document.addEventListener("click", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [statusDropdownOpen]);
+
+  // Handle project status change
+  const handleStatusChange = async (newStatus) => {
+    if (newStatus === currentStatus) {
+      setStatusDropdownOpen(false);
+      return;
+    }
+
+    try {
+      setStatusUpdateInProgress(true);
+      await updateProjectStatus(project_id, newStatus);
+      setCurrentStatus(newStatus);
+      console.log(`Project status updated to ${newStatus}`);
+      // You could add a toast notification here
+    } catch (error) {
+      console.error(`Failed to update project status:`, error);
+      // You could add an error toast notification here
+    } finally {
+      setStatusUpdateInProgress(false);
+      setStatusDropdownOpen(false);
+    }
   };
 
   // Handle application status update
@@ -169,14 +241,9 @@ export default function UserProjectCard({ project }) {
   const handleDeleteProject = async () => {
     try {
       setIsDeleting(true);
-      // Leave this empty for now as requested
-      // Will implement actual delete functionality later
-
-      // For UI mockup, let's simulate a successful deletion after a delay
       await removeProjectById(project_id);
       console.log("Project deleted successfully");
       // You would update UI or redirect here after successful deletion
-      console.log("Project deleted:", project_id);
     } catch (error) {
       console.error("Failed to delete project:", error);
     } finally {
@@ -252,14 +319,43 @@ export default function UserProjectCard({ project }) {
           <h3 className="text-lg font-semibold text-gray-800 line-clamp-1">
             {project_title}
           </h3>
-          <span
-            className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor}`}
-          >
-            {project_status
-              .split("_")
-              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(" ")}
-          </span>
+          {/* Project Status with Dropdown */}
+          <div className="relative">
+            <button
+              onClick={toggleStatusDropdown}
+              className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor} flex items-center`}
+              disabled={statusUpdateInProgress}
+            >
+              {statusUpdateInProgress ? (
+                <div className="h-3 w-3 border-2 border-current border-t-transparent rounded-full animate-spin mr-1"></div>
+              ) : null}
+              {statusDisplayNames[currentStatus] || currentStatus}
+              <ChevronDown className="h-3 w-3 ml-1" />
+            </button>
+
+            {statusDropdownOpen && (
+              <div className="absolute right-0 mt-1 w-40 bg-white rounded-md shadow-lg z-10 border border-gray-200">
+                <div className="py-1">
+                  {Object.entries(statusDisplayNames).map(([value, label]) => (
+                    <button
+                      key={value}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStatusChange(value);
+                      }}
+                      className={`${
+                        value === currentStatus
+                          ? "bg-gray-100 text-gray-900"
+                          : "text-gray-700 hover:bg-gray-50"
+                      } block px-4 py-2 text-sm w-full text-left`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <p className="text-gray-600 text-sm mb-4 line-clamp-2">
@@ -288,12 +384,12 @@ export default function UserProjectCard({ project }) {
 
         {/* Project Info */}
         <div className="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-xs text-gray-500">
-          {project_creator && (
+          {projectCreator && (
             <div className="flex items-center">
               <div className="h-5 w-5 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs mr-1.5">
-                {getUserInitials(project_creator.user_name)}
+                {getUserInitials(projectCreator.user_name)}
               </div>
-              <span>{project_creator.user_name || "Unknown"}</span>
+              <span>{projectCreator.user_name || "Unknown"}</span>
             </div>
           )}
 
@@ -320,9 +416,9 @@ export default function UserProjectCard({ project }) {
           href={`/projects/${project_id}`}
           className="block w-full py-2 bg-blue-500 text-white text-center rounded-full text-sm font-medium hover:bg-blue-600 transition-colors"
         >
-          {project_status === "recruiting"
+          {currentStatus === "recruiting"
             ? "View Project"
-            : project_status === "in_progress"
+            : currentStatus === "in_progress"
             ? "View Details"
             : "View Project"}
         </Link>
@@ -350,7 +446,7 @@ export default function UserProjectCard({ project }) {
               <div className="grid grid-cols-1 gap-3">
                 {projectUsers.map((member) => (
                   <div
-                    key={member.user_project_id}
+                    key={member.user_project_id || `member-${member.user_id}`}
                     className="p-3 rounded-md border border-gray-200 hover:border-blue-300 transition-colors"
                   >
                     <div className="flex justify-between items-start">
