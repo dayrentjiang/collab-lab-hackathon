@@ -65,7 +65,7 @@ export async function getUserHasCompletedPersonalized(userId: string) {
     const { data, error } = await supabase
       .from("users")
       .select("has_completed_personalized")
-      .eq("user_id", userId)
+      .eq("user_clerk_id", userId)
       .single();
 
     if (error) {
