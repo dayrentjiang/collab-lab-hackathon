@@ -5,6 +5,8 @@ import { useUser } from '@clerk/nextjs';
 import { getUserByClerkId, updateUser } from '@/actions/user';
 import { useRouter } from 'next/navigation';
 import ManageSkills from '../../components/ManageSkills'; // Import ManageSkills
+import { getAvailableSkills } from '@/actions/project';
+import { Skill } from '@/types/types';
 
 interface User {
   user_id: number;
@@ -24,6 +26,7 @@ export default function EditProfileForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [allSkills, setAllSkills] = useState<Skill[]>([]);
   
   const [formData, setFormData] = useState({
     user_name: '',
@@ -33,14 +36,18 @@ export default function EditProfileForm() {
     user_university: '',
   });
 
-  // Fetch skills from the backend (replace with your API or mock data)
-  const [skills, setSkills] = useState([]);
+  // Fetch skills from the backend
+  const [skills, setSkills] = useState<Skill[]>([]);
   
   useEffect(() => {
     async function loadSkillsAndUserData() {
       if (!clerkUser) return;
   
       try {
+        // Fetch all available skills
+        const availableSkills = await getAvailableSkills();
+        setAllSkills(availableSkills);
+
         const userData = await getUserByClerkId(clerkUser.id);
         if (userData) {
           setFormData({
@@ -52,7 +59,7 @@ export default function EditProfileForm() {
           });
   
           // Ensure skills are passed correctly
-          setSkills(userData.skills || []); // Assuming skills are part of userData
+          setSkills(userData.skills || []);
         }
       } catch (err) {
         setError('Failed to load user data');
@@ -200,7 +207,7 @@ export default function EditProfileForm() {
           </div>
 
            {/* Add ManageSkills Component */}
-        <ManageSkills userId={clerkUser.id} skills={skills} error={error} />
+        <ManageSkills />
           
           <div className="flex justify-between mt-4">
             <button

@@ -32,10 +32,7 @@ export default function ManageSkills() {
 
           setUserSkills(skills);  // Set the user skills
           setAllSkills(allSkills);  // Set the all available skills
-          
           setFilteredSkills(allSkills);  // Filtered skills are initially set to allSkills
-
-          
         }
       }
     };
@@ -93,20 +90,22 @@ export default function ManageSkills() {
 
   // Handle skill removal
   const handleRemoveSkill = async (skillId: number) => {
+    if (!user?.id) return;
+    
     const updatedSkills = userSkills.filter((skill) => skill.skill_id !== skillId);
     setUserSkills(updatedSkills);
-    // You would call an API here to update the user's skills on the backend
-    await updateUserSkills(user.id, updatedSkills);
+    await updateUserSkills(user.id, updatedSkills.map(skill => skill.skill_id));
   };
 
   // Handle skill addition
   const handleAddSkill = async (skillId: number) => {
+    if (!user?.id) return;
+    
     const skillToAdd = allSkills.find((skill) => skill.skill_id === skillId);
     if (skillToAdd && !userSkills.some((skill) => skill.skill_id === skillId)) {
       const updatedSkills = [...userSkills, skillToAdd];
       setUserSkills(updatedSkills);
-      // You would call an API here to update the user's skills on the backend
-      await updateUserSkills(user.id, updatedSkills);
+      await updateUserSkills(user.id, updatedSkills.map(skill => skill.skill_id));
     }
   };
 
@@ -166,12 +165,12 @@ export default function ManageSkills() {
           ) : (
             userSkills.map((skillObj) => (
               <div key={skillObj.skill_id} className="flex items-center bg-white px-3 py-1 rounded-full border border-gray-200 text-sm shadow-sm">
-                <span className="mr-2">{skillObj.skill_id.skill_name}</span>
+                <span className="mr-2">{skillObj.skill_name}</span>
                 <button
                   type="button"
                   onClick={() => handleRemoveSkill(skillObj.skill_id)}
                   className="text-gray-400 hover:text-red-500 focus:outline-none"
-                  aria-label={`Remove ${skillObj.skill_id.skill_name}`}
+                  aria-label={`Remove ${skillObj.skill_name}`}
                 >
                   <X className="h-4 w-4" />
                 </button>
