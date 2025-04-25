@@ -107,14 +107,16 @@ export async function getUserProjects(userId: string) {
   try {
     const { data: projects, error } = await supabase
       .from("projects")
-      .select(`
+      .select(
+        `
         *,
         creator:users!projects_project_creator_id_fkey(*),
         members:user_projects!user_projects_project_id_fkey(
           user:users(*)
         ),
         applications:applications(*)
-      `)
+      `
+      )
       .or(`project_creator_id.eq.${userId},user_projects.user_id.eq.${userId}`);
 
     if (error) {
@@ -134,14 +136,16 @@ export async function getProjectDetails(projectId: number) {
   try {
     const { data: project, error } = await supabase
       .from("projects")
-      .select(`
+      .select(
+        `
         *,
         creator:users!projects_project_creator_id_fkey(*),
         members:user_projects!user_projects_project_id_fkey(
           user:users(*)
         ),
         applications:applications(*)
-      `)
+      `
+      )
       .eq("project_id", projectId)
       .single();
 
@@ -153,6 +157,27 @@ export async function getProjectDetails(projectId: number) {
     return project;
   } catch (error) {
     console.error("Error fetching project details:", error);
+    return null;
+  }
+}
+
+//get user by user_clerk_id
+export async function getUserByClerkId(user_clerk_id: string) {
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("user_clerk_id", user_clerk_id)
+      .single();
+
+    if (error) {
+      console.error("Error fetching user:", error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching user:", error);
     return null;
   }
 }

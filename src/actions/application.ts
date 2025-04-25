@@ -128,7 +128,7 @@ export async function deleteApplication(applicationId: number) {
   }
 }
 
-// get all applications by project id
+// get all applications by project id to show the owner of the project
 export async function getApplicationsByProjectId(projectId: number) {
   try {
     const { data: applications, error } = await supabase
