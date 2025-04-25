@@ -2,11 +2,13 @@ import { ProfileFormData } from "@/types/types";
 import { supabase } from "@/lib/supabase";
 
 // Fixed createUser function
+// Fixed createUser function
 export async function createUser(formData: ProfileFormData) {
   // First create user in supabase using routes, get rid of the selected skills first
   const { selected_skills, ...userData } = formData;
   console.log("userData", userData);
   console.log("selected_skills", selected_skills);
+
   try {
     const user_clerk_id = userData.user_clerk_id;
     // Check if user already exists
@@ -43,15 +45,36 @@ export async function createUser(formData: ProfileFormData) {
 
     //after creating the user, we need to insert the selected skills into the user_skills table
     if (selected_skills && selected_skills.length > 0) {
-      const userId = user?.user_id; // Assuming user_id is the primary key in the users table
-      const userSkills = selected_skills.map((skillId) => ({
-        user_id: userId,
-        skill_id: skillId
-      }));
+      // Map through the selected skills array and create skill associations
+      const skillPromises = selected_skills.map(async (skillId) => {
+        // Note: Changed from `/api/skills/${skill}` to `/api/skills/${skillId}`
+        // because it seems we're already working with skill IDs
 
-      await supabase.from("user_skills").insert(userSkills);
+        // Create the user skill in the user_skills table
+        const userSkillResponse = await fetch(`/api/user/skills`, {
+          // Changed to kebab case format
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            skill_id: skillId
+          })
+        });
+
+        if (!userSkillResponse.ok) {
+          throw new Error(`Failed to associate user with skill ID: ${skillId}`);
+        }
+
+        return userSkillResponse.json();
+      });
+
+      // Wait for all skill associations to complete
+      await Promise.all(skillPromises);
     }
-    //return the user object
+
+    // Return the created user
     return user;
   } catch (error) {
     console.error("Error creating user:", error);
