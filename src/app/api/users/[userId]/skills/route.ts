@@ -10,9 +10,9 @@ export async function GET(
   try {
     const { userId: currentUserId } = await auth();
     
-    if (!currentUserId) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
+    // if (!currentUserId) {
+    //   return new NextResponse("Unauthorized", { status: 401 });
+    // }
 
     const { data: userSkills, error } = await supabase
       .from('user_skills')
@@ -33,9 +33,9 @@ export async function POST(req: Request, { params }: { params: { userId: string 
         const { userId: currentUserId } = await auth();
         const { skillId } = await req.json();
         
-        if (!currentUserId) {
-            return new NextResponse("Unauthorized", { status: 401 });
-        }
+        // if (!currentUserId) {
+        //     return new NextResponse("Unauthorized", { status: 401 });
+        // }
 
         if (!skillId) {
             return new NextResponse("Skill ID is required", { status: 400 });

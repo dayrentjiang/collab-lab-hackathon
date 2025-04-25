@@ -13,7 +13,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // 숫자인 경우 ID로 검색
+    // Search by ID if the parameter is a number
     if (!isNaN(Number(params.id))) {
       const { data: skill, error } = await supabase
         .from('skills')
@@ -31,7 +31,7 @@ export async function GET(
       return NextResponse.json(skill);
     }
     
-    // 문자열인 경우 이름으로 검색
+    // Search by name if the parameter is a string
     const { data: skills, error } = await supabase
       .from('skills')
       .select('skill_id, skill_name')
