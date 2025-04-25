@@ -2,38 +2,27 @@ import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
-// GET: Search skills by name
-export async function GET(req: Request) {
+// GET: Fetch all skills for a specific user
+export async function GET(
+  req: Request,
+  { params }: { params: { userId: string } }
+) {
   try {
     const { userId } = await auth();
-    const { searchParams } = new URL(req.url);
-    const searchQuery = searchParams.get('search');
     
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    // If search query is provided, search skills by name
-    if (searchQuery) {
-      const { data: skills, error } = await supabase
-        .from('skills')
-        .select('skill_id, skill_name')
-        .ilike('skill_name', `%${searchQuery}%`)
-        .limit(10);
-
-      if (error) throw error;
-      return NextResponse.json(skills);
-    }
-
-    // If no skill_name, return all skills
-    const { data: skills, error } = await supabase
-      .from('skills')
-      .select('skill_id, skill_name');
+    const { data: userSkills, error } = await supabase
+      .from('user_skills')
+      .select('*, skills(*)')
+      .eq('user_id', userId);
 
     if (error) throw error;
-    return NextResponse.json(skills);
+    return NextResponse.json(userSkills);
   } catch (error) {
-    console.error("[SKILLS_GET]", error);
+    console.error("[USER_SKILLS_GET]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
