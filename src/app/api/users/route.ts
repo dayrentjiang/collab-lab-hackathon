@@ -32,7 +32,9 @@ export async function POST(req: Request) {
       user_name,
       user_bio,
       user_linkedin_link,
-      user_university
+      user_university,
+      user_role,
+      user_clerk_id
     } = body;
 
     // Check if user already exists
@@ -62,7 +64,8 @@ export async function POST(req: Request) {
         user_bio,
         user_linkedin_link,
         user_university,
-        user_role: "user"
+        user_role,
+        user_clerk_id,
       })
       .select()
       .single();
