@@ -61,7 +61,10 @@ export async function POST(request: NextRequest) {
       For project recommendations, focus on projects that:
       - Have clear scope and can be completed in 1-3 months
       - Demonstrate real-world skills valuable to employers
-      - Solve actual problems users might face`
+      - Solve actual problems users might face
+      
+      Answer like a mentor, not a teacher, and make the format easy to read
+      `
     };
 
     // Add system message to the conversation
