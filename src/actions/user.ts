@@ -55,12 +55,11 @@ export async function createUser(formData: ProfileFormData) {
           .from("user_skills")
           .insert([
             {
-              user_id: user.user_clerk_id,
+              user_id: user_clerk_id,
               skill_id: skillId
             }
           ])
-          .select()
-          .single(); // Assuming you want to get the inserted row back
+          .select();
 
         if (!userSkillResponse) {
           throw new Error(`Failed to associate user with skill ID: ${skillId}`);
