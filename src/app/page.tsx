@@ -5,6 +5,7 @@ import ProjectCard from "./components/ProjectCard";
 import SkillCategoryTabs from "./components/SkillCategoryTabs";
 import { PlusIcon, SearchIcon } from "lucide-react";
 import { ProjectWithRelations } from "@/types/types";
+import {getAllProjects} from "../actions/project";
 
 export default async function Home({
   searchParams
@@ -17,7 +18,8 @@ export default async function Home({
       : undefined;
 
   // Fetch recommended projects with the selected category filter
-  const projects = await getRecommendedProjects(category);
+  const projects = await getAllProjects();
+  console.log("projects", projects);
 
   return (
     <main className="container mx-auto px-4 py-8">
