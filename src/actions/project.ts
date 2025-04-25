@@ -123,3 +123,47 @@ export const createProject = async (formData: ProjectFormData) => {
     return error;
   }
 };
+
+//get project_creator_id from project_id
+export const getProjectCreatorId = async (projectId: number) => {
+  try {
+    const { data, error } = await supabase
+      .from("projects")
+      .select("project_creator_id")
+      .eq("project_id", projectId)
+      .single();
+
+    if (error) {
+      console.error("Error fetching project creator ID:", error);
+      return null;
+    }
+
+    return data?.project_creator_id;
+  } catch (error) {
+    console.error("Error fetching project creator ID:", error);
+    return null;
+  }
+};
+
+//get project by id
+export const getProjectById = async (projectId: number) => {
+  try {
+    const { data: project, error } = await supabase
+      .from("projects")
+      .select(
+        `
+            *,
+            project_creator_id:users(*),
+            `
+      )
+      .eq("project_id", projectId)
+      .single();
+
+    if (error) throw error;
+
+    return project;
+  } catch (error) {
+    console.error("Error fetching project:", error);
+    return error;
+  }
+};

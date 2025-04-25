@@ -101,3 +101,33 @@ export async function getUserHasCompletedPersonalized(userId: string) {
     return null;
   }
 }
+
+//get all user projects that they are part of
+export const getUserProjects = async (userId: string) => {
+  try {
+    const { data: userProjects } = await supabase
+      .from("user_projects")
+      .select("*, project:projects(*)")
+      .eq("user_id", userId);
+
+    return userProjects;
+  } catch (error) {
+    console.error("[GET_USER_PROJECTS]", error);
+    throw new Error("Failed to fetch user projects");
+  }
+};
+
+//get all user project that they are the creator
+export const getUserCreatedProjects = async (userId: string) => {
+  try {
+    const { data: userProjects } = await supabase
+      .from("projects")
+      .select("*, user:user_projects(*)")
+      .eq("project_creator_id", userId);
+
+    return userProjects;
+  } catch (error) {
+    console.error("[GET_USER_PROJECTS]", error);
+    throw new Error("Failed to fetch user projects");
+  }
+};

@@ -1,8 +1,11 @@
-import { Application } from "@/types/types";
 import { supabase } from "@/lib/supabase";
 
 // Create a new application
-export async function createApplication(projectId: number, userId: string, applicationMsg: string) {
+export async function createApplication(
+  projectId: number,
+  userId: string,
+  applicationMsg: string
+) {
   try {
     const { data: application, error } = await supabase
       .from("applications")
@@ -35,10 +38,12 @@ export async function getProjectApplications(projectId: number) {
   try {
     const { data: applications, error } = await supabase
       .from("applications")
-      .select(`
+      .select(
+        `
         *,
         user:users(*)
-      `)
+      `
+      )
       .eq("project_id", projectId);
 
     if (error) {
@@ -58,10 +63,12 @@ export async function getUserApplications(userId: string) {
   try {
     const { data: applications, error } = await supabase
       .from("applications")
-      .select(`
+      .select(
+        `
         *,
         project:projects(*)
-      `)
+      `
+      )
       .eq("user_id", userId);
 
     if (error) {
@@ -77,7 +84,10 @@ export async function getUserApplications(userId: string) {
 }
 
 // Update application status
-export async function updateApplicationStatus(applicationId: number, status: "pending" | "accepted" | "rejected") {
+export async function updateApplicationStatus(
+  applicationId: number,
+  status: "pending" | "accepted" | "rejected"
+) {
   try {
     const { data: application, error } = await supabase
       .from("applications")
@@ -116,4 +126,24 @@ export async function deleteApplication(applicationId: number) {
     console.error("Error deleting application:", error);
     throw error;
   }
-} 
+}
+
+// get all applications by project id
+export async function getApplicationsByProjectId(projectId: number) {
+  try {
+    const { data: applications, error } = await supabase
+      .from("applications")
+      .select("*")
+      .eq("project_id", projectId);
+
+    if (error) {
+      console.error("Error fetching applications by project ID:", error);
+      throw error;
+    }
+
+    return applications;
+  } catch (error) {
+    console.error("Error fetching applications by project ID:", error);
+    throw error;
+  }
+}
