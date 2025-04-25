@@ -70,21 +70,7 @@ export default function Navbar() {
               </SignedIn>
             </div>
           </div>
-          
-          {/* Search Bar (Desktop) */}
-          <div className="hidden md:flex items-center flex-1 justify-center max-w-md">
-            <div className="w-full relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search projects, skills..."
-                className="block w-full pl-10 pr-3 py-2 rounded-full text-sm border border-gray-300 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-          </div>
-          
+       
           {/* Right Side Menu */}
           <div className="hidden sm:flex sm:items-center sm:ml-6 space-x-4">
             <SignedIn>

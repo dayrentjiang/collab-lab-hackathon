@@ -4,6 +4,8 @@ import { getAllProjects } from "../actions/project";
 import ProjectCard from "./components/ProjectCard";
 import SkillCategoryTabs from "./components/SkillCategoryTabs";
 import { PlusIcon, SearchIcon } from "lucide-react";
+import SearchBar from './components/SearchBar';
+
 
 export default async function Home({
   searchParams
@@ -46,7 +48,7 @@ export default async function Home({
               Post Project
             </Link>
             <Link
-              href="/projects"
+              href="/"
               className="inline-flex items-center px-6 py-3 border border-blue-500 text-blue-500 font-medium rounded-full hover:bg-blue-50 transition"
             >
               <SearchIcon className="h-5 w-5 mr-2" />
@@ -56,20 +58,17 @@ export default async function Home({
         </div>
       </section>
 
-      {/* Skill Categories */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-          Browse by Skill
-        </h2>
-        <SkillCategoryTabs />
-      </div>
+      {/* Search Bar */}
+      <SearchBar />
+
+   
 
       {/* Recommended Projects */}
       <section className="mb-12">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6">
           {category
             ? `${category.charAt(0).toUpperCase() + category.slice(1)} Projects`
-            : "Recommended Projects"}
+            : "All Projects"}
         </h2>
 
         <Suspense fallback={<ProjectsLoadingSkeleton />}>
