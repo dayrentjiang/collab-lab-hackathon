@@ -1,19 +1,24 @@
 import { ProfileFormData } from "@/types/types";
 import { supabase } from "@/lib/supabase";
 
+//get the user skills from the user_skills table
 export async function getUserSkills(userId: string): Promise<Skill[]> {
   try {
-    const response = await fetch(`/api/users/${userId}/skills`);
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch user skills');
-    }
+    const { data: userSkills, error } = await supabase
+      .from("user_skills")
+      .select("skill_id:skills(*)")
+      .eq("user_id", userId);
 
-    const data = await response.json();
-    return data.skills || [];
-  } catch (err) {
-    console.error(err);
-    throw new Error('Error fetching user skills');
+    if (error) {
+      console.error("Error fetching user skills:", error);
+      return [];
+    }
+    console.log("userSkills", userSkills);
+
+    return userSkills || [];
+  } catch (error) {
+    console.error("Error fetching user skills:", error);
+    return [];
   }
 }
 
@@ -96,7 +101,10 @@ export async function createUser(formData: ProfileFormData) {
   }
 }
 
-export async function updateUser(user_clerk_id: string, input: Partial<ProfileFormData>) {
+export async function updateUser(
+  user_clerk_id: string,
+  input: Partial<ProfileFormData>
+) {
   try {
     const { data, error } = await supabase
       .from("users")
@@ -104,22 +112,18 @@ export async function updateUser(user_clerk_id: string, input: Partial<ProfileFo
       .eq("user_clerk_id", user_clerk_id)
       .select()
       .single();
-    
+
     if (error) {
       console.error("Error updating user:", error);
       return { success: false, error: error.message };
     }
-    
-    
-    
+
     return { success: true, data };
   } catch (error: any) {
     console.error("Error updating user:", error);
     return { success: false, error: error.message };
   }
 }
-
-
 
 //now get the has_completed_personalized value from the user table and return it
 export async function getUserHasCompletedPersonalized(userId: string) {
@@ -235,20 +239,16 @@ export async function getUserByClerkId(user_clerk_id: string) {
     return null;
   }
 }
-export async function updateUserSkill(
-  id: string,
-  skill_id: number,
-
-) {
+export async function updateUserSkill(id: string, skill_id: number) {
   try {
     const { data, error } = await supabase
       .from("user_skills")
       .update({
-        skill_id,
-    
+        skill_id
       })
       .eq("id", id)
-      .select(`
+      .select(
+        `
         id,
         user_id,
         skill_id,
@@ -258,7 +258,8 @@ export async function updateUserSkill(
           id,
           name
         )
-      `)
+      `
+      )
       .single();
 
     if (error) {
@@ -271,11 +272,9 @@ export async function updateUserSkill(
       user_id: data.user_id,
       skill_id: data.skill_id,
       skill_name: data.skills.name,
-     
+
       created_at: data.created_at
     };
-
-    
 
     return { success: true, data: processedSkill };
   } catch (error: any) {
@@ -287,22 +286,16 @@ export async function updateUserSkill(
 // Delete user skill
 export async function deleteUserSkill(id: string) {
   try {
-    const { error } = await supabase
-      .from("user_skills")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("user_skills").delete().eq("id", id);
 
     if (error) {
       console.error("Error deleting user skill:", error);
       return { success: false, error: error.message };
     }
 
-    
-
     return { success: true };
   } catch (error: any) {
     console.error("Error deleting user skill:", error);
     return { success: false, error: error.message };
   }
-
 }

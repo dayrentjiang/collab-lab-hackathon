@@ -1,23 +1,16 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useState } from 'react';
-import { 
-  SignInButton, 
-  SignUpButton, 
-  SignedIn, 
-  SignedOut, 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+import {
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
   UserButton
 } from "@clerk/nextjs";
-import { 
-  Menu, 
-  X, 
-  Search, 
-  Bell, 
-  MessageSquare, 
-  PlusCircle 
-} from 'lucide-react';
+import { Menu, X, Search, Bell, MessageSquare, PlusCircle } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -25,8 +18,8 @@ export default function Navbar() {
 
   // Helper function to determine if a link is active
   const isActive = (path: string) => {
-    if (path === '/' && pathname === '/') return true;
-    if (path !== '/' && pathname?.startsWith(path)) return true;
+    if (path === "/" && pathname === "/") return true;
+    if (path !== "/" && pathname?.startsWith(path)) return true;
     return false;
   };
 
@@ -42,45 +35,55 @@ export default function Navbar() {
                 <span className="text-green-500">Lab</span>
               </Link>
             </div>
-            
+
             {/* Desktop Navigation Links */}
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <Link 
-                href="/" 
+              <Link
+                href="/"
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                  isActive('/') 
-                    ? 'border-blue-500 text-gray-900' 
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  isActive("/")
+                    ? "border-blue-500 text-gray-900"
+                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
                 }`}
               >
                 Home
               </Link>
-            
+
               <SignedIn>
-              <Link 
-                href="/projects" 
-                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                  isActive('/projects') 
-                    ? 'border-blue-500 text-gray-900' 
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                }`}
-              >
-                Projects
-              </Link>
-              <Link 
-                href="/profile" 
-                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                  isActive('/profile') 
-                    ? 'border-blue-500 text-gray-900' 
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                }`}
-              >
-                Profile
-              </Link>
+                <Link
+                  href="/projects"
+                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                    isActive("/projects")
+                      ? "border-blue-500 text-gray-900"
+                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                  }`}
+                >
+                  Projects
+                </Link>
+                <Link
+                  href="/profile"
+                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                    isActive("/profile")
+                      ? "border-blue-500 text-gray-900"
+                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                  }`}
+                >
+                  Profile
+                </Link>
+                <Link
+                  href="/collablabai"
+                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                    isActive("/collablabai")
+                      ? "border-blue-500 text-gray-900"
+                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                  }`}
+                >
+                  Ask AI
+                </Link>
               </SignedIn>
             </div>
           </div>
-       
+
           {/* Right Side Menu */}
           <div className="hidden sm:flex sm:items-center sm:ml-6 space-x-4">
             <SignedIn>
@@ -88,14 +91,17 @@ export default function Navbar() {
               <button className="p-1 rounded-full text-gray-500 hover:text-gray-700 focus:outline-none">
                 <Bell className="h-5 w-5" />
               </button>
-              
+
               {/* Messages */}
-              <Link href="/messages" className="p-1 rounded-full text-gray-500 hover:text-gray-700 focus:outline-none">
+              <Link
+                href="/messages"
+                className="p-1 rounded-full text-gray-500 hover:text-gray-700 focus:outline-none"
+              >
                 <MessageSquare className="h-5 w-5" />
               </Link>
-              
+
               {/* Create Project Button */}
-              <Link 
+              <Link
                 href="/projects/create"
                 className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
@@ -103,14 +109,12 @@ export default function Navbar() {
                 <span>Create</span>
               </Link>
 
-             
-              
               {/* User dropdown */}
               <div className="ml-3 relative">
                 <UserButton afterSignOutUrl="/" />
               </div>
             </SignedIn>
-            
+
             <SignedOut>
               <div className="flex space-x-2">
                 <SignInButton mode="modal">
@@ -126,7 +130,7 @@ export default function Navbar() {
               </div>
             </SignedOut>
           </div>
-          
+
           {/* Mobile menu button */}
           <div className="flex items-center sm:hidden">
             <button
@@ -135,13 +139,19 @@ export default function Navbar() {
               aria-expanded="false"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
-              <span className="sr-only">{mobileMenuOpen ? 'Close menu' : 'Open menu'}</span>
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              <span className="sr-only">
+                {mobileMenuOpen ? "Close menu" : "Open menu"}
+              </span>
+              {mobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </button>
           </div>
         </div>
       </div>
-      
+
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="sm:hidden">
@@ -149,9 +159,9 @@ export default function Navbar() {
             <Link
               href="/"
               className={`block pl-3 pr-4 py-2 text-base font-medium ${
-                isActive('/')
-                  ? 'bg-blue-50 border-l-4 border-blue-500 text-blue-700'
-                  : 'border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'
+                isActive("/")
+                  ? "bg-blue-50 border-l-4 border-blue-500 text-blue-700"
+                  : "border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800"
               }`}
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -160,9 +170,9 @@ export default function Navbar() {
             <Link
               href="/projects"
               className={`block pl-3 pr-4 py-2 text-base font-medium ${
-                isActive('/projects')
-                  ? 'bg-blue-50 border-l-4 border-blue-500 text-blue-700'
-                  : 'border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'
+                isActive("/projects")
+                  ? "bg-blue-50 border-l-4 border-blue-500 text-blue-700"
+                  : "border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800"
               }`}
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -172,9 +182,9 @@ export default function Navbar() {
               <Link
                 href="/dashboard"
                 className={`block pl-3 pr-4 py-2 text-base font-medium ${
-                  isActive('/dashboard')
-                    ? 'bg-blue-50 border-l-4 border-blue-500 text-blue-700'
-                    : 'border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'
+                  isActive("/dashboard")
+                    ? "bg-blue-50 border-l-4 border-blue-500 text-blue-700"
+                    : "border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800"
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -183,9 +193,9 @@ export default function Navbar() {
               <Link
                 href="/messages"
                 className={`block pl-3 pr-4 py-2 text-base font-medium ${
-                  isActive('/messages')
-                    ? 'bg-blue-50 border-l-4 border-blue-500 text-blue-700'
-                    : 'border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'
+                  isActive("/messages")
+                    ? "bg-blue-50 border-l-4 border-blue-500 text-blue-700"
+                    : "border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800"
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -194,9 +204,9 @@ export default function Navbar() {
               <Link
                 href="/projects/create"
                 className={`block pl-3 pr-4 py-2 text-base font-medium ${
-                  isActive('/projects/create')
-                    ? 'bg-blue-50 border-l-4 border-blue-500 text-blue-700'
-                    : 'border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'
+                  isActive("/projects/create")
+                    ? "bg-blue-50 border-l-4 border-blue-500 text-blue-700"
+                    : "border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800"
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -204,7 +214,7 @@ export default function Navbar() {
               </Link>
             </SignedIn>
           </div>
-          
+
           {/* Mobile search bar */}
           <div className="px-4 py-3">
             <div className="relative">
@@ -218,7 +228,7 @@ export default function Navbar() {
               />
             </div>
           </div>
-          
+
           {/* Mobile Authentication */}
           <div className="pt-4 pb-3 border-t border-gray-200">
             <SignedIn>
@@ -227,11 +237,13 @@ export default function Navbar() {
                   <UserButton afterSignOutUrl="/" />
                 </div>
                 <div className="ml-3">
-                  <div className="text-sm font-medium text-gray-500">Signed in</div>
+                  <div className="text-sm font-medium text-gray-500">
+                    Signed in
+                  </div>
                 </div>
               </div>
             </SignedIn>
-            
+
             <SignedOut>
               <div className="mt-3 space-y-2 px-4">
                 <SignInButton mode="modal">
