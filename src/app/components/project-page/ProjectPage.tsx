@@ -9,6 +9,7 @@ import { UserProject, Project } from "../../../types/types";
 import UserProjectCard from "./UserProjectCard";
 import JoinedProjectCard from "./JoinedProjectCard"; // Import the component for joined projects
 import { User, Users } from "lucide-react";
+import { ProjectCard } from "../../../types/types";
 
 type CombinedProject = UserProject & { project: Project };
 

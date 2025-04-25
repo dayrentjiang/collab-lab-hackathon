@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { Application } from "../../../types/types"; // You may need to create this type
 import Link from "next/link";
 import {
   CalendarIcon,
@@ -27,9 +28,10 @@ import {
   updateProjectStatus
 } from "../../../actions/project"; // Added updateProjectStatus import
 import { getUserByClerkId } from "../../../actions/user"; // Adjust the import path as necessary
+import { ProjectCard } from "../../../types/types"; // Adjust the import path as necessary
 
 // Define the skill category color mapping
-const getSkillCategoryColor = (category) => {
+const getSkillCategoryColor = (category: string | undefined) => {
   switch (category?.toLowerCase()) {
     case "frontend":
       return "bg-purple-100 text-purple-800";
@@ -50,7 +52,7 @@ const statusColors = {
 };
 
 // Status display names
-const statusDisplayNames = {
+const statusDisplayNames: Record<string, string> = {
   "recruiting": "Recruiting",
   "in_progress": "In Progress",
   "completed": "Completed"
@@ -63,7 +65,22 @@ const applicationStatusColors = {
   "rejected": "bg-red-100 text-red-800"
 };
 
-export default function UserProjectCard({ project }) {
+interface ProjectUser {
+  user_project_id: string;
+  user_id: string;
+  project_id: number;
+  user_role: string;
+  joined_at: string;
+  userDetails?: {
+    user_name: string;
+    user_email: string;
+    user_university?: string;
+    user_bio?: string;
+    skills?: Array<{ skill_name: string }>;
+  };
+}
+
+export default function UserProjectCard({ project }: { project: ProjectCard }) {
   const {
     project_id,
     project_title,
@@ -75,18 +92,27 @@ export default function UserProjectCard({ project }) {
     projectSkills,
     project_creator_id
   } = project;
-
-  const [applications, setApplications] = useState([]);
-  const [projectUsers, setProjectUsers] = useState([]);
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [projectUsers, setProjectUsers] = useState<ProjectUser[]>([]);
   const [expandedApplications, setExpandedApplications] = useState(false);
   const [expandedMembers, setExpandedMembers] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [updateInProgress, setUpdateInProgress] = useState(false);
-  const [currentStatus, setCurrentStatus] = useState(project_status);
+  const [currentStatus, setCurrentStatus] = useState<string>(project_status);
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
   const [statusUpdateInProgress, setStatusUpdateInProgress] = useState(false);
-  const [projectCreator, setProjectCreator] = useState(null);
+  interface ProjectCreator {
+    user_id: string;
+    user_name: string;
+    user_email: string;
+    user_university?: string;
+    user_bio?: string;
+  }
+
+  const [projectCreator, setProjectCreator] = useState<ProjectCreator | null>(
+    null
+  );
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -104,7 +130,7 @@ export default function UserProjectCard({ project }) {
         // This gets all members of the project
         const members = await getProjectUsers(project_id);
         console.log("Fetched project members:", members);
-        setProjectUsers(members || []);
+        setProjectUsers(members);
       } catch (error) {
         console.error("Failed to load project members:", error);
       }
@@ -136,7 +162,7 @@ export default function UserProjectCard({ project }) {
   });
 
   // Format application date
-  const formatApplicationDate = (dateString) => {
+  const formatApplicationDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -146,7 +172,7 @@ export default function UserProjectCard({ project }) {
   };
 
   // Get first letter of user name for avatar
-  const getUserInitials = (name) => {
+  const getUserInitials = (name: string | undefined | null): string => {
     return name
       ? name
           .split(" ")
@@ -159,7 +185,8 @@ export default function UserProjectCard({ project }) {
 
   // Get status color
   const statusColor =
-    statusColors[currentStatus] || "bg-gray-100 text-gray-800";
+    statusColors[currentStatus as keyof typeof statusColors] ||
+    "bg-gray-100 text-gray-800";
 
   // Toggle applications view
   const toggleApplicationsView = () => {
@@ -172,7 +199,7 @@ export default function UserProjectCard({ project }) {
   };
 
   // Toggle status dropdown
-  const toggleStatusDropdown = (e) => {
+  const toggleStatusDropdown = (e: React.MouseEvent) => {
     e.stopPropagation();
     setStatusDropdownOpen(!statusDropdownOpen);
   };
@@ -193,7 +220,9 @@ export default function UserProjectCard({ project }) {
   }, [statusDropdownOpen]);
 
   // Handle project status change
-  const handleStatusChange = async (newStatus) => {
+  const handleStatusChange = async (
+    newStatus: keyof typeof statusDisplayNames
+  ) => {
     if (newStatus === currentStatus) {
       setStatusDropdownOpen(false);
       return;
@@ -201,7 +230,7 @@ export default function UserProjectCard({ project }) {
 
     try {
       setStatusUpdateInProgress(true);
-      await updateProjectStatus(project_id, newStatus);
+      await updateProjectStatus(project_id, newStatus, project_creator_id);
       setCurrentStatus(newStatus);
       console.log(`Project status updated to ${newStatus}`);
       // You could add a toast notification here
@@ -215,7 +244,10 @@ export default function UserProjectCard({ project }) {
   };
 
   // Handle application status update
-  const handleStatusUpdate = async (applicationId, newStatus) => {
+  const handleStatusUpdate = async (
+    applicationId: number,
+    newStatus: "pending" | "accepted" | "rejected"
+  ) => {
     try {
       setUpdateInProgress(true);
       await updateApplicationStatus(applicationId, newStatus);
@@ -495,7 +527,7 @@ export default function UserProjectCard({ project }) {
                                 );
                                 await removeUserFromProject(
                                   member.user_id,
-                                  member.project_id
+                                  member.project_id.toString()
                                 );
                                 // Update UI by refetching project members
                                 const updatedMembers = await getProjectUsers(
@@ -540,14 +572,19 @@ export default function UserProjectCard({ project }) {
                           <div className="flex flex-wrap gap-1">
                             {member.userDetails.skills
                               .slice(0, 3)
-                              .map((skill, index) => (
-                                <span
-                                  key={index}
-                                  className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
-                                >
-                                  {skill.skill_name || "Skill"}
-                                </span>
-                              ))}
+                              .map(
+                                (
+                                  skill: { skill_name: string },
+                                  index: number
+                                ) => (
+                                  <span
+                                    key={index}
+                                    className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                                  >
+                                    {skill.skill_name || "Skill"}
+                                  </span>
+                                )
+                              )}
                             {member.userDetails.skills.length > 3 && (
                               <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
                                 +{member.userDetails.skills.length - 3} more
