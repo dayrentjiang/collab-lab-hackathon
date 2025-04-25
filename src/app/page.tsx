@@ -53,7 +53,7 @@ export default async function Home({
       {/* Skill Categories */}
       <div className="mb-8">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-          Browse by Skill
+          Browse by Category
         </h2>
         <SkillCategoryTabs />
       </div>
