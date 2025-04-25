@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { getRecommendedProjects } from "@/types/mockData";
+import { getAllProjects } from "../actions/project";
 import ProjectCard from "./components/ProjectCard";
 import SkillCategoryTabs from "./components/SkillCategoryTabs";
 import { PlusIcon, SearchIcon } from "lucide-react";
 import { ProjectWithRelations } from "@/types/types";
+
 
 export default async function Home({
   searchParams
@@ -17,7 +18,8 @@ export default async function Home({
       : undefined;
 
   // Fetch recommended projects with the selected category filter
-  const projects = await getRecommendedProjects(category);
+  const projects = await getAllProjects();
+  console.log("Projects:", projects);
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -53,7 +55,7 @@ export default async function Home({
       {/* Skill Categories */}
       <div className="mb-8">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-          Browse by Category
+          Browse by Skill
         </h2>
         <SkillCategoryTabs />
       </div>
@@ -95,42 +97,7 @@ export default async function Home({
         </Suspense>
       </section>
 
-      {/* Recent Activity Section */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-          Recent Activity
-        </h2>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 divide-y divide-gray-200">
-          <ActivityItem
-            initials="AR"
-            name="Alex Rodriguez"
-            action="created a new project"
-            projectTitle="Student Portal Redesign"
-            time="2 days ago"
-          />
-          <ActivityItem
-            initials="TK"
-            name="Taylor Kim"
-            action="joined"
-            projectTitle="Campus Event Finder App"
-            time="3 days ago"
-          />
-          <ActivityItem
-            initials="JS"
-            name="Jordan Smith"
-            action="applied to"
-            projectTitle="Student Portal Redesign"
-            time="4 days ago"
-          />
-          <ActivityItem
-            initials="MC"
-            name="Dr. Morgan Chen"
-            action="completed"
-            projectTitle="Research Database Initial Planning"
-            time="1 week ago"
-          />
-        </div>
-      </section>
+    
     </main>
   );
 }
