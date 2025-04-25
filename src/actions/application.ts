@@ -61,22 +61,41 @@ export async function getProjectApplications(projectId: number) {
 // Get all applications for a user
 export async function getUserApplications(userId: string) {
   try {
-    const { data: applications, error } = await supabase
+    // First, get all applications for the user
+    const { data: applications, error: applicationsError } = await supabase
       .from("applications")
-      .select(
-        `
-        *,
-        project:projects(*)
-      `
-      )
-      .eq("user_id", userId);
+      .select("*")
+      .eq("user_id", userId)
+      .order("applied_at", { ascending: false });
 
-    if (error) {
-      console.error("Error fetching user applications:", error);
-      throw error;
+    if (applicationsError) {
+      console.error("Error fetching applications:", applicationsError);
+      throw applicationsError;
     }
 
-    return applications;
+    if (!applications || applications.length === 0) {
+      return [];
+    }
+
+    // Then, get all related projects in a single query
+    const projectIds = applications.map(app => app.project_id);
+    const { data: projects, error: projectsError } = await supabase
+      .from("projects")
+      .select("*")
+      .in("project_id", projectIds);
+
+    if (projectsError) {
+      console.error("Error fetching projects:", projectsError);
+      throw projectsError;
+    }
+
+    // Combine the data
+    const applicationsWithProjects = applications.map(application => ({
+      ...application,
+      project: projects?.find(project => project.project_id === application.project_id)
+    }));
+
+    return applicationsWithProjects;
   } catch (error) {
     console.error("Error fetching user applications:", error);
     throw error;
