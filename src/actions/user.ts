@@ -20,7 +20,7 @@ export async function createUser(formData: ProfileFormData) {
           user_university: userData.user_university,
           user_role: userData.user_role,
           user_clerk_id,
-          has_completed_personalized: false // Default value
+          has_completed_personalized: true // Default value
         }
       ])
       .select()
