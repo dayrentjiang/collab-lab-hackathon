@@ -65,9 +65,7 @@ export async function POST(req: Request) {
         user_bio,
         user_linkedin_link,
         user_university,
-        user_role,
-        user_clerk_id,
-        has_completed_personalized,
+        user_role: "user"
       })
       .select()
       .single();
