@@ -17,3 +17,6 @@ export const getAvailableSkills = async () => {
     return error;
   }
 };
+
+//create project
+//we will create[]= the project and then create the project_skills
