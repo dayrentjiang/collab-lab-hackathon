@@ -17,11 +17,11 @@ export default async function Home({
 
   // Fetch all projects with their skills
   const projects = await getAllProjects();
-  
+
   // Filter projects by category if needed
-  const filteredProjects = category 
-    ? projects.filter(project => 
-        project.skills?.some(skill => skill.skill_category === category)
+  const filteredProjects = category
+    ? projects.filter((project) =>
+        project.skills?.some((skill) => skill.skill_category === category)
       )
     : projects;
 
