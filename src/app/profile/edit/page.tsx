@@ -53,13 +53,19 @@ export default function EditProfileForm() {
           setFormData({
             user_name: userData.user_name || '',
             user_bio: userData.user_bio || '',
-            user_role: userData.user_role || 'student',
+            user_role: (userData.user_role as "student" | "mentor") || 'student',
             user_linkedin_link: userData.user_linkedin_link || '',
             user_university: userData.user_university || '',
           });
   
-          // Ensure skills are passed correctly
-          setSkills(userData.skills || []);
+          // Transform skills data to match the expected format
+          const transformedSkills = userData.skills?.map((skill: any) => ({
+            skill_id: skill.skill_id.skill_id,
+            skill_name: skill.skill_id.skill_name,
+            skill_category: skill.skill_id.skill_category
+          })) || [];
+          
+          setSkills(transformedSkills);
         }
       } catch (err) {
         setError('Failed to load user data');
@@ -206,8 +212,16 @@ export default function EditProfileForm() {
             />
           </div>
 
-           {/* Add ManageSkills Component */}
-        <ManageSkills />
+          {/* Add ManageSkills Component with proper props */}
+          <div className="mb-6">
+            <ManageSkills 
+              allSkills={allSkills}
+              userSkills={skills}
+              onSkillsUpdate={(newSkills) => {
+                setSkills(newSkills);
+              }}
+            />
+          </div>
           
           <div className="flex justify-between mt-4">
             <button

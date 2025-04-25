@@ -6,41 +6,29 @@ import { Check, X, Plus, Search, Tag } from "lucide-react";
 import { useUser } from "@clerk/clerk-react"; // Clerk hook
 import { getUserByClerkId, updateUserSkills } from "@/actions/user"; // Assuming this fetches and updates the user data with skills.
 
-export default function ManageSkills() {
-  const { user, isLoaded, isSignedIn } = useUser(); // Get the current user data from Clerk
+interface ManageSkillsProps {
+  allSkills: Skill[];
+  userSkills: Skill[];
+  onSkillsUpdate: (skills: Skill[]) => void;
+}
 
-  const [userSkills, setUserSkills] = useState<Skill[]>([]);  // State to store fetched user skills
-  const [allSkills, setAllSkills] = useState<Skill[]>([]);    // All available skills
+export default function ManageSkills({ allSkills: initialAllSkills, userSkills: initialUserSkills, onSkillsUpdate }: ManageSkillsProps) {
+  const { user, isLoaded, isSignedIn } = useUser();
+  const [userSkills, setUserSkills] = useState<Skill[]>(initialUserSkills);
+  const [allSkills, setAllSkills] = useState<Skill[]>(initialAllSkills);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredSkills, setFilteredSkills] = useState<Skill[]>([]);
+  const [filteredSkills, setFilteredSkills] = useState<Skill[]>(initialAllSkills);
   const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch user's existing skills and all available skills
+  // Update local state when props change
   useEffect(() => {
-    const fetchSkills = async () => {
-      if (isSignedIn && user?.id) {
-        const userId = user.id; // Clerk's user ID
-        const userData = await getUserByClerkId(userId); // Fetch user data using Clerk ID
-        
-        if (userData) {
-          // Ensure skills and allSkills are defined as arrays
-          const skills = Array.isArray(userData.skills) ? userData.skills : [];
-          const allSkills = Array.isArray(userData.allSkills) ? userData.allSkills : [];
-
-          setUserSkills(skills);  // Set the user skills
-          setAllSkills(allSkills);  // Set the all available skills
-          setFilteredSkills(allSkills);  // Filtered skills are initially set to allSkills
-        }
-      }
-    };
-
-    if (isLoaded && isSignedIn) {
-      fetchSkills(); // Run the fetch when Clerk data is loaded and the user is signed in
-    }
-  }, [isLoaded, isSignedIn, user?.id]); // Dependency array to rerun when the user data changes
+    setUserSkills(initialUserSkills);
+    setAllSkills(initialAllSkills);
+    setFilteredSkills(initialAllSkills);
+  }, [initialUserSkills, initialAllSkills]);
 
   // Get unique categories from all skills
   const categories = Array.from(
@@ -54,58 +42,53 @@ export default function ManageSkills() {
     filterSkills(term);
   };
 
-  // Filter skills based on search term and category filters
   const filterSkills = (term: string = searchTerm) => {
-    let filtered = allSkills || [];  // Ensure allSkills is defined as an empty array if undefined
-
-    // Apply category filters if any
-    if (categoryFilters.length > 0) {
-      filtered = filtered.filter((skill) =>
-        categoryFilters.includes(skill.skill_category)
+    if (term.trim() === "") {
+      setFilteredSkills(allSkills);
+    } else {
+      const filtered = allSkills.filter((skill) =>
+        skill.skill_name.toLowerCase().includes(term.toLowerCase())
       );
+      setFilteredSkills(filtered);
     }
-
-    // Apply search term filter if any
-    if (term.trim() !== "") {
-      filtered = filtered.filter(
-        (skill) =>
-          skill.skill_name.toLowerCase().includes(term.toLowerCase()) ||
-          skill.skill_category.toLowerCase().includes(term.toLowerCase())
-      );
-    }
-
-    setFilteredSkills(filtered);
   };
 
-  // Toggle category filter
   const toggleCategoryFilter = (category: string) => {
-    setCategoryFilters((prev) => {
-      const newFilters = prev.includes(category)
+    setCategoryFilters((prev) =>
+      prev.includes(category)
         ? prev.filter((c) => c !== category)
-        : [...prev, category];
-      filterSkills();
-      return newFilters;
-    });
+        : [...prev, category]
+    );
   };
 
-  // Handle skill removal
   const handleRemoveSkill = async (skillId: number) => {
     if (!user?.id) return;
     
-    const updatedSkills = userSkills.filter((skill) => skill.skill_id !== skillId);
-    setUserSkills(updatedSkills);
-    await updateUserSkills(user.id, updatedSkills.map(skill => skill.skill_id));
+    try {
+      const newSkills = userSkills.filter((skill) => skill.skill_id !== skillId);
+      setUserSkills(newSkills);
+      onSkillsUpdate(newSkills);
+      
+      await updateUserSkills(user.id, newSkills.map(skill => skill.skill_id));
+    } catch (error) {
+      console.error("Error removing skill:", error);
+    }
   };
 
-  // Handle skill addition
   const handleAddSkill = async (skillId: number) => {
     if (!user?.id) return;
     
-    const skillToAdd = allSkills.find((skill) => skill.skill_id === skillId);
-    if (skillToAdd && !userSkills.some((skill) => skill.skill_id === skillId)) {
-      const updatedSkills = [...userSkills, skillToAdd];
-      setUserSkills(updatedSkills);
-      await updateUserSkills(user.id, updatedSkills.map(skill => skill.skill_id));
+    try {
+      const skillToAdd = allSkills.find((skill) => skill.skill_id === skillId);
+      if (!skillToAdd) return;
+      
+      const newSkills = [...userSkills, skillToAdd];
+      setUserSkills(newSkills);
+      onSkillsUpdate(newSkills);
+      
+      await updateUserSkills(user.id, newSkills.map(skill => skill.skill_id));
+    } catch (error) {
+      console.error("Error adding skill:", error);
     }
   };
 
