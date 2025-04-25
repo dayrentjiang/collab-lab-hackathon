@@ -55,7 +55,7 @@ export async function createUser(formData: ProfileFormData) {
           .from("user_skills")
           .insert([
             {
-              user_id: user.user_id,
+              user_id: user.user_clerk_id,
               skill_id: skillId
             }
           ])
@@ -178,7 +178,7 @@ export async function getUserByClerkId(user_clerk_id: string) {
     //for the user get the skills
     const { data: userSkills, error: skillsError } = await supabase
       .from("user_skills")
-      .select("*")
+      .select("skill_id:skills(*)")
       .eq("user_id", user_clerk_id);
 
     if (skillsError) {

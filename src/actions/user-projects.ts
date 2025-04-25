@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { checkProjectStatus } from "./project";
+import { getUserByClerkId } from "./user";
 
 // Get all projects for a user
 export const getUserProjects = async (userId: string) => {
@@ -218,9 +219,19 @@ export const getProjectUsers = async (projectId: number) => {
       .select("*, user_id")
       .eq("project_id", projectId);
 
-    //for the project users get the user details
+    if (!projectUsers) {
+      throw new Error("No project users found");
+    }
 
-    return projectUsers;
+    //for each user get the user details using getUserByClerkId
+    const usersWithDetails = await Promise.all(
+      projectUsers.map(async (projectUser) => {
+        const userDetails = await getUserByClerkId(projectUser.user_id);
+        return { ...projectUser, userDetails };
+      })
+    );
+
+    return usersWithDetails;
   } catch (error) {
     console.error("[GET_PROJECT_USERS]", error);
     throw new Error("Failed to fetch project users");
