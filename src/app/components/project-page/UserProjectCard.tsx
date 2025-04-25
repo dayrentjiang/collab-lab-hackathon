@@ -617,7 +617,13 @@ export default function UserProjectCard({ project }: { project: ProjectCard }) {
         >
           <h3 className="text-md font-medium flex items-center">
             <UsersIcon className="h-4 w-4 mr-2 text-gray-500" />
-            Applicants ({applications.length})
+            {/* //application length only if its pending */}
+            Applications (
+            {
+              applications.filter((app) => app.application_status === "pending")
+                .length
+            }
+            )
           </h3>
           <span className="text-blue-500 text-sm">
             {expandedApplications ? "Hide" : "Show"}

@@ -5,7 +5,7 @@ import {
   getUserProjectsAsCreator,
   getUserProjectsAsMember
 } from "../../../actions/user-projects";
-import { UserProject, Project } from "../../../types/types";
+import { Project } from "../../../types/types";
 import UserProjectCard from "./UserProjectCard";
 import JoinedProjectCard from "./JoinedProjectCard"; // Import the component for joined projects
 import { User, Users } from "lucide-react";
@@ -26,6 +26,7 @@ type CombinedProject = {
   created_at?: string;
   updated_at?: string;
   project_creator_id?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   projectSkills?: any[];
 };
 
@@ -126,16 +127,38 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ userId }) => {
         </div>
       ) : activeProjects.length === 0 ? (
         <div className="text-center py-10">
-          <p className="text-gray-500 text-lg">
+          <p className="text-gray-500 text-lg mb-6">
             {activeTab === "created"
               ? "You haven't created any projects yet."
               : "You haven't joined any projects yet."}
           </p>
-          {activeTab === "created" && (
-            <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition">
-              Create Your First Project
-            </button>
-          )}
+
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            {activeTab === "created" ? (
+              <>
+                <button
+                  className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition flex items-center justify-center"
+                  onClick={() => (window.location.href = "/projects/create")}
+                >
+                  <span>Create New Project</span>
+                </button>
+
+                <button
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition flex items-center justify-center"
+                  onClick={() => (window.location.href = "/")}
+                >
+                  <span>Browse Projects</span>
+                </button>
+              </>
+            ) : (
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition flex items-center justify-center"
+                onClick={() => (window.location.href = "/")}
+              >
+                <span>Find Projects to Join</span>
+              </button>
+            )}
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
