@@ -37,7 +37,26 @@ export default function UserProfilePage() {
         const userData = await getUserByClerkId(clerkUser.id);
         console.log("User Data:", userData);
         if (userData) {
-          setUserProfile(userData);
+          // Debug skills data
+          console.log("Skills Data:", userData.skills);
+          
+          // Transform skills data if it exists
+          const transformedSkills = userData.skills?.map((skill: any) => {
+            console.log("Individual Skill:", skill);
+            // Access the nested skill data from skill_id object
+            return {
+              skill_id: skill.skill_id.skill_id,
+              skill_name: skill.skill_id.skill_name,
+              skill_category: skill.skill_id.skill_category
+            };
+          }) || [];
+          
+          console.log("Transformed Skills:", transformedSkills);
+          
+          setUserProfile({
+            ...userData,
+            skills: transformedSkills
+          });
         } else {
           setError("Could not find user profile");
         }
@@ -120,13 +139,17 @@ export default function UserProfilePage() {
         
         {userProfile.skills && userProfile.skills.length > 0 ? (
           <div className="flex flex-wrap gap-2">
-            {userProfile.skills.map((skill) => (
-              <div key={skill.skill_id}>
-                <span className="bg-gray-100 px-3 py-1 rounded-full flex items-center">
+            {userProfile.skills.map((skill) => {
+              console.log("Rendering Skill:", skill);
+              return (
+                <span
+                  key={skill.skill_id}
+                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                >
                   {skill.skill_name}
                 </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <p className="text-gray-500">No skills added yet.</p>
