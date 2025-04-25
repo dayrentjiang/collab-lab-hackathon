@@ -1,4 +1,6 @@
 import { supabase } from "@/lib/supabase";
+import { ProjectFormData } from "@/types/types";
+import { getAuth } from "@clerk/nextjs/server";
 
 //fetch to /api/skills/route.ts
 export const getAvailableSkills = async () => {
@@ -67,3 +69,4 @@ export const getAllProjects = async () => {
 
 //create project
 //we will create[]= the project and then create the project_skills
+export const createProject = async (formData: ProjectFormData) => {};

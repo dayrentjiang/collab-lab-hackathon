@@ -51,23 +51,22 @@ export async function createUser(formData: ProfileFormData) {
         // because it seems we're already working with skill IDs
 
         // Create the user skill in the user_skills table
-        const userSkillResponse = await fetch(`/api/user/skills`, {
-          // Changed to kebab case format
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            user_id: user_clerk_id,
-            skill_id: skillId
-          })
-        });
+        const userSkillResponse = await supabase
+          .from("user_skills")
+          .insert([
+            {
+              user_id: user.user_id,
+              skill_id: skillId
+            }
+          ])
+          .select()
+          .single(); // Assuming you want to get the inserted row back
 
-        if (!userSkillResponse.ok) {
+        if (!userSkillResponse) {
           throw new Error(`Failed to associate user with skill ID: ${skillId}`);
         }
 
-        return userSkillResponse.json();
+        return userSkillResponse;
       });
 
       // Wait for all skill associations to complete

@@ -16,7 +16,6 @@ interface ProjectFormData {
   project_timeline?: string;
 
   required_skills: number[]; // Skill IDs
-
 }
 
 export default function CreateProjectPage() {

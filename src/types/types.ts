@@ -121,3 +121,14 @@ export interface ProfileFormData {
   user_university: string;
   selected_skills: number[]; // Skill IDs
 }
+
+//project form data structure
+export interface ProjectFormData {
+  project_title: string;
+  project_description: string;
+  project_creator_id: string; // Foreign key to User.user_id
+  project_status: "recruiting" | "in_progress" | "completed";
+  project_vacancy: number;
+  project_timeline?: string;
+  required_skills: number[]; // Skill IDs
+}
