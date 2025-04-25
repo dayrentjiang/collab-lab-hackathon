@@ -96,3 +96,16 @@ export type MessageWithRelations = Message & {
   receiver?: User;
   project?: Project;
 };
+
+//interfaces for form data
+// Form data structure
+export interface ProfileFormData {
+  user_clerk_id: string | undefined;
+  user_email: string;
+  user_name: string;
+  user_bio: string;
+  user_role: "student" | "mentor" | "admin";
+  user_linkedin_link: string;
+  user_university: string;
+  selected_skills: number[]; // Skill IDs
+}
