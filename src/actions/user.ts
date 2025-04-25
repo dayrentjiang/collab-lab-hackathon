@@ -175,7 +175,21 @@ export async function getUserByClerkId(user_clerk_id: string) {
       return null;
     }
 
-    return data;
+    //for the user get the skills
+    const { data: userSkills, error: skillsError } = await supabase
+      .from("user_skills")
+      .select("*")
+      .eq("user_id", user_clerk_id);
+
+    if (skillsError) {
+      console.error("Error fetching user skills:", skillsError);
+      return null;
+    }
+    //return the user with the skills
+    return {
+      ...data,
+      skills: userSkills
+    };
   } catch (error) {
     console.error("Error fetching user:", error);
     return null;

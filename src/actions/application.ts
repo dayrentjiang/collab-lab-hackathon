@@ -141,7 +141,25 @@ export async function getApplicationsByProjectId(projectId: number) {
       throw error;
     }
 
-    return applications;
+    //get the full user data for each application
+    const applicationsWithUserData = await Promise.all(
+      applications.map(async (application) => {
+        const { data: user, error } = await supabase
+          .from("users")
+          .select("*")
+          .eq("user_clerk_id", application.user_id)
+          .single();
+
+        if (error) {
+          console.error("Error fetching user data for application:", error);
+          throw error;
+        }
+
+        return { ...application, user };
+      })
+    );
+
+    return applicationsWithUserData;
   } catch (error) {
     console.error("Error fetching applications by project ID:", error);
     throw error;

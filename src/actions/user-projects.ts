@@ -209,3 +209,20 @@ export const getProjectSkills = async (project_id: number) => {
     return error;
   }
 };
+
+//get all user that work for a project based on the project id
+export const getProjectUsers = async (projectId: number) => {
+  try {
+    const { data: projectUsers } = await supabase
+      .from("user_projects")
+      .select("*, user_id")
+      .eq("project_id", projectId);
+
+    //for the project users get the user details
+
+    return projectUsers;
+  } catch (error) {
+    console.error("[GET_PROJECT_USERS]", error);
+    throw new Error("Failed to fetch project users");
+  }
+};
