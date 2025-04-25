@@ -4,8 +4,6 @@ import { getAllProjects } from "../actions/project";
 import ProjectCard from "./components/ProjectCard";
 import SkillCategoryTabs from "./components/SkillCategoryTabs";
 import { PlusIcon, SearchIcon } from "lucide-react";
-import { ProjectWithRelations } from "@/types/types";
-
 
 export default async function Home({
   searchParams
@@ -17,9 +15,15 @@ export default async function Home({
       ? searchParams.category
       : undefined;
 
-  // Fetch recommended projects with the selected category filter
+  // Fetch all projects with their skills
   const projects = await getAllProjects();
-  console.log("Projects:", projects);
+  
+  // Filter projects by category if needed
+  const filteredProjects = category 
+    ? projects.filter(project => 
+        project.skills?.some(skill => skill.skill_category === category)
+      )
+    : projects;
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -69,9 +73,9 @@ export default async function Home({
         </h2>
 
         <Suspense fallback={<ProjectsLoadingSkeleton />}>
-          {projects.length > 0 ? (
+          {Array.isArray(filteredProjects) && filteredProjects.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.map((project: ProjectWithRelations) => (
+              {filteredProjects.map((project) => (
                 <ProjectCard key={project.project_id} project={project} />
               ))}
             </div>
@@ -96,8 +100,6 @@ export default async function Home({
           )}
         </Suspense>
       </section>
-
-    
     </main>
   );
 }
@@ -129,38 +131,6 @@ function ProjectsLoadingSkeleton() {
           <div className="h-9 bg-gray-200 rounded-full w-full"></div>
         </div>
       ))}
-    </div>
-  );
-}
-
-// Activity Item component
-function ActivityItem({
-  initials,
-  name,
-  action,
-  projectTitle,
-  time
-}: {
-  initials: string;
-  name: string;
-  action: string;
-  projectTitle: string;
-  time: string;
-}) {
-  return (
-    <div className="p-4 flex items-start">
-      <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-medium mr-4">
-        {initials}
-      </div>
-      <div>
-        <p className="text-gray-800">
-          <span className="font-medium">{name}</span> {action}{" "}
-          <Link href="#" className="text-blue-600 hover:underline">
-            {projectTitle}
-          </Link>
-        </p>
-        <p className="text-sm text-gray-500">{time}</p>
-      </div>
     </div>
   );
 }

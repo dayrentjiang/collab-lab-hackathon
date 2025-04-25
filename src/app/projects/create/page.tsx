@@ -9,6 +9,7 @@ import { Check, X, Loader2, LayoutGrid, Users } from 'lucide-react';
 import AddSkill from '../../components/AddSkill';
 
 interface ProjectFormData {
+  project_creator_id: string;
   project_title: string;
   project_description: string;
   project_status: 'recruiting' | 'in_progress' | 'completed';
@@ -19,7 +20,14 @@ interface ProjectFormData {
 }
 
 export default function CreateProjectPage() {
-  const { user, isLoaded } = useUser();
+  const { isLoaded, user } = useUser();
+
+  if (!isLoaded) {
+   
+    return null;
+  }
+
+  if (!user) return null;
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -31,6 +39,7 @@ export default function CreateProjectPage() {
 
   // Default form state
   const [formData, setFormData] = useState<ProjectFormData>({
+    project_creator_id: user.id,
     project_title: '',
     project_description: '',
     project_status: 'recruiting',
