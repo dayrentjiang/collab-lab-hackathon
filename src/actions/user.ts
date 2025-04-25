@@ -1,4 +1,5 @@
 import { ProfileFormData } from "@/types/types";
+import { supabase } from "@/lib/supabase";
 
 // Fixed createUser function
 export async function createUser(formData: ProfileFormData) {
@@ -6,56 +7,40 @@ export async function createUser(formData: ProfileFormData) {
   const { selected_skills, ...userData } = formData;
   console.log("userData", userData);
   console.log("selected_skills", selected_skills);
-
   try {
-    // Step 1: Create the user
-    const response = await fetch(`/api/users`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(userData)
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to create user");
-    }
-
-    const user = await response.json();
-    const userId = user.user_id; // Assuming the response contains the user ID
-
-    // Step 2: If there are selected skills, create user_skills entries
-    if (selected_skills && selected_skills.length > 0) {
-      // Map through the selected skills array and create skill associations
-      const skillPromises = selected_skills.map(async (skillId) => {
-        // Note: Changed from `/api/skills/${skill}` to `/api/skills/${skillId}`
-        // because it seems we're already working with skill IDs
-
-        // Create the user skill in the user_skills table
-        const userSkillResponse = await fetch(`/api/user-skills`, {
-          // Changed to kebab case format
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            user_id: userId,
-            skill_id: skillId
-          })
-        });
-
-        if (!userSkillResponse.ok) {
-          throw new Error(`Failed to associate user with skill ID: ${skillId}`);
+    const user_clerk_id = userData.user_clerk_id;
+    const { data: user, error } = await supabase
+      .from("users")
+      .insert([
+        {
+          user_email: userData.user_email,
+          user_name: userData.user_name,
+          user_bio: userData.user_bio,
+          user_linkedin_link: userData.user_linkedin_link,
+          user_university: userData.user_university,
+          user_role: userData.user_role,
+          user_clerk_id,
+          has_completed_personalized: false // Default value
         }
+      ])
+      .select()
+      .single();
 
-        return userSkillResponse.json();
-      });
-
-      // Wait for all skill associations to complete
-      await Promise.all(skillPromises);
+    if (error) {
+      console.error("Error creating user:", error);
     }
 
-    // Return the created user
+    //after creating the user, we need to insert the selected skills into the user_skills table
+    if (selected_skills && selected_skills.length > 0) {
+      const userId = user?.user_id; // Assuming user_id is the primary key in the users table
+      const userSkills = selected_skills.map((skillId) => ({
+        user_id: userId,
+        skill_id: skillId
+      }));
+
+      await supabase.from("user_skills").insert(userSkills);
+    }
+    //return the user object
     return user;
   } catch (error) {
     console.error("Error creating user:", error);
