@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { Send, Loader, Bot, User, AlertCircle } from "lucide-react";
-import { getUserSkills } from "../../actions/user"; // Import your database action
+import { getUserSkills, getUserByClerkId } from "../../actions/user"; // Import your database action
 
 // Define TypeScript interfaces
 interface Message {
@@ -22,12 +22,12 @@ interface AIChatBotProps {
 }
 
 const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
+  const [userName, setUserName] = useState(""); // Get user name from Clerk
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
       role: "assistant",
-      content:
-        "Hi there! I'm your project idea assistant. How can I help you today? I'll tailor my suggestions based on your skills."
+      content: `Hi there! I'm your project idea assistant. How can I help you today? I'll tailor my suggestions based on your skills.`
     }
   ]);
   const [input, setInput] = useState("");
@@ -49,9 +49,13 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
 
         // Process skills data based on the actual structure
         if (Array.isArray(skillsData)) {
-          const processedSkills = skillsData.map((skillItem) => {
+          const processedSkills = skillsData.map((skillItem: any) => {
             // Extract from nested structure
-            if (skillItem.skill_id && typeof skillItem.skill_id === "object") {
+            if (
+              skillItem.skill_id &&
+              typeof skillItem.skill_id === "object" &&
+              !Array.isArray(skillItem.skill_id)
+            ) {
               return {
                 skill_id: skillItem.skill_id.skill_id || 0,
                 skill_name: skillItem.skill_id.skill_name || "Unknown",
@@ -60,7 +64,10 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
             } else {
               // Fallback for direct properties
               return {
-                skill_id: skillItem.skill_id || 0,
+                skill_id:
+                  typeof skillItem.skill_id === "number"
+                    ? skillItem.skill_id
+                    : 0,
                 skill_name: skillItem.skill_name || "Unknown",
                 skill_category: skillItem.skill_category || "Other"
               };
@@ -69,6 +76,26 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
 
           console.log("Processed skills:", processedSkills);
           setUserSkills(processedSkills);
+
+          //get the user name
+          const userData = await getUserByClerkId(userId);
+          console.log("User Data:", userData);
+          if (userData) {
+            const name = userData.user_name || "User";
+            setUserName(name);
+
+            // Update the greeting message with the user's name
+            setMessages((prevMessages) => [
+              {
+                id: 1,
+                role: "assistant",
+                content: `Hi ${name}! I'm your project idea assistant. How can I help you today? I'll tailor my suggestions based on your skills.`
+              },
+              ...prevMessages.slice(1)
+            ]);
+          } else {
+            console.error("User data not found for userId:", userId);
+          }
         } else {
           console.log("Skills data is not an array:", skillsData);
           setUserSkills([]);
@@ -259,7 +286,9 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
                     <User size={16} className="mr-1" />
                   )}
                   <span className="font-medium text-xs">
-                    {message.role === "assistant" ? "AI Assistant" : "You"}
+                    {message.role === "assistant"
+                      ? "Collab Lab Assistant"
+                      : "You"}
                   </span>
                 </div>
                 <div className="whitespace-pre-line">{message.content}</div>
@@ -273,7 +302,7 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
               <div className="bg-gray-200 text-gray-800 p-3 rounded-lg rounded-tl-none max-w-[80%]">
                 <div className="flex items-center">
                   <Bot size={16} className="mr-1" />
-                  <span className="font-medium text-xs">AI Assistant</span>
+                  <span className="font-medium text-xs">Collab Lab AI</span>
                 </div>
                 <div className="flex items-center mt-2">
                   <Loader size={16} className="animate-spin mr-2" />
