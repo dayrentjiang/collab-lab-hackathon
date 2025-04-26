@@ -19,9 +19,13 @@ export default async function Home({
   const projects = (await getAllProjects()) as ProjectWithRelations[];
 
   // Filter projects by category if needed
+  // Sort projects by created_at in descending order (newest first)
+  const sortedProjects = projects.sort((a, b) => 
+    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
 
-  //only show projec that do not have complete status
-  const filteredProjects = projects.filter(
+  //only show projects that do not have complete status
+  const filteredProjects = sortedProjects.filter(
     (project) => project.project_status !== "completed"
   );
   console.log(filteredProjects);
