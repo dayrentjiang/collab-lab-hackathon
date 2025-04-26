@@ -13,7 +13,8 @@ import {
   Star,
   Trash2,
   X,
-  ChevronDown
+  ChevronDown,
+  Pencil
 } from "lucide-react";
 import {
   getApplicationsByProjectId,
@@ -25,10 +26,14 @@ import {
 } from "../../../actions/user-projects"; // Add this import
 import {
   removeProjectById,
-  updateProjectStatus
+  updateProjectStatus,
+  updateProject,
+  getAvailableSkills
 } from "../../../actions/project"; // Added updateProjectStatus import
 import { getUserByClerkId } from "../../../actions/user"; // Adjust the import path as necessary
-import { ProjectCard } from "../../../types/types"; // Adjust the import path as necessary
+import { ProjectCard, ProjectFormData, Skill } from "../../../types/types"; // Adjust the import path as necessary
+import AddSkill from "@/app/components/AddSkill";
+import { useRouter } from "next/navigation";
 
 // Define the skill category color mapping
 const getSkillCategoryColor = (category: string | undefined) => {
@@ -80,7 +85,12 @@ interface ProjectUser {
   };
 }
 
-export default function UserProjectCard({ project }: { project: ProjectCard }) {
+interface UserProjectCardProps {
+  project: ProjectCard;
+  onUpdate?: () => void;
+}
+
+export default function UserProjectCard({ project, onUpdate }: UserProjectCardProps) {
   const {
     project_id,
     project_title,
@@ -102,6 +112,21 @@ export default function UserProjectCard({ project }: { project: ProjectCard }) {
   const [currentStatus, setCurrentStatus] = useState<string>(project_status);
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
   const [statusUpdateInProgress, setStatusUpdateInProgress] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editFormData, setEditFormData] = useState<ProjectFormData>({
+    project_title: project_title,
+    project_description: project_description,
+    project_status: project_status as "recruiting" | "in_progress" | "completed",
+    project_vacancy: project_vacancy,
+    project_timeline: project_timeline,
+    required_skills: projectSkills?.map(skill => Number(skill.skill_id)) || [],
+    project_creator_id: project_creator_id
+  });
+  const [isEditing, setIsEditing] = useState(false);
+  const [availableSkills, setAvailableSkills] = useState<Skill[]>([]);
+  const [selectedSkills, setSelectedSkills] = useState<number[]>(editFormData.required_skills);
+  const router = useRouter();
+
   interface ProjectCreator {
     user_id: string;
     user_name: string;
@@ -149,9 +174,19 @@ export default function UserProjectCard({ project }: { project: ProjectCard }) {
       }
     };
 
+    const fetchSkills = async () => {
+      try {
+        const skills = await getAvailableSkills();
+        setAvailableSkills(skills);
+      } catch (error) {
+        console.error("Failed to fetch skills:", error);
+      }
+    };
+
     fetchApplications();
     fetchProjectMembers(); // Fetch all team members
     fetchProjectCreator(); // Fetch project creator details
+    fetchSkills();
   }, [project_id, project_creator_id]);
 
   // Format the creation date
@@ -284,8 +319,176 @@ export default function UserProjectCard({ project }: { project: ProjectCard }) {
     }
   };
 
+  // Handle project edit
+  const handleEditProject = async () => {
+    try {
+      setIsEditing(true);
+      const updatedProject = await updateProject(
+        project_id,
+        {
+          ...editFormData,
+          required_skills: selectedSkills
+        },
+        project_creator_id
+      );
+      
+      if (updatedProject) {
+        console.log("Project updated successfully");
+        setShowEditModal(false);
+        if (onUpdate) {
+          onUpdate(); // Call the parent's update function
+        } else {
+          window.location.reload(); // Fallback to page reload
+        }
+      }
+    } catch (error) {
+      console.error("Failed to update project:", error);
+    } finally {
+      setIsEditing(false);
+    }
+  };
+
+  const handleSkillToggle = (skillId: number) => {
+    setSelectedSkills(prev => {
+      if (prev.includes(skillId)) {
+        return prev.filter(id => id !== skillId);
+      } else {
+        return [...prev, skillId];
+      }
+    });
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-300 relative">
+      {/* Edit Button next to Delete Button */}
+      <button
+        onClick={() => setShowEditModal(true)}
+        className="absolute top-2 right-8 text-gray-400 hover:text-blue-500 z-10"
+        title="Edit Project"
+      >
+        <Pencil className="h-5 w-5" />
+      </button>
+
+      {/* Edit Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center px-6 py-4 bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
+              <h3 className="text-xl font-semibold text-gray-900">
+                Edit Project
+              </h3>
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="text-gray-400 hover:text-gray-500"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Project Title
+                </label>
+                <input
+                  type="text"
+                  value={editFormData.project_title}
+                  onChange={(e) => setEditFormData({...editFormData, project_title: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Project Description
+                </label>
+                <textarea
+                  value={editFormData.project_description}
+                  onChange={(e) => setEditFormData({...editFormData, project_description: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  rows={4}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Project Status
+                </label>
+                <select
+                  value={editFormData.project_status}
+                  onChange={(e) => setEditFormData({...editFormData, project_status: e.target.value as "recruiting" | "in_progress" | "completed"})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                >
+                  <option value="recruiting">Recruiting</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Vacancy
+                </label>
+                <input
+                  type="number"
+                  value={editFormData.project_vacancy}
+                  onChange={(e) => setEditFormData({...editFormData, project_vacancy: parseInt(e.target.value)})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Timeline
+                </label>
+                <input
+                  type="text"
+                  value={editFormData.project_timeline}
+                  onChange={(e) => setEditFormData({...editFormData, project_timeline: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                />
+              </div>
+
+              {/* Skills Section */}
+              <div>
+                <AddSkill
+                  skills={availableSkills}
+                  selectedSkills={selectedSkills}
+                  onSkillToggle={handleSkillToggle}
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 mt-6">
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                disabled={isEditing}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEditProject}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center"
+                disabled={isEditing}
+              >
+                {isEditing ? (
+                  <>
+                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Pencil className="h-4 w-4 mr-1" />
+                    Save Changes
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Delete Button at the top right */}
       <button
         onClick={() => setShowDeleteConfirm(true)}
