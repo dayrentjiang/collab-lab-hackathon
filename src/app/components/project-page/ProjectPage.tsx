@@ -185,7 +185,7 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ userId }) => {
                 {activeTab === "created" && (
                   <div className="mt-6">
                     <Link
-                      href="/projects/new"
+                      href="/projects/create"
                       className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-500 text-white font-medium rounded-xl hover:from-blue-600 hover:to-teal-600 transition-all shadow-lg hover:shadow-xl"
                     >
                       <PlusCircle className="h-5 w-5 mr-2" />
