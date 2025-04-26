@@ -41,6 +41,7 @@ export default function UserProfilePage() {
           console.log("Skills Data:", userData.skills);
           
           // Transform skills data if it exists
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const transformedSkills = userData.skills?.map((skill: any) => {
             console.log("Individual Skill:", skill);
             // Access the nested skill data from skill_id object
@@ -79,7 +80,7 @@ export default function UserProfilePage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <h1 className="text-2xl font-bold text-red-500">Error: {error}</h1>
-        <p>We couldn't load your profile. Please try again later.</p>
+        <p>We couldn&apos;t load your profile. Please try again later.</p>
       </div>
     );
   }
