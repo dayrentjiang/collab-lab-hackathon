@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getAllProjects } from "../actions/project";
 import FilteredProjectGrid from "./components/FilteredProjectGrid";
 import { PlusIcon, SearchIcon } from "lucide-react";
+import { ProjectWithRelations } from "../types/types";
 
 export default async function Home({
   searchParams
@@ -15,12 +16,7 @@ export default async function Home({
     typeof params.category === "string" ? params.category : undefined;
 
   // Fetch all projects with their skills
-  const projects = (await getAllProjects()) as Array<{
-    id: string;
-    skills?: Array<{ skill_category: string }>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [key: string]: any;
-  }>;
+  const projects = (await getAllProjects()) as ProjectWithRelations[];
 
   // Filter projects by category if needed
 
