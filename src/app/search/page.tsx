@@ -1,9 +1,9 @@
 'use client';
-
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { Project } from '../../types/types';
+import { Skill } from '../../types/types';
 import { getAllProjects } from '../../actions/project';
 import { getAvailableSkills } from '../../actions/project';
 import ProjectCard from '../components/ProjectCard';
@@ -15,12 +15,14 @@ export default function SearchPage() {
   const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
   const [selectedStatus, setSelectedStatus] = useState(searchParams.get('status') || '');
-  const [skills, setSkills] = useState([]);
-  const [projects, setProjects] = useState([]);
-  const [filteredProjects, setFilteredProjects] = useState([]);
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+  
 
+  
   // Fetch skills and projects on page load
   useEffect(() => {
     const fetchData = async () => {

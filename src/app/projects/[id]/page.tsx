@@ -1,5 +1,6 @@
 // src/app/projects/[id]/page.tsx
-import { getAllProjects } from '@/actions/project';
+import { getAllProjects } from '../../../actions/project';
+import React from "react";
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock, Users, Tag } from 'lucide-react';

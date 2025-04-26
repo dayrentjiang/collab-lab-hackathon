@@ -1,3 +1,4 @@
+import React from "react";
 import Link from "next/link";
 import { getAllProjects } from "../actions/project";
 import FilteredProjectGrid from "./components/FilteredProjectGrid";

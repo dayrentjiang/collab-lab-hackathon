@@ -1,23 +1,14 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { getUserByClerkId, updateUser } from '@/actions/user';
+import { getUserByClerkId, updateUser } from '../../../actions/user';
 import { useRouter } from 'next/navigation';
 import ManageSkills from '../../components/ManageSkills'; // Import ManageSkills
-import { getAvailableSkills } from '@/actions/project';
-import { Skill } from '@/types/types';
+import { getAvailableSkills } from '../../../actions/project';
+import { Skill } from '../../../types/types';
 
-interface User {
-  user_id: number;
-  user_clerk_id: string;
-  user_email: string;
-  user_name: string;
-  user_bio?: string;
-  user_role: "student" | "admin" | "mentor";
-  user_linkedin_link?: string;
-  user_university?: string;
-}
+
 
 export default function EditProfileForm() {
   const { user: clerkUser } = useUser();
@@ -28,7 +19,13 @@ export default function EditProfileForm() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [allSkills, setAllSkills] = useState<Skill[]>([]);
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    user_name: string;
+    user_bio: string;
+    user_role: "student" | "admin" | "mentor";
+    user_linkedin_link: string;
+    user_university: string;
+  }>({
     user_name: '',
     user_bio: '',
     user_role: 'student',
