@@ -23,7 +23,7 @@ interface Project {
     user_id: string;
     user_name: string;
     user_bio?: string;
-    clerk_user_id: string;
+    user_clerk_id: string;
   };
 }
 
@@ -439,7 +439,7 @@ export default function ProjectDetailPage() {
 
                   {project.project_creator && (
                     <Link
-                      href={`/messages/new?recipient=${project.project_creator.clerk_user_id}`}
+                      href={`/messages/new?recipient=${project.project_creator.user_clerk_id}`}
                       className="px-4 py-2 border border-blue-300 text-blue-600 text-sm font-medium rounded-md hover:bg-blue-50 transition-colors"
                     >
                       Contact Creator
