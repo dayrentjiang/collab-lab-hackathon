@@ -144,31 +144,31 @@ export default function ManageSkills({ allSkills: initialAllSkills, userSkills: 
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex flex-col">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-xl font-semibold text-blue-900 mb-2">
           Manage Skills <span className="text-red-500">*</span>
         </label>
-        <p className="text-sm text-gray-500 mb-3">
+        <p className="text-sm text-gray-600 mb-4">
           Select or remove skills from your profile
         </p>
       </div>
 
       {/* User's Current Skills Display */}
-      <div className="mb-4">
-        <div className={`flex flex-wrap gap-2 p-3 ${userSkills.length > 0 ? "bg-gray-50" : ""} rounded-md border border-gray-200 min-h-16`}>
+      <div className="mb-6">
+        <div className={`flex flex-wrap gap-3 p-6 ${userSkills.length > 0 ? "bg-gradient-to-r from-blue-50 to-teal-50" : ""} rounded-xl border border-blue-100 min-h-20 shadow-sm`}>
           {userSkills.length === 0 ? (
             <p className="text-sm text-gray-400 flex items-center">
               No skills selected
             </p>
           ) : (
             userSkills.map((skillObj) => (
-              <div key={skillObj.skill_id} className="flex items-center bg-white px-3 py-1 rounded-full border border-gray-200 text-sm shadow-sm">
-                <span className="mr-2">{skillObj.skill_name}</span>
+              <div key={skillObj.skill_id} className="flex items-center bg-white px-4 py-2 rounded-full border border-blue-100 text-sm shadow-sm hover:shadow-md transition-all">
+                <span className="mr-2 text-blue-700">{skillObj.skill_name}</span>
                 <button
                   type="button"
                   onClick={() => handleRemoveSkill(skillObj.skill_id)}
-                  className="text-gray-400 hover:text-red-500 focus:outline-none"
+                  className="text-gray-400 hover:text-red-500 focus:outline-none transition-colors"
                   aria-label={`Remove ${skillObj.skill_name}`}
                 >
                   <X className="h-4 w-4" />

@@ -10,7 +10,7 @@ import {
 import { Project } from "../../../types/types";
 import UserProjectCard from "./UserProjectCard";
 import JoinedProjectCard from "./JoinedProjectCard"; // Import the component for joined projects
-import { CheckCircle, User, Users } from "lucide-react";
+import { CheckCircle, User, Users, FolderOpen, PlusCircle } from "lucide-react";
 
 // Make sure we have a comprehensive type that matches the data structure returned by our APIs
 type CombinedProject = {
@@ -112,126 +112,102 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ userId }) => {
     activeTab === "created"
       ? createdProjects
       : activeTab === "joined"
-      ? joinedProjects
+      ? joinedProjects.filter(project => project.project_status !== "completed")
       : completedProjects;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
-      {/* Navigation Tabs */}
-      <div className="flex justify-center mb-8 border-b border-gray-200">
-        <button
-          onClick={() => handleTabChange("created")}
-          className={`flex items-center px-6 py-3 font-medium text-sm ${
-            activeTab === "created"
-              ? "border-b-2 border-blue-500 text-blue-600"
-              : "text-gray-500 hover:text-gray-700"
-          }`}
-        >
-          <User className="h-4 w-4 mr-2" />
-          My Created Projects
-        </button>
-        <button
-          onClick={() => handleTabChange("joined")}
-          className={`flex items-center px-6 py-3 font-medium text-sm ${
-            activeTab === "joined"
-              ? "border-b-2 border-blue-500 text-blue-600"
-              : "text-gray-500 hover:text-gray-700"
-          }`}
-        >
-          <Users className="h-4 w-4 mr-2" />
-          Joined Projects
-        </button>
-        <button
-          onClick={() => handleTabChange("completed")}
-          className={`flex items-center px-6 py-3 font-medium text-sm ${
-            activeTab === "completed"
-              ? "border-b-2 border-blue-500 text-blue-600"
-              : "text-gray-500 hover:text-gray-700"
-          }`}
-        >
-          <CheckCircle className="h-4 w-4 mr-2" />
-          Completed Projects
-        </button>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-500 to-teal-500 px-6 py-8 text-white">
+            <h1 className="text-3xl font-bold">My Projects</h1>
+            <p className="text-blue-100 mt-2">Manage and track your project progress</p>
+          </div>
 
-      <h1 className="text-3xl font-bold mb-8 text-center">
-        {activeTab === "created"
-          ? "My Created Projects"
-          : activeTab === "joined"
-          ? "Joined Projects"
-          : "Completed Projects"}
-      </h1>
-
-      {loading ? (
-        <div className="flex justify-center items-center py-20">
-          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-      ) : activeProjects.length === 0 ? (
-        <div className="text-center py-10">
-          <p className="text-gray-500 text-lg mb-6">
-            {activeTab === "created"
-              ? "You haven't created any projects yet."
-              : activeTab === "joined"
-              ? "You haven't joined any projects yet."
-              : "You don't have any completed projects yet."}
-          </p>
-
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            {activeTab === "created" ? (
-              <>
-                <Link href="/projects/create">
-                  <button className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition flex items-center justify-center">
-                    <span>Create New Project</span>
-                  </button>
-                </Link>
-                <button
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition flex items-center justify-center"
-                  onClick={() => (window.location.href = "/")}
-                >
-                  <span>Browse Projects</span>
-                </button>
-              </>
-            ) : activeTab === "joined" ? (
+          {/* Tabs */}
+          <div className="border-b border-gray-200">
+            <div className="flex space-x-8 px-6 py-4">
               <button
-                className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition flex items-center justify-center"
-                onClick={() => (window.location.href = "/")}
-              >
-                <span>Find Projects to Join</span>
-              </button>
-            ) : (
-              <button
-                className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition flex items-center justify-center"
                 onClick={() => handleTabChange("created")}
+                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === "created"
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
               >
-                <span>View Active Projects</span>
+                Created Projects
               </button>
+              <button
+                onClick={() => handleTabChange("joined")}
+                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === "joined"
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                Joined Projects
+              </button>
+              <button
+                onClick={() => handleTabChange("completed")}
+                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === "completed"
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                Completed Projects
+              </button>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="p-6">
+            {loading ? (
+              <div className="flex items-center justify-center min-h-[200px]">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+              </div>
+            ) : activeProjects.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-gray-400 mb-4">
+                  <FolderOpen className="h-12 w-12 mx-auto" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-1">
+                  No projects found
+                </h3>
+                <p className="text-gray-500">
+                  {activeTab === "created"
+                    ? "You haven't created any projects yet"
+                    : activeTab === "joined"
+                    ? "You haven't joined any projects yet"
+                    : "You haven't completed any projects yet"}
+                </p>
+                {activeTab === "created" && (
+                  <div className="mt-6">
+                    <Link
+                      href="/projects/new"
+                      className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-500 text-white font-medium rounded-xl hover:from-blue-600 hover:to-teal-600 transition-all shadow-lg hover:shadow-xl"
+                    >
+                      <PlusCircle className="h-5 w-5 mr-2" />
+                      Create New Project
+                    </Link>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {activeProjects.map((project) => (
+                  activeTab === "created" ? (
+                    <UserProjectCard key={project.project_id} project={project} />
+                  ) : (
+                    <JoinedProjectCard key={project.project_id} project={project} />
+                  )
+                ))}
+              </div>
             )}
           </div>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {activeTab === "created"
-            ? activeProjects.map((project) => (
-                <UserProjectCard
-                  key={`created-${project.project_id}`}
-                  project={project}
-                />
-              ))
-            : activeTab === "joined"
-            ? activeProjects.map((project) => (
-                <JoinedProjectCard
-                  key={`joined-${project.project_id}`}
-                  project={project}
-                />
-              ))
-            : activeProjects.map((project) => (
-                <JoinedProjectCard
-                  key={`completed-${project.project_id}`}
-                  project={project}
-                />
-              ))}
-        </div>
-      )}
+      </div>
     </div>
   );
 };

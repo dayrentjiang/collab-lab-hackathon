@@ -114,17 +114,17 @@ export default function AddSkill({
   return (
     <div className="space-y-4">
       <div className="flex flex-col">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-lg font-semibold text-blue-900 mb-2">
           Required Skills <span className="text-red-500">*</span>
         </label>
-        <p className="text-sm text-gray-500 mb-3">
+        <p className="text-sm text-gray-600 mb-3">
           Select the skills needed for this project
         </p>
       </div>
 
       {/* Error message */}
       {error && (
-        <div className="mb-3 p-2 bg-red-50 border border-red-100 rounded-md">
+        <div className="mb-3 p-3 bg-red-50 border border-red-100 rounded-xl">
           <p className="text-sm text-red-600">{error}</p>
         </div>
       )}
@@ -132,9 +132,9 @@ export default function AddSkill({
       {/* Selected Skills Display */}
       <div className="mb-4">
         <div
-          className={`flex flex-wrap gap-2 p-3 ${
-            selectedSkills.length > 0 ? "bg-gray-50" : ""
-          } rounded-md border border-gray-200 min-h-16`}
+          className={`flex flex-wrap gap-2 p-4 ${
+            selectedSkills.length > 0 ? "bg-gradient-to-r from-blue-50 to-teal-50" : ""
+          } rounded-xl border border-blue-100 min-h-16`}
         >
           {selectedSkills.length === 0 ? (
             <p className="text-sm text-gray-400 flex items-center">
@@ -146,13 +146,13 @@ export default function AddSkill({
               return skill ? (
                 <div
                   key={skillId}
-                  className="flex items-center bg-white px-3 py-1 rounded-full border border-gray-200 text-sm shadow-sm"
+                  className="flex items-center bg-white px-4 py-2 rounded-full border border-blue-100 text-sm shadow-sm hover:shadow-md transition-all"
                 >
-                  <span className="mr-2">{skill.skill_name}</span>
+                  <span className="mr-2 text-blue-700">{skill.skill_name}</span>
                   <button
                     type="button"
                     onClick={() => onSkillToggle(skillId)}
-                    className="text-gray-400 hover:text-red-500 focus:outline-none"
+                    className="text-gray-400 hover:text-red-500 focus:outline-none transition-colors"
                     aria-label={`Remove ${skill.skill_name}`}
                   >
                     <X className="h-4 w-4" />

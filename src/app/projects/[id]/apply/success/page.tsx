@@ -10,14 +10,14 @@ export default function ApplicationSuccessPage({
 
   return (
     <div className="container mx-auto px-4 py-16 max-w-2xl">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+          <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center">
             <CheckCircle className="h-10 w-10 text-green-500" />
           </div>
         </div>
 
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">
           Application Submitted!
         </h1>
 
@@ -30,14 +30,14 @@ export default function ApplicationSuccessPage({
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href={`/projects/${projectId}`}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+            className="px-6 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-all shadow-sm"
           >
             Back to Project
           </Link>
 
           <Link
             href="/applications"
-            className="px-6 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition-colors"
+            className="px-6 py-2 bg-gradient-to-r from-blue-500 to-teal-500 text-white font-medium rounded-lg hover:from-blue-600 hover:to-teal-600 transition-all shadow-sm"
           >
             View My Applications
           </Link>

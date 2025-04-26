@@ -228,13 +228,13 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-6 text-center">
+      <h1 className="text-4xl font-bold mb-6 text-center bg-gradient-to-r from-blue-500 to-teal-500 bg-clip-text text-transparent">
         Project Idea Assistant
       </h1>
 
       {/* Skills loading indicator */}
       {isLoadingSkills && (
-        <div className="bg-blue-50 text-blue-700 p-2 rounded-md mb-4 flex items-center justify-center">
+        <div className="bg-blue-50 text-blue-700 p-4 rounded-xl mb-4 flex items-center justify-center shadow-sm border border-blue-100">
           <Loader size={16} className="animate-spin mr-2" />
           <span>Loading your skills profile...</span>
         </div>
@@ -242,13 +242,13 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
 
       {/* Skills summary - shows what skills were loaded */}
       {!isLoadingSkills && userSkills.length > 0 && (
-        <div className="bg-green-50 text-green-700 p-2 rounded-md mb-4">
-          <div className="text-sm font-medium mb-1">Your skills:</div>
-          <div className="flex flex-wrap gap-1">
+        <div className="bg-gradient-to-r from-blue-50 to-teal-50 text-blue-800 p-6 rounded-xl mb-6 shadow-sm border border-blue-100">
+          <div className="text-sm font-medium mb-3">Your skills:</div>
+          <div className="flex flex-wrap gap-2">
             {userSkills.map((skill) => (
               <span
                 key={skill.skill_id}
-                className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs"
+                className="bg-white text-blue-700 px-4 py-2 rounded-full text-sm shadow-sm border border-blue-100 hover:bg-blue-50 transition-all"
               >
                 {skill.skill_name}
               </span>
@@ -258,9 +258,9 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
       )}
 
       {/* Chat container */}
-      <div className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col h-[600px]">
+      <div className="bg-white shadow-xl rounded-xl overflow-hidden flex flex-col h-[600px] border border-gray-100">
         {/* Message history */}
-        <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+        <div className="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-gray-50 to-white">
           {messages.map((message) => (
             <div
               key={message.id}
@@ -270,21 +270,21 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
             >
               <div
                 className={`
-                  max-w-[80%] p-3 rounded-lg
+                  max-w-[80%] p-4 rounded-2xl
                   ${
                     message.role === "user"
-                      ? "bg-blue-500 text-white rounded-tr-none"
-                      : "bg-gray-200 text-gray-800 rounded-tl-none"
+                      ? "bg-gradient-to-r from-blue-500 to-teal-500 text-white rounded-tr-none shadow-md"
+                      : "bg-white text-gray-800 rounded-tl-none shadow-sm border border-gray-100"
                   }
                 `}
               >
-                <div className="flex items-center mb-1">
+                <div className="flex items-center mb-2">
                   {message.role === "assistant" ? (
-                    <Bot size={16} className="mr-1" />
+                    <Bot size={18} className="mr-2 text-blue-500" />
                   ) : (
-                    <User size={16} className="mr-1" />
+                    <User size={18} className="mr-2 text-white" />
                   )}
-                  <span className="font-medium text-xs">
+                  <span className="font-medium text-sm">
                     {message.role === "assistant"
                       ? "Collab Lab Assistant"
                       : "You"}
@@ -298,13 +298,13 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
           {/* Loading indicator */}
           {isLoading && (
             <div className="flex items-center mb-4">
-              <div className="bg-gray-200 text-gray-800 p-3 rounded-lg rounded-tl-none max-w-[80%]">
+              <div className="bg-white text-gray-800 p-4 rounded-2xl rounded-tl-none max-w-[80%] shadow-sm border border-gray-100">
                 <div className="flex items-center">
-                  <Bot size={16} className="mr-1" />
-                  <span className="font-medium text-xs">Collab Lab AI</span>
+                  <Bot size={18} className="mr-2 text-blue-500" />
+                  <span className="font-medium text-sm">Collab Lab AI</span>
                 </div>
                 <div className="flex items-center mt-2">
-                  <Loader size={16} className="animate-spin mr-2" />
+                  <Loader size={16} className="animate-spin mr-2 text-blue-500" />
                   <span>Thinking...</span>
                 </div>
               </div>
@@ -314,8 +314,8 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
           {/* Error message */}
           {error && (
             <div className="flex justify-center mb-4">
-              <div className="bg-red-50 text-red-700 p-3 rounded-lg max-w-[90%] flex items-start">
-                <AlertCircle size={16} className="mr-2 mt-0.5 flex-shrink-0" />
+              <div className="bg-red-50 text-red-700 p-4 rounded-xl max-w-[90%] flex items-start shadow-sm border border-red-100">
+                <AlertCircle size={18} className="mr-2 mt-0.5 flex-shrink-0" />
                 <span>{error}</span>
               </div>
             </div>
@@ -326,19 +326,19 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
         </div>
 
         {/* Input area */}
-        <div className="border-t border-gray-200 p-4 bg-white">
-          <form onSubmit={handleSubmit} className="flex space-x-2">
+        <div className="border-t border-gray-100 p-6 bg-white">
+          <form onSubmit={handleSubmit} className="flex space-x-3">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about project ideas, features, or implementation..."
-              className="flex-1 border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="flex-1 border border-gray-200 rounded-full px-5 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-all"
               disabled={isLoading}
             />
             <button
               type="submit"
-              className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-gradient-to-r from-blue-500 to-teal-500 text-white p-3 rounded-full hover:from-blue-600 hover:to-teal-600 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isLoading || !input.trim()}
             >
               <Send size={20} />
@@ -346,12 +346,12 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
           </form>
 
           {/* Quick suggestions */}
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             <button
               onClick={() =>
                 handleQuickPrompt("Suggest a project idea based on my skills")
               }
-              className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full transition"
+              className="text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-full transition-all shadow-sm border border-blue-100"
               disabled={isLoading}
             >
               Project for my skills
@@ -362,7 +362,7 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
                   "What should I learn next to improve my skill set?"
                 )
               }
-              className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full transition"
+              className="text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-full transition-all shadow-sm border border-blue-100"
               disabled={isLoading}
             >
               What to learn next
@@ -373,7 +373,7 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
                   "Recommend a tech stack that matches my skills"
                 )
               }
-              className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full transition"
+              className="text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-full transition-all shadow-sm border border-blue-100"
               disabled={isLoading}
             >
               Tech stack match
@@ -384,7 +384,7 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
                   "What challenges might I face with my skill level?"
                 )
               }
-              className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full transition"
+              className="text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-full transition-all shadow-sm border border-blue-100"
               disabled={isLoading}
             >
               Potential challenges

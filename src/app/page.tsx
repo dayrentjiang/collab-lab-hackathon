@@ -27,28 +27,28 @@ export default async function Home({
   console.log(filteredProjects);
 
   return (
-    <main className="container mx-auto px-4 py-8">
+    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section */}
-      <section className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
+      <section className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mb-12 mt-6 mx-4 sm:mx-8 lg:mx-auto max-w-7xl">
         <div className="max-w-3xl">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">
+          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
             Find Your Next Collaboration
           </h1>
-          <p className="text-xl text-gray-600 mb-6">
+          <p className="text-xl text-gray-600 mb-8">
             Connect with students and early-career developers to collaborate on
             meaningful projects
           </p>
           <div className="flex flex-wrap gap-4">
             <Link
               href="/projects/create"
-              className="inline-flex items-center px-6 py-3 bg-blue-500 text-white font-medium rounded-full hover:bg-blue-600 transition"
+              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-500 text-white font-medium rounded-xl hover:from-blue-600 hover:to-teal-600 transition-all shadow-lg hover:shadow-xl"
             >
               <PlusIcon className="h-5 w-5 mr-2" />
               Post Project
             </Link>
             <Link
               href="/"
-              className="inline-flex items-center px-6 py-3 border border-blue-500 text-blue-500 font-medium rounded-full hover:bg-blue-50 transition"
+              className="inline-flex items-center px-6 py-3 border-2 border-blue-100 text-blue-600 font-medium rounded-xl hover:bg-blue-50 transition-all shadow-lg hover:shadow-xl"
             >
               <SearchIcon className="h-5 w-5 mr-2" />
               Explore Projects
@@ -58,14 +58,12 @@ export default async function Home({
       </section>
 
       {/* Recommended Projects */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+      <section className="mb-12 mx-4 sm:mx-8 lg:mx-auto max-w-7xl">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8">
           {category
             ? `${category.charAt(0).toUpperCase() + category.slice(1)} Projects`
             : "All Projects"}
         </h2>
-
-        {/* //only pass project with status !completed */}
 
         <FilteredProjectGrid projects={filteredProjects} />
       </section>

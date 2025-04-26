@@ -773,23 +773,25 @@ export default function UserProjectCard({
 
       {/* Edit Modal */}
       {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center px-6 py-4 bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
-              <h3 className="text-xl font-semibold text-gray-900">
-                Edit Project
-              </h3>
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="text-gray-400 hover:text-gray-500"
-              >
-                <X className="h-5 w-5" />
-              </button>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-500 to-teal-500 px-8 py-6 rounded-t-2xl">
+              <div className="flex justify-between items-center">
+                <h3 className="text-2xl font-bold text-white">
+                  Edit Project
+                </h3>
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="text-white/80 hover:text-white transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
             </div>
 
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="p-8 space-y-6">
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-gray-700">
                   Project Title
                 </label>
                 <input
@@ -801,12 +803,12 @@ export default function UserProjectCard({
                       project_title: e.target.value
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-gray-700">
                   Project Description
                 </label>
                 <textarea
@@ -817,13 +819,13 @@ export default function UserProjectCard({
                       project_description: e.target.value
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                   rows={4}
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-gray-700">
                   Project Status
                 </label>
                 <select
@@ -837,7 +839,7 @@ export default function UserProjectCard({
                         | "completed"
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                 >
                   <option value="recruiting">Recruiting</option>
                   <option value="in_progress">In Progress</option>
@@ -845,8 +847,8 @@ export default function UserProjectCard({
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-gray-700">
                   Vacancy
                 </label>
                 <input
@@ -858,12 +860,12 @@ export default function UserProjectCard({
                       project_vacancy: parseInt(e.target.value)
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-gray-700">
                   Timeline
                 </label>
                 <select
@@ -874,7 +876,7 @@ export default function UserProjectCard({
                       project_timeline: e.target.value
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                 >
                   <option value="">Select Timeline</option>
                   <option value="1-2 weeks">1-2 weeks</option>
@@ -886,7 +888,10 @@ export default function UserProjectCard({
               </div>
 
               {/* Skills Section */}
-              <div>
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-gray-700">
+                  Required Skills
+                </label>
                 <AddSkill
                   skills={availableSkills}
                   selectedSkills={selectedSkills}
@@ -895,27 +900,27 @@ export default function UserProjectCard({
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 mt-6">
+            <div className="flex justify-end gap-4 p-6 border-t border-gray-100">
               <button
                 onClick={() => setShowEditModal(false)}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                className="px-6 py-3 border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors"
                 disabled={isEditing}
               >
                 Cancel
               </button>
               <button
                 onClick={handleEditProject}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center"
+                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-500 text-white rounded-xl hover:from-blue-600 hover:to-teal-600 transition-all shadow-lg hover:shadow-xl flex items-center"
                 disabled={isEditing}
               >
                 {isEditing ? (
                   <>
-                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                     Saving...
                   </>
                 ) : (
                   <>
-                    <Pencil className="h-4 w-4 mr-1" />
+                    <Pencil className="h-5 w-5 mr-2" />
                     Save Changes
                   </>
                 )}
