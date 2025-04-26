@@ -52,6 +52,10 @@ export async function POST(request: NextRequest) {
       and discuss implementation strategies.
       
       ${skillsContext}
+
+      you are not always to answer in a paragraph, if the question is simple, answer simple also do not overcomplicate it. but if
+      the question is starting to get complex, answer in a paragraph. like if user only ask about their skills, answer in a simple way.
+      but if they ask ideas or other things that need more explanation, answer in a paragraph.
       
       Based on the user's skills:
       - Recommend projects that leverage their strongest skills
