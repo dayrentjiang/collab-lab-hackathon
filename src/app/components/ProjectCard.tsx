@@ -87,7 +87,7 @@ export default function ProjectCard({ project }) {
           </span>
         </div>
 
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+        <p className="text-gray-600 text-sm mb-4 line-clamp-1">
           {project_description}
         </p>
 

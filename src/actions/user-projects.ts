@@ -278,3 +278,24 @@ export const removeUserFromProject = async (
     throw new Error("Failed to remove user from project");
   }
 };
+
+//fetch all completed projects from a user
+export const getCompletedProjects = async (userId: string) => {
+  try {
+    const { data: completedProjects } = await supabase
+      .from("user_projects")
+      .select("project_id")
+      .eq("user_id", userId);
+
+    if (!completedProjects) {
+      throw new Error("No completed projects found");
+    }
+
+    //and then for each project check the project_status =
+
+    return completedProjects;
+  } catch (error) {
+    console.error("[GET_COMPLETED_PROJECTS]", error);
+    throw new Error("Failed to fetch completed projects");
+  }
+};
