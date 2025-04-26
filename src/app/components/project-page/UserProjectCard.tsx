@@ -441,12 +441,18 @@ export default function UserProjectCard({ project, onUpdate }: UserProjectCardPr
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Timeline
                 </label>
-                <input
-                  type="text"
+                <select
                   value={editFormData.project_timeline}
                   onChange={(e) => setEditFormData({...editFormData, project_timeline: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
+                >
+                  <option value="">Select Timeline</option>
+                  <option value="1-2 weeks">1-2 weeks</option>
+                  <option value="3-4 weeks">3-4 weeks</option>
+                  <option value="1-2 months">1-2 months</option>
+                  <option value="3-6 months">3-6 months</option>
+                  <option value="6+ months">6+ months</option>
+                </select>
               </div>
 
               {/* Skills Section */}
