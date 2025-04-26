@@ -297,3 +297,87 @@ export const updateProjectStatus = async (
     return false;
   }
 };
+
+/**
+ * Updates a project with new data
+ * @param projectId - The ID of the project to update
+ * @param formData - The new project data
+ * @param userId - The ID of the user attempting to update the project
+ * @returns The updated project or an error
+ */
+export const updateProject = async (
+  projectId: number,
+  formData: ProjectFormData,
+  userId: string
+) => {
+  try {
+    // First, verify that the user is the creator of the project
+    const { data: project, error: fetchError } = await supabase
+      .from("projects")
+      .select("project_creator_id")
+      .eq("project_id", projectId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    if (project?.project_creator_id !== userId) {
+      throw new Error("User is not the creator of this project");
+    }
+
+    const {
+      project_title,
+      project_description,
+      project_status,
+      project_vacancy,
+      project_timeline,
+      required_skills: skills
+    } = formData;
+
+    // Update the project details
+    const { data: updatedProject, error: updateError } = await supabase
+      .from("projects")
+      .update({
+        project_title,
+        project_description,
+        project_status,
+        project_vacancy,
+        project_timeline
+      })
+      .eq("project_id", projectId)
+      .select()
+      .single();
+
+    if (updateError) throw updateError;
+
+    // Delete existing project skills
+    const { error: deleteSkillsError } = await supabase
+      .from("project_skills")
+      .delete()
+      .eq("project_id", projectId);
+
+    if (deleteSkillsError) throw deleteSkillsError;
+
+    // Add new project skills if provided
+    if (skills && skills.length > 0) {
+      const skillPromises = skills.map(async (skillId) => {
+        const { error: skillError } = await supabase
+          .from("project_skills")
+          .insert([
+            {
+              project_id: projectId,
+              skill_id: skillId
+            }
+          ]);
+
+        if (skillError) throw skillError;
+      });
+
+      await Promise.all(skillPromises);
+    }
+
+    return updatedProject;
+  } catch (error) {
+    console.error("Error updating project:", error);
+    return error;
+  }
+};
