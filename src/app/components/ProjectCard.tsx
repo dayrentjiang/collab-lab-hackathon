@@ -2,6 +2,19 @@ import Link from "next/link";
 import { CalendarIcon, ClockIcon, UsersIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getProjectMembers } from "../../actions/user-projects"; // Import the action
+import { Project } from "../../types/types";
+
+interface ProjectWithRelations extends Project {
+  skills: Array<{
+    skill_id: string;
+    skill_name: string;
+    skill_category: string;
+  }>;
+  project_creator: {
+    user_name: string;
+  };
+  project_id: number;
+}
 
 // Define the skill category color mapping
 const getSkillCategoryColor = (category: string) => {
@@ -24,7 +37,7 @@ const statusColors = {
   "completed": "bg-gray-100 text-gray-800"
 };
 
-export default function ProjectCard({ project }) {
+export default function ProjectCard({ project }: { project: ProjectWithRelations }) {
   const {
     project_id,
     project_title,
@@ -37,14 +50,14 @@ export default function ProjectCard({ project }) {
     project_creator
   } = project;
 
-  const [projectMembers, setProjectMembers] = useState([]);
+  const [projectMembers, setProjectMembers] = useState<Array<{ userDetails?: { user_name: string } }>>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch project members
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const members = await getProjectMembers(project_id);
+        const members = await getProjectMembers(project_id.toString());
         setProjectMembers(members || []);
       } catch (error) {
         console.error("Failed to fetch project members:", error);
