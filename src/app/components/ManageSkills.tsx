@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Skill } from "@/types/types"; // Assuming this type is already defined for your skills.
 import { Check, X, Plus, Search, Tag } from "lucide-react";
 import { useUser } from "@clerk/clerk-react"; // Clerk hook
-import { getUserByClerkId, updateUserSkills } from "@/actions/user"; // Assuming this fetches and updates the user data with skills.
+import { updateUserSkills } from "@/actions/user"; // Assuming this fetches and updates the user data with skills.
 
 interface ManageSkillsProps {
   allSkills: Skill[];

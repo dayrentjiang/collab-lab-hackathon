@@ -82,6 +82,7 @@ describe("createUser function (logging version)", () => {
     };
 
     // Call the function with cast to any to allow missing fields for test
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await createUser(mockFormData as any);
 
     // Check logs

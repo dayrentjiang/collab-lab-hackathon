@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { Skill } from "@/types/types";
-import { Check, X, ChevronRight, Loader2 } from "lucide-react";
+import { ChevronRight, Loader2 } from "lucide-react";
 import { getAvailableSkills } from "@/actions/project";
 import AddSkill from "../../components/AddSkill";
 import {
@@ -31,26 +31,11 @@ interface ProfileFormData {
 
 export default function ProfileSetup() {
   const { isLoaded, user } = useUser();
-
-  if (!isLoaded) {
-    return null;
-  }
-
-  if (!user) return null;
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<ProfileSetupStep>("basics");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoadingSkills, setIsLoadingSkills] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
   const [allSkills, setAllSkills] = useState<Skill[]>([]);
-  const [filteredSkills, setFilteredSkills] = useState<Skill[]>([]);
-  const [skills, setSkills] = useState<Skill[]>([]);
-  const findSkillById = (id: number): Skill | undefined => {
-    return skills.find((skill) => skill.skill_id === id);
-  };
   const [isLoading, setIsLoading] = useState(true);
-
-  //check if user has_completed_personalized. redirect them to /
 
   useEffect(() => {
     const checkUserProfile = async () => {
@@ -77,7 +62,6 @@ export default function ProfileSetup() {
 
   useEffect(() => {
     const fetchSkills = async () => {
-      setIsLoadingSkills(true);
       try {
         const fetchedSkills = await getAvailableSkills();
         // Make sure skills have the correct format
@@ -86,32 +70,13 @@ export default function ProfileSetup() {
           skill_id: Number(skill.skill_id)
         }));
         setAllSkills(normalizedSkills);
-        setFilteredSkills(normalizedSkills);
-        // Also set skills so findSkillById works correctly
-        setSkills(normalizedSkills);
       } catch (error) {
         console.error("Failed to fetch skills:", error);
-      } finally {
-        setIsLoadingSkills(false);
       }
     };
 
     fetchSkills();
   }, []);
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const term = e.target.value;
-    setSearchTerm(term);
-
-    if (term.trim() === "") {
-      setFilteredSkills(allSkills);
-    } else {
-      const filtered = allSkills.filter((skill) =>
-        skill.skill_name.toLowerCase().includes(term.toLowerCase())
-      );
-      setFilteredSkills(filtered);
-    }
-  };
 
   // Default form values
   const [formData, setFormData] = useState<ProfileFormData>({

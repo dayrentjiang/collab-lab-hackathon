@@ -118,6 +118,7 @@ export async function updateUser(
     }
 
     return { success: true, data };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Error updating user:", error);
     return { success: false, error: error.message };
@@ -266,7 +267,8 @@ export async function updateUserSkills(userId: string, newSkills: number[]) {
     }
 
     return { success: true };
-  } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     console.error("Error updating user skills:", error);
     return { success: false, error: error.message };
   }
@@ -338,12 +340,13 @@ export async function updateUserSkill(id: string, skill_id: number) {
       id: data.id,
       user_id: data.user_id,
       skill_id: data.skill_id,
-      skill_name: data.skills.name,
+      skill_name: data.skills[0].name,
 
       created_at: data.created_at
     };
 
     return { success: true, data: processedSkill };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Error updating user skill:", error);
     return { success: false, error: error.message };
@@ -361,6 +364,7 @@ export async function deleteUserSkill(id: string) {
     }
 
     return { success: true };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Error deleting user skill:", error);
     return { success: false, error: error.message };
