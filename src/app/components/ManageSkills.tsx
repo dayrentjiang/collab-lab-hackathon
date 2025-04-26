@@ -43,15 +43,31 @@ export default function ManageSkills({ allSkills: initialAllSkills, userSkills: 
   };
 
   const filterSkills = (term: string = searchTerm) => {
-    if (term.trim() === "") {
-      setFilteredSkills(allSkills);
-    } else {
-      const filtered = allSkills.filter((skill) =>
-        skill.skill_name.toLowerCase().includes(term.toLowerCase())
+    let filtered = allSkills;
+
+    // Apply category filters if any
+    if (categoryFilters.length > 0) {
+      filtered = filtered.filter((skill) =>
+        categoryFilters.includes(skill.skill_category)
       );
-      setFilteredSkills(filtered);
     }
+
+    // Apply search term filter if any
+    if (term.trim() !== "") {
+      filtered = filtered.filter(
+        (skill) =>
+          skill.skill_name.toLowerCase().includes(term.toLowerCase()) ||
+          skill.skill_category.toLowerCase().includes(term.toLowerCase())
+      );
+    }
+
+    setFilteredSkills(filtered);
   };
+
+  // Filter skills when category filters or search term changes
+  useEffect(() => {
+    filterSkills();
+  }, [categoryFilters, searchTerm]);
 
   const toggleCategoryFilter = (category: string) => {
     setCategoryFilters((prev) =>
