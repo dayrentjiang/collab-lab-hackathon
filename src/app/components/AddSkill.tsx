@@ -1,7 +1,7 @@
 "use client";
-
+import React from 'react';
 import { useState, useEffect, useRef } from "react";
-import { Skill } from "@/types/types";
+import { Skill } from "../../types/types";
 import { Check, X, Plus, Search, Tag } from "lucide-react";
 
 interface AddSkillProps {
@@ -107,6 +107,10 @@ export default function AddSkill({
     setFilteredSkills(skills);
   }, [skills]);
 
+  useEffect(() => {
+    filterSkills();
+  }, [categoryFilters]);
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col">
@@ -195,13 +199,9 @@ export default function AddSkill({
                 />
               </div>
             </div>
-
-            {/* Category filters */}
-            <div className="px-3 py-2 border-b border-gray-200">
-              <div
-                className="flex flex-wrap gap-2 overflow-y-auto"
-                style={{ maxHeight: "6rem" }}
-              >
+{/* Category Filters */}
+<div className="px-3 py-2 border-b border-gray-200">
+              <div className="flex flex-wrap gap-2 overflow-y-auto" style={{ maxHeight: "6rem" }}>
                 {categories.map((category) => (
                   <button
                     key={category}
