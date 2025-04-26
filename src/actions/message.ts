@@ -53,7 +53,7 @@ export async function createMessage(
 export async function getAllMessages(userId: string) {
   try {
     // Build query to get all messages where the user is either sender or receiver
-    let query = supabase
+    const query = supabase
       .from("messages")
       .select("*")
       .or(`msg_sender_id.eq.${userId},msg_receiver_id.eq.${userId}`)
