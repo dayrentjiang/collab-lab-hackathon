@@ -374,17 +374,45 @@ export default function UserProjectCard({
             {project_title}
           </h3>
           <div className="flex items-center gap-3 shrink-0">
-            <button
-              onClick={toggleStatusDropdown}
-              className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor} flex items-center whitespace-nowrap`}
-              disabled={statusUpdateInProgress}
-            >
-              {statusUpdateInProgress ? (
-                <div className="h-3 w-3 border-2 border-current border-t-transparent rounded-full animate-spin mr-1"></div>
-              ) : null}
-              {statusDisplayNames[currentStatus] || currentStatus}
-              <ChevronDown className="h-3 w-3 ml-1" />
-            </button>
+            {/* Status button with dropdown container */}
+            <div className="relative inline-block">
+              <button
+                onClick={toggleStatusDropdown}
+                className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor} flex items-center whitespace-nowrap`}
+                disabled={statusUpdateInProgress}
+              >
+                {statusUpdateInProgress ? (
+                  <div className="h-3 w-3 border-2 border-current border-t-transparent rounded-full animate-spin mr-1"></div>
+                ) : null}
+                {statusDisplayNames[currentStatus] || currentStatus}
+                <ChevronDown className="h-3 w-3 ml-1" />
+              </button>
+
+              {/* Status Dropdown Menu */}
+              {statusDropdownOpen && (
+                <div className="absolute left-0 top-full mt-1 w-40 bg-white rounded-xl shadow-lg z-10 border border-gray-100 overflow-hidden">
+                  <div className="py-1">
+                    {Object.entries(statusDisplayNames).map(([value, label]) => (
+                      <button
+                        key={value}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStatusChange(value);
+                        }}
+                        className={`${
+                          value === currentStatus
+                            ? "bg-blue-50 text-blue-600"
+                            : "text-gray-700 hover:bg-gray-50"
+                        } block px-4 py-2 text-sm w-full text-left transition-colors`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="flex gap-2">
               <button
                 onClick={() => setShowEditModal(true)}
@@ -489,30 +517,6 @@ export default function UserProjectCard({
             : "View Project"}
         </Link>
       </div>
-
-      {/* Status Dropdown */}
-      {statusDropdownOpen && (
-        <div className="absolute right-20 top-12 mt-1 w-40 bg-white rounded-md shadow-lg z-10 border border-gray-200">
-          <div className="py-1">
-            {Object.entries(statusDisplayNames).map(([value, label]) => (
-              <button
-                key={value}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleStatusChange(value);
-                }}
-                className={`${
-                  value === currentStatus
-                    ? "bg-gray-100 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-50"
-                } block px-4 py-2 text-sm w-full text-left`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Project Members Section */}
       <div className="border-t border-gray-200">
