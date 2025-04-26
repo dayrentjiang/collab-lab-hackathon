@@ -5,30 +5,20 @@ import FilteredProjectGrid from "./components/FilteredProjectGrid";
 import { PlusIcon, SearchIcon } from "lucide-react";
 import { ProjectWithRelations } from "../types/types";
 
-export default async function Home({
-  searchParams
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
-  // Await the searchParams object before accessing its properties
-  const params = await searchParams;
-  const category =
-    typeof params.category === "string" ? params.category : undefined;
-
+export default async function Home() {
   // Fetch all projects with their skills
   const projects = (await getAllProjects()) as ProjectWithRelations[];
 
-  // Filter projects by category if needed
   // Sort projects by created_at in descending order (newest first)
-  const sortedProjects = projects.sort((a, b) => 
-    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  const sortedProjects = projects.sort(
+    (a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 
-  //only show projects that do not have complete status
+  // Only show projects that are not completed
   const filteredProjects = sortedProjects.filter(
     (project) => project.project_status !== "completed"
   );
-  console.log(filteredProjects);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -64,9 +54,7 @@ export default async function Home({
       {/* Recommended Projects */}
       <section className="mb-12 mx-4 sm:mx-8 lg:mx-auto max-w-7xl">
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8">
-          {category
-            ? `${category.charAt(0).toUpperCase() + category.slice(1)} Projects`
-            : "All Projects"}
+          All Projects
         </h2>
 
         <FilteredProjectGrid projects={filteredProjects} />

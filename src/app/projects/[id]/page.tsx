@@ -3,7 +3,7 @@
 
 import { getAllProjects } from "@/actions/project";
 import { getProjectMembers } from "../../../actions/user-projects"; // Import the action
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Clock, Users, Tag } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -26,11 +26,9 @@ interface Project {
   };
 }
 
-export default function ProjectDetailPage({
-  params
-}: {
-  params: { id: string };
-}) {
+export default function ProjectDetailPage() {
+  const params = useParams();
+  const { id } = params as { id: string };
   const [project, setProject] = useState<Project | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [projectMembers, setProjectMembers] = useState<any[]>([]);
@@ -42,7 +40,7 @@ export default function ProjectDetailPage({
     const fetchProject = async () => {
       try {
         // Convert id from string to number
-        const projectId = parseInt(params.id, 10);
+        const projectId = parseInt(id, 10);
 
         if (isNaN(projectId)) {
           notFound();

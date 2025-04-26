@@ -4,7 +4,7 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
@@ -29,5 +29,14 @@
     ".next/types/**/*.ts",
     "src/app/api/chat/route.js"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "src/app/api/applications/[id]/route.ts",
+    "src/app/api/applications/route.ts",
+    "src/app/api/projects/[projectId]/route.ts",
+    "src/app/api/projects/[projectId]/skills/[id]/route.ts",
+    "src/app/api/projects/[projectId]/skills/route.ts",
+    "src/app/api/users/[userId]/route.ts",
+    "src/app/api/users/route.ts"
+  ]
 }

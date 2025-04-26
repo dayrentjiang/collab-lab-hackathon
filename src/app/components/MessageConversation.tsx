@@ -42,8 +42,6 @@ export default function MessageConversation({
         
         const fetchedMessages = await getAllMessages(
           user.id,        // Current user ID (sender)
-          recipientId,    // Recipient ID
-          projectId       // Optional project ID
         );
         
         console.log("Fetched messages:", fetchedMessages);

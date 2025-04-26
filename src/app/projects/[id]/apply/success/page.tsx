@@ -1,11 +1,10 @@
+"use client";
 import Link from "next/link";
 import { CheckCircle } from "lucide-react";
+import { useParams } from "next/navigation";
 
-export default function ApplicationSuccessPage({
-  params
-}: {
-  params: { id: string };
-}) {
+export default function ApplicationSuccessPage() {
+  const params = useParams();
   const projectId = params.id;
 
   return (
@@ -67,8 +66,8 @@ export default function ApplicationSuccessPage({
               </div>
               <div>
                 <p className="text-gray-600">
-                  You&apos;ll receive a notification when your application status
-                  changes.
+                  You&apos;ll receive a notification when your application
+                  status changes.
                 </p>
               </div>
             </div>
@@ -79,8 +78,8 @@ export default function ApplicationSuccessPage({
               </div>
               <div>
                 <p className="text-gray-600">
-                  If accepted, you&apos;ll be added to the project team and can begin
-                  collaborating.
+                  If accepted, you&apos;ll be added to the project team and can
+                  begin collaborating.
                 </p>
               </div>
             </div>

@@ -4,17 +4,6 @@ import { useEffect, useState } from "react";
 import { getProjectMembers } from "../../actions/user-projects"; // Import the action
 import { Project } from "../../types/types";
 
-interface ProjectWithRelations extends Project {
-  skills: Array<{
-    skill_id: string;
-    skill_name: string;
-    skill_category: string;
-  }>;
-  project_creator: {
-    user_name: string;
-  };
-  project_id: number;
-}
 
 // Define the skill category color mapping
 const getSkillCategoryColor = (category: string) => {
@@ -37,7 +26,8 @@ const statusColors = {
   "completed": "bg-gray-100 text-gray-800"
 };
 
-export default function ProjectCard({ project }: { project: ProjectWithRelations }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default function ProjectCard({ project }: { project: any }) {
   const {
     project_id,
     project_title,

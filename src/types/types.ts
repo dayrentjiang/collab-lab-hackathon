@@ -32,6 +32,7 @@ export type Project = {
   project_timeline?: string;
   created_at: string;
   updated_at: string;
+  skills?: Skill[]; // Optional, for API responses
 };
 
 export type UserSkill = {

@@ -1,44 +1,41 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useUser } from '@clerk/nextjs';
-import { useSearchParams } from 'next/navigation';
-import { getUserByClerkId } from '../../../actions/user';
-import DirectMessageForm from '../../components/DirectMessageForm';
-import Link from 'next/link';
+import React, { useState, useEffect, Suspense } from "react";
+import { useUser } from "@clerk/nextjs";
+import { getUserByClerkId } from "../../../actions/user";
+import DirectMessageForm from "../../components/DirectMessageForm";
+import Link from "next/link";
 
-export default function NewMessagePage() {
-
+function NewMessagePageContent() {
   const { user: clerkUser, isLoaded } = useUser();
-  const searchParams = useSearchParams();
-  const recipientId = searchParams.get('recipient');
-  
+  const [recipientId, setRecipientId] = useState<string | null>(null);
   const [userData, setUserData] = useState<any>(null);
   const [recipientData, setRecipientData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Get the query param manually from the URL
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("recipient");
+      setRecipientId(id);
+    }
+  }, []);
+
+  useEffect(() => {
     async function loadData() {
-      if (!isLoaded || !clerkUser) return;
-      
+      if (!isLoaded || !clerkUser || !recipientId) return;
+
       try {
-        // Load current user data
         const user = await getUserByClerkId(clerkUser.id);
         setUserData(user);
 
-        console.log("Current User Data:", user);
-        
-        // Only try to load recipient data if a recipient ID is provided
-        if (recipientId) {
-          const recipient = await getUserByClerkId(recipientId);
+        const recipient = await getUserByClerkId(recipientId);
+        if (recipient) {
           setRecipientData(recipient);
-          
-          if (!recipient) {
-            setError("Recipient not found");
-          }
         } else {
-          setError("No recipient specified");
+          setError("Recipient not found");
         }
       } catch (err) {
         console.error("Error loading data:", err);
@@ -47,9 +44,9 @@ export default function NewMessagePage() {
         setLoading(false);
       }
     }
-    
+
     loadData();
-  }, [clerkUser, isLoaded, recipientId]);
+  }, [isLoaded, clerkUser, recipientId]);
 
   if (!isLoaded || loading) {
     return (
@@ -65,7 +62,9 @@ export default function NewMessagePage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="bg-white shadow rounded-lg p-6">
-          <p className="text-center text-red-500">You must be logged in to send messages</p>
+          <p className="text-center text-red-500">
+            You must be logged in to send messages
+          </p>
         </div>
       </div>
     );
@@ -78,31 +77,38 @@ export default function NewMessagePage() {
           ← Back to Messages
         </Link>
       </div>
-      
+
       <div className="bg-white shadow rounded-lg p-6">
         <h1 className="text-2xl font-bold mb-6">New Message</h1>
-        
+
         {error ? (
           <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded mb-4">
             {error}
           </div>
         ) : null}
-        
+
         {userData && recipientData ? (
-          <DirectMessageForm 
+          <DirectMessageForm
             senderData={userData}
             recipientData={recipientData}
-            onMessageSent={() => {
-              // Navigate back to messages after sending
-              window.location.href = '/';
-            }}
+            onMessageSent={() => (window.location.href = "/")}
           />
         ) : (
           <p className="text-gray-500">
-            {!recipientId ? "Please specify a recipient" : "Loading message form..."}
+            {!recipientId
+              ? "Please specify a recipient"
+              : "Loading message form..."}
           </p>
         )}
       </div>
     </div>
+  );
+}
+
+export default function NewMessagePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NewMessagePageContent />
+    </Suspense>
   );
 }
