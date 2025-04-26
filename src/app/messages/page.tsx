@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
-import { useParams, useSearchParams } from "next/navigation";
 import { getAllMessages } from "../../actions/message";
 import { getUserByClerkId } from "../../actions/user";
 
@@ -22,14 +21,6 @@ interface UserMap {
 
 export default function MessagesDisplayPage() {
   const { isLoaded, user } = useUser();
-  const params = useParams();
-  const searchParams = useSearchParams();
-
-  const recipientId =
-    (params.recipientId as string) || searchParams.get("recipient");
-  const projectId = searchParams.get("project")
-    ? parseInt(searchParams.get("project") as string, 10)
-    : undefined;
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [userMap, setUserMap] = useState<UserMap>({});
@@ -61,6 +52,7 @@ export default function MessagesDisplayPage() {
 
         setMessages(fetchedMessages);
         setUserMap(userMapTemp);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         console.error("Error fetching messages or users:", err);
         setError(err.message);

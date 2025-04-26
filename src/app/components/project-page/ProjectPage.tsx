@@ -10,7 +10,7 @@ import {
 import { Project } from "../../../types/types";
 import UserProjectCard from "./UserProjectCard";
 import JoinedProjectCard from "./JoinedProjectCard"; // Import the component for joined projects
-import { CheckCircle, User, Users, FolderOpen, PlusCircle } from "lucide-react";
+import { FolderOpen, PlusCircle } from "lucide-react";
 
 // Make sure we have a comprehensive type that matches the data structure returned by our APIs
 type CombinedProject = {
@@ -112,7 +112,9 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ userId }) => {
     activeTab === "created"
       ? createdProjects
       : activeTab === "joined"
-      ? joinedProjects.filter(project => project.project_status !== "completed")
+      ? joinedProjects.filter(
+          (project) => project.project_status !== "completed"
+        )
       : completedProjects;
 
   return (
@@ -122,7 +124,9 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ userId }) => {
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-500 to-teal-500 px-6 py-8 text-white">
             <h1 className="text-3xl font-bold">My Projects</h1>
-            <p className="text-blue-100 mt-2">Manage and track your project progress</p>
+            <p className="text-blue-100 mt-2">
+              Manage and track your project progress
+            </p>
           </div>
 
           {/* Tabs */}
@@ -196,13 +200,19 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ userId }) => {
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {activeProjects.map((project) => (
+                {activeProjects.map((project) =>
                   activeTab === "created" ? (
-                    <UserProjectCard key={project.project_id} project={project} />
+                    <UserProjectCard
+                      key={project.project_id}
+                      project={project}
+                    />
                   ) : (
-                    <JoinedProjectCard key={project.project_id} project={project} />
+                    <JoinedProjectCard
+                      key={project.project_id}
+                      project={project}
+                    />
                   )
-                ))}
+                )}
               </div>
             )}
           </div>
