@@ -33,7 +33,6 @@ import {
 import { getUserByClerkId } from "../../../actions/user"; // Adjust the import path as necessary
 import { ProjectCard, ProjectFormData, Skill } from "../../../types/types"; // Adjust the import path as necessary
 import AddSkill from "@/app/components/AddSkill";
-import { useRouter } from "next/navigation";
 
 // Define the skill category color mapping
 const getSkillCategoryColor = (category: string | undefined) => {
@@ -90,7 +89,10 @@ interface UserProjectCardProps {
   onUpdate?: () => void;
 }
 
-export default function UserProjectCard({ project, onUpdate }: UserProjectCardProps) {
+export default function UserProjectCard({
+  project,
+  onUpdate
+}: UserProjectCardProps) {
   const {
     project_id,
     project_title,
@@ -116,16 +118,21 @@ export default function UserProjectCard({ project, onUpdate }: UserProjectCardPr
   const [editFormData, setEditFormData] = useState<ProjectFormData>({
     project_title: project_title,
     project_description: project_description,
-    project_status: project_status as "recruiting" | "in_progress" | "completed",
+    project_status: project_status as
+      | "recruiting"
+      | "in_progress"
+      | "completed",
     project_vacancy: project_vacancy,
     project_timeline: project_timeline,
-    required_skills: projectSkills?.map(skill => Number(skill.skill_id)) || [],
+    required_skills:
+      projectSkills?.map((skill) => Number(skill.skill_id)) || [],
     project_creator_id: project_creator_id
   });
   const [isEditing, setIsEditing] = useState(false);
   const [availableSkills, setAvailableSkills] = useState<Skill[]>([]);
-  const [selectedSkills, setSelectedSkills] = useState<number[]>(editFormData.required_skills);
-  const router = useRouter();
+  const [selectedSkills, setSelectedSkills] = useState<number[]>(
+    editFormData.required_skills
+  );
 
   interface ProjectCreator {
     user_id: string;
@@ -331,7 +338,7 @@ export default function UserProjectCard({ project, onUpdate }: UserProjectCardPr
         },
         project_creator_id
       );
-      
+
       if (updatedProject) {
         console.log("Project updated successfully");
         setShowEditModal(false);
@@ -349,9 +356,9 @@ export default function UserProjectCard({ project, onUpdate }: UserProjectCardPr
   };
 
   const handleSkillToggle = (skillId: number) => {
-    setSelectedSkills(prev => {
+    setSelectedSkills((prev) => {
       if (prev.includes(skillId)) {
-        return prev.filter(id => id !== skillId);
+        return prev.filter((id) => id !== skillId);
       } else {
         return [...prev, skillId];
       }
@@ -779,7 +786,7 @@ export default function UserProjectCard({ project, onUpdate }: UserProjectCardPr
                 <X className="h-5 w-5" />
               </button>
             </div>
-            
+
             <div className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -788,7 +795,12 @@ export default function UserProjectCard({ project, onUpdate }: UserProjectCardPr
                 <input
                   type="text"
                   value={editFormData.project_title}
-                  onChange={(e) => setEditFormData({...editFormData, project_title: e.target.value})}
+                  onChange={(e) =>
+                    setEditFormData({
+                      ...editFormData,
+                      project_title: e.target.value
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 />
               </div>
@@ -799,7 +811,12 @@ export default function UserProjectCard({ project, onUpdate }: UserProjectCardPr
                 </label>
                 <textarea
                   value={editFormData.project_description}
-                  onChange={(e) => setEditFormData({...editFormData, project_description: e.target.value})}
+                  onChange={(e) =>
+                    setEditFormData({
+                      ...editFormData,
+                      project_description: e.target.value
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   rows={4}
                 />
@@ -811,7 +828,15 @@ export default function UserProjectCard({ project, onUpdate }: UserProjectCardPr
                 </label>
                 <select
                   value={editFormData.project_status}
-                  onChange={(e) => setEditFormData({...editFormData, project_status: e.target.value as "recruiting" | "in_progress" | "completed"})}
+                  onChange={(e) =>
+                    setEditFormData({
+                      ...editFormData,
+                      project_status: e.target.value as
+                        | "recruiting"
+                        | "in_progress"
+                        | "completed"
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 >
                   <option value="recruiting">Recruiting</option>
@@ -827,7 +852,12 @@ export default function UserProjectCard({ project, onUpdate }: UserProjectCardPr
                 <input
                   type="number"
                   value={editFormData.project_vacancy}
-                  onChange={(e) => setEditFormData({...editFormData, project_vacancy: parseInt(e.target.value)})}
+                  onChange={(e) =>
+                    setEditFormData({
+                      ...editFormData,
+                      project_vacancy: parseInt(e.target.value)
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 />
               </div>
@@ -838,7 +868,12 @@ export default function UserProjectCard({ project, onUpdate }: UserProjectCardPr
                 </label>
                 <select
                   value={editFormData.project_timeline}
-                  onChange={(e) => setEditFormData({...editFormData, project_timeline: e.target.value})}
+                  onChange={(e) =>
+                    setEditFormData({
+                      ...editFormData,
+                      project_timeline: e.target.value
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 >
                   <option value="">Select Timeline</option>

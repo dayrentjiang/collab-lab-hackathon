@@ -28,6 +28,7 @@ type CombinedProject = {
   created_at: string;
   updated_at: string;
   project_creator_id: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   projectSkills: any[];
 };
 

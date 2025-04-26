@@ -25,6 +25,7 @@ const statusColors = {
   "completed": "bg-gray-100 text-gray-800"
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function JoinedProjectCard({ project }: { project: { project_status: "recruiting" | "in_progress" | "completed"; [key: string]: any } }) {
   const {
     project_id,
@@ -39,6 +40,7 @@ export default function JoinedProjectCard({ project }: { project: { project_stat
     joined_at
   } = project;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [projectUsers, setProjectUsers] = useState<any[]>([]);
   const [expandedMembers, setExpandedMembers] = useState(false);
 

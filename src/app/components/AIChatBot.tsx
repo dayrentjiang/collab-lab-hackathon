@@ -22,7 +22,6 @@ interface AIChatBotProps {
 }
 
 const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
-  const [userName, setUserName] = useState(""); // Get user name from Clerk
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
@@ -49,6 +48,7 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
 
         // Process skills data based on the actual structure
         if (Array.isArray(skillsData)) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const processedSkills = skillsData.map((skillItem: any) => {
             // Extract from nested structure
             if (
@@ -82,7 +82,6 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ userId }) => {
           console.log("User Data:", userData);
           if (userData) {
             const name = userData.user_name || "User";
-            setUserName(name);
 
             // Update the greeting message with the user's name
             setMessages((prevMessages) => [
