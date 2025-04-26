@@ -103,6 +103,7 @@ export default function ProjectDetailPage({
     // Check if user is the creator
     if (project?.project_creator?.user_id === user.id) return true;
 
+
     // Check if user is a team member
     return projectMembers.some(
       (member) => member.userDetails?.user_clerk_id === user.id
@@ -440,7 +441,9 @@ export default function ProjectDetailPage({
 
                   {project.project_creator && (
                     <Link
-                      href={`/messages/new?recipient=${project.project_creator.user_id}`}
+                 
+
+                      href={`/messages/new?recipient=${project.project_creator.user_clerk_id}`}
                       className="px-4 py-2 border border-blue-300 text-blue-600 text-sm font-medium rounded-md hover:bg-blue-50 transition-colors"
                     >
                       Contact Creator
