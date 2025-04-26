@@ -279,23 +279,44 @@ export const removeUserFromProject = async (
   }
 };
 
-//fetch all completed projects from a user
-export const getCompletedProjects = async (userId: string) => {
+//get user project where they are creator in that project (check by role)
+export const getAllCompleteProjects = async (userId: string) => {
   try {
-    const { data: completedProjects } = await supabase
+    console.log("Fetching user projects as creator:", userId);
+    const { data: userProjects } = await supabase
       .from("user_projects")
-      .select("project_id")
+      .select("*")
       .eq("user_id", userId);
 
-    if (!completedProjects) {
-      throw new Error("No completed projects found");
+    if (!userProjects) {
+      throw new Error("No user projects found");
     }
 
-    //and then for each project check the project_status =
+    console.log(userProjects);
+    //get the full project list using the project id for the one that is complete
+    const { data: projects } = await supabase
+      .from("projects")
+      .select("*")
+      .in(
+        "project_id",
+        userProjects.map((userProject) => userProject.project_id)
+      )
+      .eq("project_status", "completed");
 
-    return completedProjects;
+    if (!projects) {
+      throw new Error("No projects found");
+    }
+    //for each project get the project skills
+    const projectsWithSkills = await Promise.all(
+      projects.map(async (project) => {
+        const projectSkills = await getProjectSkills(project.project_id);
+        return { ...project, projectSkills };
+      })
+    );
+
+    return projectsWithSkills;
   } catch (error) {
-    console.error("[GET_COMPLETED_PROJECTS]", error);
-    throw new Error("Failed to fetch completed projects");
+    console.error("[GET_USER_PROJECTS_AS_CREATOR]", error);
+    throw new Error("Failed to fetch user projects as creator");
   }
 };

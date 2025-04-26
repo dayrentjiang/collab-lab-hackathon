@@ -4,12 +4,13 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   getUserProjectsAsCreator,
-  getUserProjectsAsMember
+  getUserProjectsAsMember,
+  getAllCompleteProjects
 } from "../../../actions/user-projects";
 import { Project } from "../../../types/types";
 import UserProjectCard from "./UserProjectCard";
 import JoinedProjectCard from "./JoinedProjectCard"; // Import the component for joined projects
-import { User, Users } from "lucide-react";
+import { CheckCircle, User, Users } from "lucide-react";
 
 // Make sure we have a comprehensive type that matches the data structure returned by our APIs
 type CombinedProject = {
@@ -36,9 +37,14 @@ interface ProjectPageProps {
 }
 
 const ProjectPage: React.FC<ProjectPageProps> = ({ userId }) => {
-  const [activeTab, setActiveTab] = useState<"created" | "joined">("created");
+  const [activeTab, setActiveTab] = useState<
+    "created" | "joined" | "completed"
+  >("created");
   const [createdProjects, setCreatedProjects] = useState<CombinedProject[]>([]);
   const [joinedProjects, setJoinedProjects] = useState<CombinedProject[]>([]);
+  const [completedProjects, setCompletedProjects] = useState<CombinedProject[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
 
   // Separate useEffect for each tab's data to avoid conflicts
@@ -71,14 +77,29 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ userId }) => {
       }
     };
 
-    // On component mount, fetch both types of projects
+    const fetchCompletedProjects = async () => {
+      if (activeTab === "completed") setLoading(true);
+      try {
+        const data = await getAllCompleteProjects(userId);
+        console.log("Fetched completed projects:", data);
+        setCompletedProjects(data || []);
+      } catch (err) {
+        console.error("Error fetching completed projects:", err);
+        setCompletedProjects([]);
+      } finally {
+        if (activeTab === "completed") setLoading(false);
+      }
+    };
+
+    // On component mount, fetch all types of projects
     // This way we have the data ready when the user switches tabs
     fetchCreatedProjects();
     fetchJoinedProjects();
+    fetchCompletedProjects();
   }, [userId]); // Only depends on userId, not activeTab
 
   // Function to handle tab change
-  const handleTabChange = (tab: "created" | "joined") => {
+  const handleTabChange = (tab: "created" | "joined" | "completed") => {
     setActiveTab(tab);
     // We're not fetching on tab change anymore, so we just need to set loading briefly
     // while we switch to already-loaded data
@@ -88,7 +109,11 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ userId }) => {
 
   // Get the currently active projects based on the selected tab
   const activeProjects =
-    activeTab === "created" ? createdProjects : joinedProjects;
+    activeTab === "created"
+      ? createdProjects
+      : activeTab === "joined"
+      ? joinedProjects
+      : completedProjects;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
@@ -116,10 +141,25 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ userId }) => {
           <Users className="h-4 w-4 mr-2" />
           Joined Projects
         </button>
+        <button
+          onClick={() => handleTabChange("completed")}
+          className={`flex items-center px-6 py-3 font-medium text-sm ${
+            activeTab === "completed"
+              ? "border-b-2 border-blue-500 text-blue-600"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          <CheckCircle className="h-4 w-4 mr-2" />
+          Completed Projects
+        </button>
       </div>
 
       <h1 className="text-3xl font-bold mb-8 text-center">
-        {activeTab === "created" ? "My Created Projects" : "Joined Projects"}
+        {activeTab === "created"
+          ? "My Created Projects"
+          : activeTab === "joined"
+          ? "Joined Projects"
+          : "Completed Projects"}
       </h1>
 
       {loading ? (
@@ -131,7 +171,9 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ userId }) => {
           <p className="text-gray-500 text-lg mb-6">
             {activeTab === "created"
               ? "You haven't created any projects yet."
-              : "You haven't joined any projects yet."}
+              : activeTab === "joined"
+              ? "You haven't joined any projects yet."
+              : "You don't have any completed projects yet."}
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -149,12 +191,19 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ userId }) => {
                   <span>Browse Projects</span>
                 </button>
               </>
-            ) : (
+            ) : activeTab === "joined" ? (
               <button
                 className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition flex items-center justify-center"
                 onClick={() => (window.location.href = "/")}
               >
                 <span>Find Projects to Join</span>
+              </button>
+            ) : (
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition flex items-center justify-center"
+                onClick={() => handleTabChange("created")}
+              >
+                <span>View Active Projects</span>
               </button>
             )}
           </div>
@@ -168,9 +217,16 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ userId }) => {
                   project={project}
                 />
               ))
-            : activeProjects.map((project) => (
+            : activeTab === "joined"
+            ? activeProjects.map((project) => (
                 <JoinedProjectCard
                   key={`joined-${project.project_id}`}
+                  project={project}
+                />
+              ))
+            : activeProjects.map((project) => (
+                <JoinedProjectCard
+                  key={`completed-${project.project_id}`}
                   project={project}
                 />
               ))}
