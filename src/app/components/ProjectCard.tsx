@@ -145,9 +145,23 @@ export default function ProjectCard({ project }) {
 
         {/* Project Members */}
         <div className="mb-4">
-          <h4 className="text-xs font-medium text-gray-700 mb-2">
-            Project Members
-          </h4>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-xs font-medium text-gray-700">
+              Project Members
+            </h4>
+            <div className="text-xs text-gray-500 flex items-center">
+              <UsersIcon className="h-3.5 w-3.5 mr-1.5" />
+              {isLoading ? (
+                <span className="animate-pulse">Loading...</span>
+              ) : (
+                <span>
+                  {projectMembers.length}/
+                  {project_vacancy + projectMembers.length} positions filled
+                </span>
+              )}
+            </div>
+          </div>
+
           <div className="flex flex-col space-y-2">
             {isLoading ? (
               <div className="flex space-x-1">
@@ -181,19 +195,10 @@ export default function ProjectCard({ project }) {
                     members
                   </span>
                 )}
-                <div className="text-xs text-gray-500 mt-1 flex items-center">
-                  <UsersIcon className="h-3.5 w-3.5 mr-1.5" />
-                  {projectMembers.length}/
-                  {project_vacancy + projectMembers.length} positions filled
-                </div>
               </>
             ) : (
               <div className="flex flex-col space-y-1">
                 <span className="text-xs text-gray-500">No members yet</span>
-                <div className="text-xs text-gray-500 flex items-center">
-                  <UsersIcon className="h-3.5 w-3.5 mr-1.5" />
-                  0/{project_vacancy} positions filled
-                </div>
               </div>
             )}
           </div>
