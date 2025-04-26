@@ -412,23 +412,39 @@ export default function UserProjectCard({
         </p>
 
         {/* Skills */}
-        <div className="flex flex-wrap gap-2 mb-4 min-h-[28px]">
+        <div className="flex flex-wrap gap-2 mb-4">
           {projectSkills &&
             projectSkills.slice(0, 3).map((skillWrapper) => (
               <span
                 key={skillWrapper.skill_id}
                 className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getSkillCategoryColor(
                   skillWrapper.skills?.skill_category || ""
-                )} max-w-[120px] truncate inline-flex items-center`}
+                )}`}
                 title={skillWrapper.skills?.skill_name || "Unknown"}
               >
                 {skillWrapper.skills?.skill_name || "Unknown"}
               </span>
             ))}
           {projectSkills && projectSkills.length > 3 && (
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 max-w-[100px] truncate inline-flex items-center">
-              +{projectSkills.length - 3} more
-            </span>
+            <div className="group relative">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 cursor-help">
+                +{projectSkills.length - 3} more
+              </span>
+              <div className="absolute left-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                <div className="flex flex-wrap gap-1">
+                  {projectSkills.slice(3).map((skillWrapper) => (
+                    <span
+                      key={skillWrapper.skill_id}
+                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${getSkillCategoryColor(
+                        skillWrapper.skills?.skill_category || ""
+                      )}`}
+                    >
+                      {skillWrapper.skills?.skill_name || "Unknown"}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
           )}
         </div>
 

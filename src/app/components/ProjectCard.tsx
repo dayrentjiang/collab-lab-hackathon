@@ -118,9 +118,25 @@ export default function ProjectCard({ project }: { project: ProjectWithRelations
               </span>
             ))}
           {skills && skills.length > 3 && (
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-              +{skills.length - 3} more
-            </span>
+            <div className="group relative">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 cursor-help">
+                +{skills.length - 3} more
+              </span>
+              <div className="absolute left-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                <div className="flex flex-wrap gap-1">
+                  {skills.slice(3).map((skill) => (
+                    <span
+                      key={skill.skill_id}
+                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${getSkillCategoryColor(
+                        skill.skill_category
+                      )}`}
+                    >
+                      {skill.skill_name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
           )}
         </div>
 
