@@ -47,24 +47,17 @@ export async function createMessage(
 /**
  * Gets all messages between a specific sender and receiver
  */
-export async function getAllMessages(
-  message_sender_id: string,
-  message_receiver_id: string,
-  projectId?: number | null
-) {
+/**
+ * Gets all messages for a user (both sent and received)
+ */
+export async function getAllMessages(userId: string) {
   try {
+    // Build query to get all messages where the user is either sender or receiver
     let query = supabase
       .from("messages")
       .select("*")
-      .or(
-        `and(msg_sender_id.eq.${message_sender_id},msg_receiver_id.eq.${message_receiver_id}),and(msg_sender_id.eq.${message_receiver_id},msg_receiver_id.eq.${message_sender_id})`
-      )
+      .or(`msg_sender_id.eq.${userId},msg_receiver_id.eq.${userId}`)
       .order("sent_at", { ascending: true });
-
-    // Add project filter if specified
-    if (projectId) {
-      query = query.eq("project_id", projectId);
-    }
 
     const { data, error } = await query;
 
@@ -72,6 +65,7 @@ export async function getAllMessages(
       throw new Error(`Failed to fetch messages: ${error.message}`);
     }
 
+    console.log("Fetched messages:", data);
     return data || [];
   } catch (error) {
     console.error("Error fetching messages:", error);
