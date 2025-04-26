@@ -14,22 +14,21 @@ import { CheckCircle, User, Users } from "lucide-react";
 
 // Make sure we have a comprehensive type that matches the data structure returned by our APIs
 type CombinedProject = {
-  user_project_id?: string;
-  user_id?: string;
+  user_project_id: string;
+  user_id: string;
   project_id: number;
-  user_role?: string;
-  joined_at?: string;
-  project?: Project; // For joined projects
-  project_title?: string; // For created projects (direct properties)
-  project_description?: string;
-  project_status?: string;
-  project_vacancy?: number;
-  project_timeline?: string;
-  created_at?: string;
-  updated_at?: string;
-  project_creator_id?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  projectSkills?: any[];
+  user_role: string;
+  joined_at: string;
+  project: Project;
+  project_title: string;
+  project_description: string;
+  project_status: "recruiting" | "in_progress" | "completed";
+  project_vacancy: number;
+  project_timeline: string;
+  created_at: string;
+  updated_at: string;
+  project_creator_id: string;
+  projectSkills: any[];
 };
 
 interface ProjectPageProps {

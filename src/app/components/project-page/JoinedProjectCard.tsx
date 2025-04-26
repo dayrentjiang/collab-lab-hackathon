@@ -5,7 +5,7 @@ import { CalendarIcon, ClockIcon, UsersIcon, Users, Star } from "lucide-react";
 import { getProjectUsers } from "../../../actions/user-projects";
 
 // Define the skill category color mapping
-const getSkillCategoryColor = (category) => {
+const getSkillCategoryColor = (category: string) => {
   switch (category?.toLowerCase()) {
     case "frontend":
       return "bg-purple-100 text-purple-800";
@@ -25,10 +25,10 @@ const statusColors = {
   "completed": "bg-gray-100 text-gray-800"
 };
 
-export default function JoinedProjectCard({ project }) {
+export default function JoinedProjectCard({ project }: { project: { project_status: "recruiting" | "in_progress" | "completed"; [key: string]: any } }) {
   const {
     project_id,
-    project_title,
+    project_title, 
     project_description,
     project_status,
     project_vacancy,
@@ -39,7 +39,7 @@ export default function JoinedProjectCard({ project }) {
     joined_at
   } = project;
 
-  const [projectUsers, setProjectUsers] = useState([]);
+  const [projectUsers, setProjectUsers] = useState<any[]>([]);
   const [expandedMembers, setExpandedMembers] = useState(false);
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export default function JoinedProjectCard({ project }) {
     : "Unknown";
 
   // Format member date
-  const formatMemberDate = (dateString) => {
+  const formatMemberDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -82,7 +82,7 @@ export default function JoinedProjectCard({ project }) {
   };
 
   // Get first letter of user name for avatar
-  const getUserInitials = (name) => {
+  const getUserInitials = (name: string) => {
     return name
       ? name
           .split(" ")
@@ -95,7 +95,7 @@ export default function JoinedProjectCard({ project }) {
 
   // Get status color
   const statusColor =
-    statusColors[project_status] || "bg-gray-100 text-gray-800";
+    statusColors[project_status as keyof typeof statusColors] || "bg-gray-100 text-gray-800";
 
   // Toggle members view
   const toggleMembersView = () => {
@@ -135,7 +135,7 @@ export default function JoinedProjectCard({ project }) {
         {/* Skills */}
         <div className="flex flex-wrap gap-2 mb-4 min-h-[28px]">
           {projectSkills &&
-            projectSkills.slice(0, 3).map((skillWrapper) => (
+            projectSkills.slice(0, 3).map((skillWrapper: { skill_id: string; skills?: { skill_category?: string; skill_name?: string } }) => (
               <span
                 key={skillWrapper.skill_id}
                 className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getSkillCategoryColor(
@@ -274,7 +274,7 @@ export default function JoinedProjectCard({ project }) {
                           <div className="flex flex-wrap gap-1">
                             {member.userDetails.skills
                               .slice(0, 3)
-                              .map((skill, index) => (
+                              .map((skill: { skill_name?: string }, index: number) => (
                                 <span
                                   key={index}
                                   className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 max-w-[120px] truncate inline-flex items-center"
