@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import React from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { createApplication } from '../../../../actions/application';
-import { getAllProjects } from '@/actions/project';
+import { getAllProjects } from '../../../../actions/project';
 import Link from 'next/link';
 import { ArrowLeft, Check, Loader2 } from 'lucide-react';
 
@@ -22,7 +23,7 @@ export default function ApplyToProjectPage({ params }: { params: { id: string } 
   const projectId = parseInt(params.id, 10);
 
   // Load project data
-  useState(() => {
+  useEffect(() => {
     const fetchProject = async () => {
       try {
         setIsLoading(true);

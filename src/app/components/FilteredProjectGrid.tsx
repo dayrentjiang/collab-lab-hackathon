@@ -1,11 +1,12 @@
 'use client';
-
+import React from 'react';
 import { useState, useMemo } from 'react';
-import { Project } from '@/types/types';
+import { Project } from '../../types/types';
 import ProjectCard from './ProjectCard';
 import { Search } from 'lucide-react';
+import { ProjectWithRelations } from '../../types/types';
 
-export default function FilteredProjectGrid({ projects }: { projects: Project[] }) {
+export default function FilteredProjectGrid({ projects }: { projects: ProjectWithRelations[] }) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredProjects = useMemo(() => {
@@ -13,11 +14,11 @@ export default function FilteredProjectGrid({ projects }: { projects: Project[] 
 
     const lower = searchTerm.toLowerCase();
     return projects.filter((project) =>
-      project.project_title.toLowerCase().includes(lower) ||
-      project.project_description.toLowerCase().includes(lower) ||
-      project.skills?.some((skill) =>
-        skill.skill_name.toLowerCase().includes(lower)
-      )
+    project.project_title.toLowerCase().includes(lower) ||
+    project.project_description.toLowerCase().includes(lower) ||
+    project.required_skills?.some(
+      (skill) => skill.skill_name.toLowerCase().includes(lower)
+    )
     );
   }, [searchTerm, projects]);
 

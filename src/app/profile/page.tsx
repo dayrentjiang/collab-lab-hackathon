@@ -1,8 +1,9 @@
 "use client"
 
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { getUserByClerkId } from '@/actions/user';
+import { getUserByClerkId } from '../../actions/user';
 import Link from 'next/link';
 
 interface UserSkill {
