@@ -1,35 +1,129 @@
 // src/app/projects/[id]/page.tsx
-import { getAllProjects } from "../../../actions/project";
-import React from "react";
+"use client";
+
+import { getAllProjects } from "@/actions/project";
+import { getProjectMembers } from "../../../actions/user-projects"; // Import the action
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Clock, Users, Tag } from "lucide-react";
-import SearchBar from "../../components/SearchBar";
+import { useEffect, useState } from "react";
+import { useUser } from "@clerk/nextjs"; // Import useUser hook
 
-export default async function ProjectDetailPage({
+// Define Project interface based on the properties used in the component
+interface Project {
+  project_id: string;
+  project_title: string;
+  project_description: string;
+  project_status: "recruiting" | "in_progress" | "completed";
+  project_vacancy: number;
+  project_timeline?: string;
+  created_at: string;
+  skills?: { skill_name: string; skill_category: string }[];
+  project_creator?: {
+    user_id: string;
+    user_name: string;
+    user_bio?: string;
+  };
+}
+
+export default function ProjectDetailPage({
   params
 }: {
   params: { id: string };
 }) {
-  // Convert id from string to number
-  const projectId = parseInt(params.id, 10);
+  const [project, setProject] = useState<Project | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [projectMembers, setProjectMembers] = useState<any[]>([]);
+  const [isLoadingMembers, setIsLoadingMembers] = useState(true);
+  const [isLoadingProject, setIsLoadingProject] = useState(true);
+  const { isLoaded, user } = useUser();
 
-  if (isNaN(projectId)) {
-    notFound();
+  useEffect(() => {
+    const fetchProject = async () => {
+      try {
+        // Convert id from string to number
+        const projectId = parseInt(params.id, 10);
+
+        if (isNaN(projectId)) {
+          notFound();
+        }
+
+        // Get all projects
+        const allProjects = await getAllProjects();
+
+        // If allProjects is an error or not an array
+        if (!Array.isArray(allProjects)) {
+          notFound();
+        }
+
+        // Find the specific project by ID
+        const foundProject = allProjects.find(
+          (p) => p.project_id === projectId
+        );
+
+        // If project is not found
+        if (!foundProject) {
+          notFound();
+        }
+
+        setProject(foundProject);
+      } catch (error) {
+        console.error("Failed to fetch project:", error);
+      } finally {
+        setIsLoadingProject(false);
+      }
+    };
+
+    fetchProject();
+  }, [params.id]);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      if (!project) return;
+
+      try {
+        const members = await getProjectMembers(project.project_id);
+        setProjectMembers(members || []);
+      } catch (error) {
+        console.error("Failed to fetch project members:", error);
+      } finally {
+        setIsLoadingMembers(false);
+      }
+    };
+
+    if (project) {
+      fetchMembers();
+    }
+  }, [project]);
+
+  // Check if current user is a member or creator
+  const isUserMemberOrCreator = () => {
+    if (!isLoaded || !user) return false;
+
+    // Check if user is the creator
+    if (project?.project_creator?.user_id === user.id) return true;
+
+    // Check if user is a team member
+    return projectMembers.some(
+      (member) => member.userDetails?.user_clerk_id === user.id
+    );
+  };
+
+  if (isLoadingProject) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+            <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-3/4 mb-6"></div>
+            {/* More loading skeleton elements */}
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  // Get all projects
-  const allProjects = await getAllProjects();
-
-  // If allProjects is an error or not an array
-  if (!Array.isArray(allProjects)) {
-    notFound();
-  }
-
-  // Find the specific project by ID
-  const project = allProjects.find((p) => p.project_id === projectId);
-
-  // If project is not found
   if (!project) {
     return notFound();
   }
