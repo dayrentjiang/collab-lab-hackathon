@@ -180,13 +180,26 @@ export const getUserProjectsAsComplete = async (userId: string) => {
 
 //get all member of a project
 export const getProjectMembers = async (projectId: string) => {
+  console.log("Fetching project members:", projectId);
   try {
     const { data: projectMembers } = await supabase
       .from("user_projects")
-      .select("*, user:users(*)")
+      .select("*")
       .eq("project_id", projectId);
 
-    return projectMembers;
+    if (!projectMembers) {
+      throw new Error("No project members found");
+    }
+
+    // for each project member get the user details using getUserByClerkId
+    const membersWithDetails = await Promise.all(
+      projectMembers.map(async (projectMember) => {
+        const userDetails = await getUserByClerkId(projectMember.user_id);
+        return { ...projectMember, userDetails };
+      })
+    );
+    console.log("Fetched project members:", membersWithDetails);
+    return membersWithDetails;
   } catch (error) {
     console.error("[GET_PROJECT_MEMBERS]", error);
     throw new Error("Failed to fetch project members");

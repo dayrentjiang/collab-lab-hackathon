@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Link from 'next/link';
+import Link from "next/link";
 import {
   getUserProjectsAsCreator,
   getUserProjectsAsMember
@@ -137,11 +137,11 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ userId }) => {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             {activeTab === "created" ? (
               <>
-              <Link href="/projects/create">
-  <button className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition flex items-center justify-center">
-    <span>Create New Project</span>
-  </button>
-</Link>
+                <Link href="/projects/create">
+                  <button className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition flex items-center justify-center">
+                    <span>Create New Project</span>
+                  </button>
+                </Link>
                 <button
                   className="px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition flex items-center justify-center"
                   onClick={() => (window.location.href = "/")}
