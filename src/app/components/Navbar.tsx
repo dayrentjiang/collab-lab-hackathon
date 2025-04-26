@@ -190,7 +190,7 @@ export default function Navbar() {
             </Link>
             <SignedIn>
               <Link
-                href="/dashboard"
+                href="/applications"
                 className={`block pl-3 pr-4 py-2 text-base font-medium ${
                   isActive("/dashboard")
                     ? "bg-blue-50 border-l-4 border-blue-500 text-blue-700"
@@ -198,7 +198,7 @@ export default function Navbar() {
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Dashboard
+                Applications
               </Link>
               <Link
                 href="/messages"
@@ -210,6 +210,17 @@ export default function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Messages
+              </Link>
+              <Link
+                href="/collablabai"
+                className={`block pl-3 pr-4 py-2 text-base font-medium ${
+                  isActive("/projects/create")
+                    ? "bg-blue-50 border-l-4 border-blue-500 text-blue-700"
+                    : "border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800"
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Ask AI
               </Link>
               <Link
                 href="/projects/create"
