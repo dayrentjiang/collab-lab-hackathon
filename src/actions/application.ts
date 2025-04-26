@@ -78,7 +78,7 @@ export async function getUserApplications(userId: string) {
     }
 
     // Then, get all related projects in a single query
-    const projectIds = applications.map(app => app.project_id);
+    const projectIds = applications.map((app) => app.project_id);
     const { data: projects, error: projectsError } = await supabase
       .from("projects")
       .select("*")
@@ -90,9 +90,11 @@ export async function getUserApplications(userId: string) {
     }
 
     // Combine the data
-    const applicationsWithProjects = applications.map(application => ({
+    const applicationsWithProjects = applications.map((application) => ({
       ...application,
-      project: projects?.find(project => project.project_id === application.project_id)
+      project: projects?.find(
+        (project) => project.project_id === application.project_id
+      )
     }));
 
     return applicationsWithProjects;
@@ -224,6 +226,26 @@ export async function getApplicationsByProjectId(projectId: number) {
     return applicationsWithUserData;
   } catch (error) {
     console.error("Error fetching applications by project ID:", error);
+    throw error;
+  }
+}
+
+// get all applications by user id to show the user their applications
+export async function getApplicationsByUserId(userId: string) {
+  try {
+    const { data: applications, error } = await supabase
+      .from("applications")
+      .select("*")
+      .eq("user_id", userId);
+
+    if (error) {
+      console.error("Error fetching applications by user ID:", error);
+      throw error;
+    }
+
+    return applications;
+  } catch (error) {
+    console.error("Error fetching applications by user ID:", error);
     throw error;
   }
 }

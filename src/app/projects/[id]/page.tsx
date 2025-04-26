@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Clock, Users, Tag } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useUser } from "@clerk/nextjs"; // Import useUser hook
 
 // Define Project interface based on the properties used in the component
 interface Project {
@@ -35,6 +36,7 @@ export default function ProjectDetailPage({
   const [projectMembers, setProjectMembers] = useState<any[]>([]);
   const [isLoadingMembers, setIsLoadingMembers] = useState(true);
   const [isLoadingProject, setIsLoadingProject] = useState(true);
+  const { isLoaded, user } = useUser();
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -94,6 +96,19 @@ export default function ProjectDetailPage({
     }
   }, [project]);
 
+  // Check if current user is a member or creator
+  const isUserMemberOrCreator = () => {
+    if (!isLoaded || !user) return false;
+
+    // Check if user is the creator
+    if (project?.project_creator?.user_id === user.id) return true;
+
+    // Check if user is a team member
+    return projectMembers.some(
+      (member) => member.userDetails?.user_clerk_id === user.id
+    );
+  };
+
   if (isLoadingProject) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -146,6 +161,10 @@ export default function ProjectDetailPage({
         return "bg-gray-100 text-gray-800";
     }
   };
+
+  // Check if the user should see the Apply button
+  const showApplyButton =
+    project.project_status === "recruiting" && !isUserMemberOrCreator();
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -320,7 +339,7 @@ export default function ProjectDetailPage({
                   </div>
                 )}
 
-                {project.project_status === "recruiting" && (
+                {showApplyButton ? (
                   <div className="mt-4">
                     <Link
                       href={`/projects/${project.project_id}/apply`}
@@ -329,13 +348,17 @@ export default function ProjectDetailPage({
                       Apply to Join
                     </Link>
                   </div>
-                )}
-
-                {project.project_status === "in_progress" && (
-                  <div className="bg-yellow-50 p-3 rounded-md text-sm text-yellow-800 mt-4">
-                    This project is already in progress. Applications are
-                    currently closed.
+                ) : isUserMemberOrCreator() ? (
+                  <div className="bg-green-50 p-3 rounded-md text-sm text-green-800 mt-4">
+                    You are part of this project team.
                   </div>
+                ) : (
+                  project.project_status === "in_progress" && (
+                    <div className="bg-yellow-50 p-3 rounded-md text-sm text-yellow-800 mt-4">
+                      This project is already in progress. Applications are
+                      currently closed.
+                    </div>
+                  )
                 )}
 
                 {project.project_status === "completed" && (
@@ -406,7 +429,7 @@ export default function ProjectDetailPage({
                 </p>
 
                 <div className="flex flex-wrap gap-3">
-                  {project.project_status === "recruiting" && (
+                  {showApplyButton && (
                     <Link
                       href={`/projects/${project.project_id}/apply`}
                       className="px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 transition-colors"

@@ -22,11 +22,12 @@ export default async function Home({
   }>;
 
   // Filter projects by category if needed
-  const filteredProjects = category
-    ? projects.filter((project) =>
-        project.skills?.some((skill) => skill.skill_category === category)
-      )
-    : projects;
+
+  //only show projec that do not have complete status
+  const filteredProjects = projects.filter(
+    (project) => project.project_status !== "completed"
+  );
+  console.log(filteredProjects);
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -66,6 +67,8 @@ export default async function Home({
             ? `${category.charAt(0).toUpperCase() + category.slice(1)} Projects`
             : "All Projects"}
         </h2>
+
+        {/* //only pass project with status !completed */}
 
         <FilteredProjectGrid projects={filteredProjects} />
       </section>
