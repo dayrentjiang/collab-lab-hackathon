@@ -359,212 +359,17 @@ export default function UserProjectCard({ project, onUpdate }: UserProjectCardPr
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-300 relative">
-      {/* Edit Button next to Delete Button */}
-      <button
-        onClick={() => setShowEditModal(true)}
-        className="absolute top-2 right-8 text-gray-400 hover:text-blue-500 z-10"
-        title="Edit Project"
-      >
-        <Pencil className="h-5 w-5" />
-      </button>
-
-      {/* Edit Modal */}
-      {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center px-6 py-4 bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
-              <h3 className="text-xl font-semibold text-gray-900">
-                Edit Project
-              </h3>
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="text-gray-400 hover:text-gray-500"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Project Title
-                </label>
-                <input
-                  type="text"
-                  value={editFormData.project_title}
-                  onChange={(e) => setEditFormData({...editFormData, project_title: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Project Description
-                </label>
-                <textarea
-                  value={editFormData.project_description}
-                  onChange={(e) => setEditFormData({...editFormData, project_description: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  rows={4}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Project Status
-                </label>
-                <select
-                  value={editFormData.project_status}
-                  onChange={(e) => setEditFormData({...editFormData, project_status: e.target.value as "recruiting" | "in_progress" | "completed"})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="recruiting">Recruiting</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="completed">Completed</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Vacancy
-                </label>
-                <input
-                  type="number"
-                  value={editFormData.project_vacancy}
-                  onChange={(e) => setEditFormData({...editFormData, project_vacancy: parseInt(e.target.value)})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Timeline
-                </label>
-                <select
-                  value={editFormData.project_timeline}
-                  onChange={(e) => setEditFormData({...editFormData, project_timeline: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="">Select Timeline</option>
-                  <option value="1-2 weeks">1-2 weeks</option>
-                  <option value="3-4 weeks">3-4 weeks</option>
-                  <option value="1-2 months">1-2 months</option>
-                  <option value="3-6 months">3-6 months</option>
-                  <option value="6+ months">6+ months</option>
-                </select>
-              </div>
-
-              {/* Skills Section */}
-              <div>
-                <AddSkill
-                  skills={availableSkills}
-                  selectedSkills={selectedSkills}
-                  onSkillToggle={handleSkillToggle}
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 mt-6">
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                disabled={isEditing}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleEditProject}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center"
-                disabled={isEditing}
-              >
-                {isEditing ? (
-                  <>
-                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Pencil className="h-4 w-4 mr-1" />
-                    Save Changes
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Button at the top right */}
-      <button
-        onClick={() => setShowDeleteConfirm(true)}
-        className="absolute top-2 right-2 text-gray-400 hover:text-red-500 z-10"
-        title="Delete Project"
-      >
-        <Trash2 className="h-5 w-5" />
-      </button>
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Delete Project
-              </h3>
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                className="text-gray-400 hover:text-gray-500"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <p className="mb-6 text-gray-600">
-              Are you sure you want to delete this project? This action cannot
-              be undone and all project data will be permanently lost.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                disabled={isDeleting}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteProject}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 flex items-center"
-                disabled={isDeleting}
-              >
-                {isDeleting ? (
-                  <>
-                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Deleting...
-                  </>
-                ) : (
-                  <>
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    Delete Project
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="p-5">
-        <div className="flex justify-between items-start mb-3 mt-4">
-          {" "}
-          {/* Added margin top for delete button space */}
-          <h3 className="text-lg font-semibold text-gray-800 line-clamp-1">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col min-h-[280px]">
+      {/* Top Section with Title and Actions */}
+      <div className="p-5 pb-3 border-b border-gray-100">
+        <div className="flex justify-between items-start gap-4">
+          <h3 className="text-lg font-semibold text-gray-800 line-clamp-2 min-h-[56px] flex-1">
             {project_title}
           </h3>
-          {/* Project Status with Dropdown */}
-          <div className="relative">
+          <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={toggleStatusDropdown}
-              className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor} flex items-center`}
+              className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor} flex items-center whitespace-nowrap`}
               disabled={statusUpdateInProgress}
             >
               {statusUpdateInProgress ? (
@@ -573,58 +378,55 @@ export default function UserProjectCard({ project, onUpdate }: UserProjectCardPr
               {statusDisplayNames[currentStatus] || currentStatus}
               <ChevronDown className="h-3 w-3 ml-1" />
             </button>
-
-            {statusDropdownOpen && (
-              <div className="absolute right-0 mt-1 w-40 bg-white rounded-md shadow-lg z-10 border border-gray-200">
-                <div className="py-1">
-                  {Object.entries(statusDisplayNames).map(([value, label]) => (
-                    <button
-                      key={value}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleStatusChange(value);
-                      }}
-                      className={`${
-                        value === currentStatus
-                          ? "bg-gray-100 text-gray-900"
-                          : "text-gray-700 hover:bg-gray-50"
-                      } block px-4 py-2 text-sm w-full text-left`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowEditModal(true)}
+                className="text-gray-400 hover:text-blue-500 transition-colors"
+                title="Edit Project"
+              >
+                <Pencil className="h-5 w-5" />
+              </button>
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="text-gray-400 hover:text-red-500 transition-colors"
+                title="Delete Project"
+              >
+                <Trash2 className="h-5 w-5" />
+              </button>
+            </div>
           </div>
         </div>
+      </div>
 
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+      {/* Main Content */}
+      <div className="p-5 flex-grow flex flex-col">
+        <p className="text-gray-600 text-sm mb-4 line-clamp-2 min-h-[40px]">
           {project_description}
         </p>
 
         {/* Skills */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap gap-2 mb-4 min-h-[28px]">
           {projectSkills &&
             projectSkills.slice(0, 3).map((skillWrapper) => (
               <span
                 key={skillWrapper.skill_id}
                 className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getSkillCategoryColor(
                   skillWrapper.skills?.skill_category || ""
-                )}`}
+                )} max-w-[120px] truncate inline-flex items-center`}
+                title={skillWrapper.skills?.skill_name || "Unknown"}
               >
                 {skillWrapper.skills?.skill_name || "Unknown"}
               </span>
             ))}
           {projectSkills && projectSkills.length > 3 && (
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 max-w-[100px] truncate inline-flex items-center">
               +{projectSkills.length - 3} more
             </span>
           )}
         </div>
 
         {/* Project Info */}
-        <div className="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-xs text-gray-500">
+        <div className="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-xs text-gray-500 min-h-[20px]">
           {projectCreator && (
             <div className="flex items-center">
               <div className="h-5 w-5 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs mr-1.5">
@@ -655,7 +457,7 @@ export default function UserProjectCard({ project, onUpdate }: UserProjectCardPr
         {/* Action Button */}
         <Link
           href={`/projects/${project_id}`}
-          className="block w-full py-2 bg-blue-500 text-white text-center rounded-full text-sm font-medium hover:bg-blue-600 transition-colors"
+          className="mt-auto block w-full py-2 bg-blue-500 text-white text-center rounded-full text-sm font-medium hover:bg-blue-600 transition-colors"
         >
           {currentStatus === "recruiting"
             ? "View Project"
@@ -665,7 +467,31 @@ export default function UserProjectCard({ project, onUpdate }: UserProjectCardPr
         </Link>
       </div>
 
-      {/* Project Members Section with Toggle */}
+      {/* Status Dropdown */}
+      {statusDropdownOpen && (
+        <div className="absolute right-20 top-12 mt-1 w-40 bg-white rounded-md shadow-lg z-10 border border-gray-200">
+          <div className="py-1">
+            {Object.entries(statusDisplayNames).map(([value, label]) => (
+              <button
+                key={value}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleStatusChange(value);
+                }}
+                className={`${
+                  value === currentStatus
+                    ? "bg-gray-100 text-gray-900"
+                    : "text-gray-700 hover:bg-gray-50"
+                } block px-4 py-2 text-sm w-full text-left`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Project Members Section */}
       <div className="border-t border-gray-200">
         <div
           className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50"
@@ -818,7 +644,7 @@ export default function UserProjectCard({ project, onUpdate }: UserProjectCardPr
         )}
       </div>
 
-      {/* Applications Section with Toggle */}
+      {/* Applications Section */}
       <div className="border-t border-gray-200">
         <div
           className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50"
@@ -937,6 +763,181 @@ export default function UserProjectCard({ project, onUpdate }: UserProjectCardPr
           </div>
         )}
       </div>
+
+      {/* Edit Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center px-6 py-4 bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
+              <h3 className="text-xl font-semibold text-gray-900">
+                Edit Project
+              </h3>
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="text-gray-400 hover:text-gray-500"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Project Title
+                </label>
+                <input
+                  type="text"
+                  value={editFormData.project_title}
+                  onChange={(e) => setEditFormData({...editFormData, project_title: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Project Description
+                </label>
+                <textarea
+                  value={editFormData.project_description}
+                  onChange={(e) => setEditFormData({...editFormData, project_description: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  rows={4}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Project Status
+                </label>
+                <select
+                  value={editFormData.project_status}
+                  onChange={(e) => setEditFormData({...editFormData, project_status: e.target.value as "recruiting" | "in_progress" | "completed"})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                >
+                  <option value="recruiting">Recruiting</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Vacancy
+                </label>
+                <input
+                  type="number"
+                  value={editFormData.project_vacancy}
+                  onChange={(e) => setEditFormData({...editFormData, project_vacancy: parseInt(e.target.value)})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Timeline
+                </label>
+                <select
+                  value={editFormData.project_timeline}
+                  onChange={(e) => setEditFormData({...editFormData, project_timeline: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                >
+                  <option value="">Select Timeline</option>
+                  <option value="1-2 weeks">1-2 weeks</option>
+                  <option value="3-4 weeks">3-4 weeks</option>
+                  <option value="1-2 months">1-2 months</option>
+                  <option value="3-6 months">3-6 months</option>
+                  <option value="6+ months">6+ months</option>
+                </select>
+              </div>
+
+              {/* Skills Section */}
+              <div>
+                <AddSkill
+                  skills={availableSkills}
+                  selectedSkills={selectedSkills}
+                  onSkillToggle={handleSkillToggle}
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 mt-6">
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                disabled={isEditing}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEditProject}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center"
+                disabled={isEditing}
+              >
+                {isEditing ? (
+                  <>
+                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Pencil className="h-4 w-4 mr-1" />
+                    Save Changes
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Delete Project
+              </h3>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="text-gray-400 hover:text-gray-500"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <p className="mb-6 text-gray-600">
+              Are you sure you want to delete this project? This action cannot
+              be undone and all project data will be permanently lost.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteProject}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 flex items-center"
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <>
+                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Delete Project
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -103,11 +103,12 @@ export default function JoinedProjectCard({ project }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-300">
-      <div className="p-5">
-        <div className="flex justify-between items-start mb-3">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col min-h-[280px]">
+      {/* Top Section with Title and Status */}
+      <div className="p-5 pb-3 border-b border-gray-100">
+        <div className="flex justify-between items-start gap-4">
           <div className="flex-1">
-            <h3 className="text-lg font-semibold text-gray-800 line-clamp-1">
+            <h3 className="text-lg font-semibold text-gray-800 line-clamp-2 min-h-[56px]">
               {project_title}
             </h3>
             <div className="text-xs text-gray-500 mt-1">
@@ -115,7 +116,7 @@ export default function JoinedProjectCard({ project }) {
             </div>
           </div>
           <span
-            className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor}`}
+            className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor} whitespace-nowrap`}
           >
             {project_status
               .split("_")
@@ -123,33 +124,37 @@ export default function JoinedProjectCard({ project }) {
               .join(" ")}
           </span>
         </div>
+      </div>
 
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+      {/* Main Content */}
+      <div className="p-5 flex-grow flex flex-col">
+        <p className="text-gray-600 text-sm mb-4 line-clamp-2 min-h-[40px]">
           {project_description}
         </p>
 
         {/* Skills */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap gap-2 mb-4 min-h-[28px]">
           {projectSkills &&
             projectSkills.slice(0, 3).map((skillWrapper) => (
               <span
                 key={skillWrapper.skill_id}
                 className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getSkillCategoryColor(
                   skillWrapper.skills?.skill_category || ""
-                )}`}
+                )} max-w-[120px] truncate inline-flex items-center`}
+                title={skillWrapper.skills?.skill_name || "Unknown"}
               >
                 {skillWrapper.skills?.skill_name || "Unknown"}
               </span>
             ))}
           {projectSkills && projectSkills.length > 3 && (
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 max-w-[100px] truncate inline-flex items-center">
               +{projectSkills.length - 3} more
             </span>
           )}
         </div>
 
         {/* Project Info */}
-        <div className="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-xs text-gray-500">
+        <div className="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-xs text-gray-500 min-h-[20px]">
           {project_creator && (
             <div className="flex items-center">
               <div className="h-5 w-5 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs mr-1.5">
@@ -180,7 +185,7 @@ export default function JoinedProjectCard({ project }) {
         {/* Action Button */}
         <Link
           href={`/projects/${project_id}`}
-          className="block w-full py-2 bg-blue-500 text-white text-center rounded-full text-sm font-medium hover:bg-blue-600 transition-colors"
+          className="mt-auto block w-full py-2 bg-blue-500 text-white text-center rounded-full text-sm font-medium hover:bg-blue-600 transition-colors"
         >
           View Project Details
         </Link>
@@ -272,13 +277,14 @@ export default function JoinedProjectCard({ project }) {
                               .map((skill, index) => (
                                 <span
                                   key={index}
-                                  className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                                  className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 max-w-[120px] truncate inline-flex items-center"
+                                  title={skill.skill_name || "Skill"}
                                 >
                                   {skill.skill_name || "Skill"}
                                 </span>
                               ))}
                             {member.userDetails.skills.length > 3 && (
-                              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                              <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 max-w-[100px] truncate inline-flex items-center">
                                 +{member.userDetails.skills.length - 3} more
                               </span>
                             )}
