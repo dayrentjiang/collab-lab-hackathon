@@ -71,16 +71,6 @@ export default function Navbar() {
                   Applications
                 </Link>
                 <Link
-                  href="/profile"
-                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                    isActive("/profile")
-                      ? "border-blue-500 text-gray-900"
-                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                  }`}
-                >
-                  Profile
-                </Link>
-                <Link
                   href="/collablabai"
                   className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                     isActive("/collablabai")
@@ -97,6 +87,16 @@ export default function Navbar() {
           {/* Right Side Menu */}
           <div className="hidden sm:flex sm:items-center sm:ml-6 space-x-4">
             <SignedIn>
+              <Link
+                href="/profile"
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                  isActive("/profile")
+                    ? "border-blue-500 text-gray-900"
+                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                }`}
+              >
+                Profile
+              </Link>
               {/* Notification */}
               <button className="p-1 rounded-full text-gray-500 hover:text-gray-700 focus:outline-none">
                 <Bell className="h-5 w-5" />
