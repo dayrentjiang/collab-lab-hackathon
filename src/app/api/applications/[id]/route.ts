@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { NextResponse } from "next/server";
+import { supabase } from "@/lib/supabase";
 
 // GET /api/applications/[id]
 export async function GET(
@@ -8,14 +9,14 @@ export async function GET(
 ) {
   try {
     const { data: application, error } = await supabase
-      .from('applications')
-      .select('*')
-      .eq('application_id', params.id)
+      .from("applications")
+      .select("*")
+      .eq("application_id", params.id)
       .single();
 
     if (error || !application) {
       return NextResponse.json(
-        { error: 'Application not found' },
+        { error: "Application not found" },
         { status: 404 }
       );
     }
@@ -23,7 +24,7 @@ export async function GET(
     return NextResponse.json(application);
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to fetch application' },
+      { error: "Failed to fetch application" },
       { status: 500 }
     );
   }
@@ -40,21 +41,21 @@ export async function PUT(
 
     if (!application_msg) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
     const { data: result, error } = await supabase
-      .from('applications')
+      .from("applications")
       .update({ application_msg })
-      .eq('application_id', params.id)
+      .eq("application_id", params.id)
       .select()
       .single();
 
     if (error || !result) {
       return NextResponse.json(
-        { error: 'Application not found' },
+        { error: "Application not found" },
         { status: 404 }
       );
     }
@@ -62,7 +63,7 @@ export async function PUT(
     return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to update application' },
+      { error: "Failed to update application" },
       { status: 500 }
     );
   }
@@ -75,22 +76,22 @@ export async function DELETE(
 ) {
   try {
     const { error } = await supabase
-      .from('applications')
+      .from("applications")
       .delete()
-      .eq('application_id', params.id);
+      .eq("application_id", params.id);
 
     if (error) {
       return NextResponse.json(
-        { error: 'Application not found' },
+        { error: "Application not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ message: 'Application deleted successfully' });
+    return NextResponse.json({ message: "Application deleted successfully" });
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to delete application' },
+      { error: "Failed to delete application" },
       { status: 500 }
     );
   }
-} 
+}

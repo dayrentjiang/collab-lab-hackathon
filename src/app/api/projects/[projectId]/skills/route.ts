@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextResponse } from "next/server";
 import { getProjectSkills, createProjectSkill } from "@/actions/project-skills";
 import { CreateProjectSkillInput } from "@/types/types";
@@ -27,7 +28,7 @@ export async function POST(
     const body = await request.json();
     const input: CreateProjectSkillInput = {
       project_id: Number(projectId),
-      skill_id: Number(body.skill_id),
+      skill_id: Number(body.skill_id)
     };
     const projectSkill = await createProjectSkill(input);
     return NextResponse.json(projectSkill);
@@ -37,4 +38,4 @@ export async function POST(
       { status: 500 }
     );
   }
-} 
+}

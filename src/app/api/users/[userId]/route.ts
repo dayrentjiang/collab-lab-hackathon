@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
-import { hash } from 'bcrypt';
+import { NextResponse } from "next/server";
+import { supabase } from "@/lib/supabase";
+import { hash } from "bcrypt";
 
 // GET /api/users/[userId] - Get a specific user
 export async function GET(
@@ -10,19 +10,24 @@ export async function GET(
   try {
     const { userId } = params;
     const { data: user, error } = await supabase
-      .from('users')
-      .select('user_id, user_email, user_name, user_bio, user_role, user_linkedin_link, user_university, user_clerk_id, has_completed_personalized, created_at, updated_at')
-      .eq('user_id', userId)
+      .from("users")
+      .select(
+        "user_id, user_email, user_name, user_bio, user_role, user_linkedin_link, user_university, user_clerk_id, has_completed_personalized, created_at, updated_at"
+      )
+      .eq("user_id", userId)
       .single();
 
     if (error || !user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     return NextResponse.json(user);
   } catch (error) {
-    console.error('Error fetching user:', error);
-    return NextResponse.json({ error: 'Failed to fetch user' }, { status: 500 });
+    console.error("Error fetching user:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch user" },
+      { status: 500 }
+    );
   }
 }
 
@@ -34,10 +39,21 @@ export async function PATCH(
   try {
     const { userId } = params;
     const body = await req.json();
-    const { user_email, user_password, user_name, user_bio, user_linkedin_link, user_university, user_clerk_id, user_role, has_completed_personalized } = body;
+    const {
+      user_email,
+      user_password,
+      user_name,
+      user_bio,
+      user_linkedin_link,
+      user_university,
+      user_clerk_id,
+      user_role,
+      has_completed_personalized
+    } = body;
 
     // Build update query dynamically based on provided fields
     const updates: string[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const values: any[] = [];
     let paramCount = 1;
 
@@ -91,12 +107,15 @@ export async function PATCH(
     updates.push(`updated_at = NOW()`);
 
     if (updates.length === 0) {
-      return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
+      return NextResponse.json(
+        { error: "No fields to update" },
+        { status: 400 }
+      );
     }
 
     values.push(userId);
     const { data: result, error } = await supabase
-      .from('users')
+      .from("users")
       .update({
         ...(user_email && { user_email }),
         ...(user_password && { user_password: await hash(user_password, 10) }),
@@ -106,21 +125,26 @@ export async function PATCH(
         ...(user_university && { user_university }),
         ...(user_clerk_id && { user_clerk_id }),
         ...(user_role && { user_role }),
-        ...(has_completed_personalized !== undefined && { has_completed_personalized }),
+        ...(has_completed_personalized !== undefined && {
+          has_completed_personalized
+        }),
         updated_at: new Date().toISOString()
       })
-      .eq('user_id', userId)
+      .eq("user_id", userId)
       .select()
       .single();
 
     if (error || !result) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error updating user:', error);
-    return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
+    console.error("Error updating user:", error);
+    return NextResponse.json(
+      { error: "Failed to update user" },
+      { status: 500 }
+    );
   }
 }
 
@@ -132,17 +156,20 @@ export async function DELETE(
   try {
     const { userId } = params;
     const { error } = await supabase
-      .from('users')
+      .from("users")
       .delete()
-      .eq('user_id', userId);
+      .eq("user_id", userId);
 
     if (error) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ message: 'User deleted successfully' });
+    return NextResponse.json({ message: "User deleted successfully" });
   } catch (error) {
-    console.error('Error deleting user:', error);
-    return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 });
+    console.error("Error deleting user:", error);
+    return NextResponse.json(
+      { error: "Failed to delete user" },
+      { status: 500 }
+    );
   }
-} 
+}

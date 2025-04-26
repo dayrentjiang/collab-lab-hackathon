@@ -1,5 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextResponse } from "next/server";
-import { updateProjectSkill, deleteProjectSkill } from "@/actions/project-skills";
+import {
+  updateProjectSkill,
+  deleteProjectSkill
+} from "@/actions/project-skills";
 import { UpdateProjectSkillInput } from "@/types/types";
 
 export async function PUT(
@@ -9,7 +13,7 @@ export async function PUT(
   try {
     const body = await request.json();
     const input: UpdateProjectSkillInput = {
-      skill_id: body.skill_id,
+      skill_id: body.skill_id
     };
     const projectSkill = await updateProjectSkill(params.id, input);
     return NextResponse.json(projectSkill);
@@ -34,4 +38,4 @@ export async function DELETE(
       { status: 500 }
     );
   }
-} 
+}

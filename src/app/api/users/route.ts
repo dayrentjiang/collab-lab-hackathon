@@ -35,9 +35,7 @@ export async function POST(req: Request) {
       user_university,
       user_role,
       user_clerk_id,
-      has_completed_personalized,
-      user_clerk_id,
-      has_completed_personalized,
+      has_completed_personalized
     } = body;
 
     // Check if user already exists
@@ -69,7 +67,7 @@ export async function POST(req: Request) {
         user_university,
         user_role,
         user_clerk_id,
-        has_completed_personalized,
+        has_completed_personalized
       })
       .select()
       .single();

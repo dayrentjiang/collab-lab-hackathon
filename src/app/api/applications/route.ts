@@ -1,12 +1,13 @@
-import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { NextResponse } from "next/server";
+import { supabase } from "@/lib/supabase";
 
 // GET /api/applications
 export async function GET() {
   try {
     const { data: applications, error } = await supabase
-      .from('applications')
-      .select('*');
+      .from("applications")
+      .select("*");
 
     if (error) {
       throw error;
@@ -15,7 +16,7 @@ export async function GET() {
     return NextResponse.json(applications);
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to fetch applications' },
+      { error: "Failed to fetch applications" },
       { status: 500 }
     );
   }
@@ -30,13 +31,13 @@ export async function POST(request: Request) {
     // Validate required fields
     if (!project_id || !user_id || !application_msg) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
     const { data: result, error } = await supabase
-      .from('applications')
+      .from("applications")
       .insert({ project_id, user_id, application_msg })
       .select()
       .single();
@@ -48,8 +49,8 @@ export async function POST(request: Request) {
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to create application' },
+      { error: "Failed to create application" },
       { status: 500 }
     );
   }
-} 
+}
