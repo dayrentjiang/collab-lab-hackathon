@@ -45,7 +45,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section */}
-      <section className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mb-12 mt-6 mx-4 sm:mx-8 lg:mx-auto max-w-7xl">
+      <section className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mb-12 mx-4 sm:mx-8 lg:mx-auto max-w-7xl">
         <div className="max-w-3xl">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
             Find Your Next Collaboration
