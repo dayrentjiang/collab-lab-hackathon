@@ -51,7 +51,9 @@ export default function Home() {
             Find Your Next Collaboration
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-          Turn your ideas into reality. Whether you have skills to offer or ideas to share, CollabLab connects you with the right people and projects. Build, collaborate, and grow your skills together.
+            Turn your ideas into reality. Whether you have skills to offer or
+            ideas to share, CollabLab connects you with the right people and
+            projects. Build, collaborate, and grow your skills together.
           </p>
           <div className="flex flex-wrap gap-4">
             <Link
@@ -75,7 +77,7 @@ export default function Home() {
       {/* Recommended Projects */}
       <section className="mb-12 mx-4 sm:mx-8 lg:mx-auto max-w-7xl">
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8">
-          All Projects
+          All Available Projects
         </h2>
 
         {loading ? (
