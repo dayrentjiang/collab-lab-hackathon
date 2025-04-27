@@ -1,24 +1,46 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { getAllProjects } from "../actions/project";
 import FilteredProjectGrid from "./components/FilteredProjectGrid";
 import { PlusIcon, SearchIcon } from "lucide-react";
 import { ProjectWithRelations } from "../types/types";
 
-export default async function Home() {
-  // Fetch all projects with their skills
-  const projects = (await getAllProjects()) as ProjectWithRelations[];
+export default function Home() {
+  const [filteredProjects, setFilteredProjects] = useState<
+    ProjectWithRelations[]
+  >([]);
+  const [loading, setLoading] = useState(true);
 
-  // Sort projects by created_at in descending order (newest first)
-  const sortedProjects = projects.sort(
-    (a, b) =>
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  );
+  useEffect(() => {
+    async function fetchProjects() {
+      try {
+        setLoading(true);
+        // Fetch all projects with their skills
+        const projects = (await getAllProjects()) as ProjectWithRelations[];
 
-  // Only show projects that are not completed
-  const filteredProjects = sortedProjects.filter(
-    (project) => project.project_status !== "completed"
-  );
+        // Sort projects by created_at in descending order (newest first)
+        const sortedProjects = projects.sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+
+        // Only show projects that are not completed
+        const filtered = sortedProjects.filter(
+          (project) => project.project_status !== "completed"
+        );
+
+        setFilteredProjects(filtered);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProjects();
+  }, []);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -57,7 +79,13 @@ export default async function Home() {
           All Projects
         </h2>
 
-        <FilteredProjectGrid projects={filteredProjects} />
+        {loading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : (
+          <FilteredProjectGrid projects={filteredProjects} />
+        )}
       </section>
     </main>
   );
