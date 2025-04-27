@@ -51,7 +51,7 @@ export default function Home() {
             Find Your Next Collaboration
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-          Turn your ideas into reality. Whether you're a coder, designer, or just full of big dreams, CollabLab connects you with the right people and projects. Build, collaborate, and grow your skills together.
+          Turn your ideas into reality. Whether you have skills to offer or ideas to share, CollabLab connects you with the right people and projects. Build, collaborate, and grow your skills together.
           </p>
           <div className="flex flex-wrap gap-4">
             <Link
